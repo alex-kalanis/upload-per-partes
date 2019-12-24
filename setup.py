@@ -16,6 +16,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/alex-kalanis/upload-per-partes',
     install_require=[
+        'base64',
         'hashlib',
     ],
     packages=find_packages(),

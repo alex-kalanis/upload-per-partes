@@ -21,7 +21,7 @@ class AResponse:
         self._error_message = self.STATUS_OK
         self._status = self.STATUS_OK
 
-    def get_result(self):
+    def get_result(self) -> dict:
         raise NotImplementedError('TBI')
 
 
@@ -44,7 +44,7 @@ class CancelResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "driver": str(self._shared_key),
             "status": str(self._status),
@@ -76,7 +76,7 @@ class CheckResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "driver": str(self._shared_key),
             "checksum": str(self._checksum),
@@ -123,7 +123,7 @@ class DoneResponse(AResponse):
     def get_file_name(self) -> str:
         return self._data.file_name
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "name": str(self._data.file_name),
             "driver": str(self._shared_key),
@@ -164,7 +164,7 @@ class InitResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "name": str(self._data.file_name),
             "driver": str(self._shared_key),
@@ -195,7 +195,7 @@ class TruncateResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "driver": str(self._shared_key),
             "status": str(self._status),
@@ -223,7 +223,7 @@ class UploadResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_result(self):
+    def get_result(self) -> dict:
         return {
             "driver": str(self._shared_key),
             "status": str(self._status),

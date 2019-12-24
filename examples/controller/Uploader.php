@@ -117,7 +117,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
                 UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));
-        } catch (Lib\Video\UploadException $ex) {
+        } catch (Lib\Content\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('driver'),
                 UploadPerPartes\DriveFile\Data::init(),
