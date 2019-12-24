@@ -1,0 +1,93 @@
+<?php
+
+namespace UploadPerPartes;
+
+/**
+ * Class Translations
+ * @package UploadPerPartes
+ * Return translated quotes from backend
+ * - necessary due many translation systems through web
+ * For work extends this class and pass extension into your project
+ */
+class Translations
+{
+    public static function init(): Translations
+    {
+        return new static();
+    }
+
+    public function driveFileAlreadyExists(): string
+    {
+        return 'DRIVEFILE ALREADY EXISTS';
+    }
+
+    public function driveFileNotContinuous(): string
+    {
+        return 'DRIVEFILE IS NOT CONTINUOUS';
+    }
+
+    public function driveFileCannotRemove(): string
+    {
+        return 'DRIVEFILE CANNOT BE REMOVED';
+    }
+
+    public function driveFileVariantNotSet(): string
+    {
+        return 'DRIVEFILE VARIANT NOT SET';
+    }
+
+    public function driveFileCannotRead(): string
+    {
+        return 'CANNOT READ DRIVEFILE';
+    }
+
+    public function driveFileCannotWrite(): string
+    {
+        return 'CANNOT WRITE DRIVEFILE';
+    }
+
+    public function cannotRemoveData(): string
+    {
+        return 'CANNOT REMOVE DATA';
+    }
+
+    public function readTooEarly(): string
+    {
+        return 'READ TOO EARLY';
+    }
+
+    public function differentFileSizes(): string
+    {
+        return 'DIFFERENT FILE SIZES';
+    }
+
+    public function cannotOpenFile(): string
+    {
+        return 'CANNOT OPEN FILE';
+    }
+
+    public function cannotSeekFile(): string
+    {
+        return 'CANNOT SEEK FILE';
+    }
+
+    public function cannotWriteFile(): string
+    {
+        return 'CANNOT WRITE FILE';
+    }
+
+    public function cannotTruncateFile(): string
+    {
+        return 'FILE CANNOT TRUNCATE';
+    }
+
+    public function segmentOutOfBounds(): string
+    {
+        return 'SEGMENT OUT OF BOUNDS';
+    }
+
+    public function segmentNotUploadedYet(): string
+    {
+        return 'SEGMENT NOT UPLOADED YET';
+    }
+}
