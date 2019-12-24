@@ -158,10 +158,10 @@ class Upload
             $this->driver->create($dataPack);
             return Response\InitResponse::initBegin($sharedKey, $dataPack);
 
-        } catch (Exceptions\ContinuityUploadException $e) { // navazani na predchozi?
+        } catch (Exceptions\ContinuityUploadException $e) { // continue from previous?
             return $this->partesContinuity($fileName, $tempName, $length, $partsCounter);
 
-        } catch (Exceptions\UploadException $e) { // obecne neco spatne
+        } catch (Exceptions\UploadException $e) { // something bad happen
             return Response\InitResponse::initError($sharedKey, DriveFile\Data::init()->setData(
                 $fileName, $tempName, $length, $partsCounter, $this->bytesPerPart, 0
             ), $e);
@@ -235,7 +235,7 @@ class Upload
         $sharedKey = $this->getSharedName($fileName);
         try {
             $data = $this->driver->read();
-            if ($length != $data->fileSize) { // rozdilna velikost
+            if ($length != $data->fileSize) { // different size
                 $data->fileName = $fileName; // failed name
                 return Response\InitResponse::initContinueFail(
                     $sharedKey,
@@ -245,7 +245,7 @@ class Upload
             }
             return Response\InitResponse::initContinue($sharedKey, $data);
 
-        } catch (Exceptions\UploadException $e) { // chcip na pokracovani
+        } catch (Exceptions\UploadException $e) { // dead on continue
             return Response\InitResponse::initError($sharedKey, DriveFile\Data::init()->setData(
                 $fileName, $tempName, $length, $partsCounter, $this->bytesPerPart, 0
             ), $e);

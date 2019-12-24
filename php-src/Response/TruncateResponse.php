@@ -11,13 +11,6 @@ use Exception;
  */
 class TruncateResponse extends AResponse
 {
-    const STATUS_OK = 'OK';
-    const STATUS_FAIL = 'FAIL';
-
-    protected $sharedKey = '';
-    protected $errorMessage = self::STATUS_OK;
-    protected $status = self::STATUS_OK;
-
     public static function initOk(string $sharedKey): TruncateResponse
     {
         $l = new static();

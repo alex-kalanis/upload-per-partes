@@ -12,16 +12,9 @@ use Exception;
  */
 class DoneResponse extends AResponse
 {
-    const STATUS_OK = 'OK';
-    const STATUS_FAIL = 'FAIL';
-    const STATUS_COMPLETE = 'COMPLETE';
-
     /** @var null|DriveFile\Data */
     protected $data = null;
-    protected $sharedKey = '';
     protected $targetPath = '';
-    protected $errorMessage = self::STATUS_OK;
-    protected $status = self::STATUS_OK;
 
     public static function initDone(string $sharedKey, string $targetPath, DriveFile\Data $data): DoneResponse
     {

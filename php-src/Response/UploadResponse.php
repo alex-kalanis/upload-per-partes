@@ -11,14 +11,6 @@ use Exception;
  */
 class UploadResponse extends AResponse
 {
-    const STATUS_OK = 'OK';
-    const STATUS_FAIL = 'FAIL';
-    const STATUS_COMPLETE = 'COMPLETE';
-
-    protected $sharedKey = '';
-    protected $errorMessage = self::STATUS_OK;
-    protected $status = self::STATUS_OK;
-
     public static function initOK(string $sharedKey): UploadResponse
     {
         $l = new static();

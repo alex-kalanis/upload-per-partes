@@ -11,13 +11,6 @@ use Exception;
  */
 class CancelResponse extends AResponse
 {
-    const STATUS_OK = 'OK';
-    const STATUS_FAIL = 'FAIL';
-
-    protected $sharedKey = '';
-    protected $errorMessage = self::STATUS_OK;
-    protected $status = self::STATUS_OK;
-
     public static function initCancel(string $sharedKey): CancelResponse
     {
         $l = new static();

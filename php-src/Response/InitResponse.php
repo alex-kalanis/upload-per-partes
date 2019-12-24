@@ -12,17 +12,8 @@ use Exception;
  */
 class InitResponse extends AResponse
 {
-    const STATUS_OK = 'OK';
-    const STATUS_BEGIN = 'BEGIN';
-    const STATUS_FAIL = 'FAIL';
-    const STATUS_CONTINUE = 'CONTINUE';
-    const STATUS_FAILED_CONTINUE = 'FAILED_CONTINUE';
-
     /** @var null|DriveFile\Data */
     protected $data = null;
-    protected $sharedKey = '';
-    protected $errorMessage = self::STATUS_OK;
-    protected $status = self::STATUS_OK;
 
     public static function initBegin(string $sharedKey, DriveFile\Data $data): InitResponse
     {
