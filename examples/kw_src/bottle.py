@@ -27,7 +27,7 @@ def begin():
         ).get_result()
     except UploadException as ex:
         return InitResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
             UploadData(),
             ex
         ).get_result()
@@ -36,13 +36,13 @@ def begin():
 @app.post('/uploader/check')
 def check():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
         return lib.partes_check(
             int(bottle.request.forms.get('segment'))
         ).get_result()
     except UploadException as ex:
         return CheckResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
             ex
         ).get_result()
 
@@ -50,13 +50,14 @@ def check():
 @app.post('/uploader/part')
 def part():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
         return lib.partes_upload(
             bytearray(base64.b64decode(bottle.request.forms.get('content')))
         ).get_result()
     except UploadException as ex:
         return UploadResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result()
 
@@ -64,13 +65,14 @@ def part():
 @app.post('/uploader/truncate')
 def truncate():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
         return lib.partes_truncate_from(
             int(bottle.request.forms.get('segment'))
         ).get_result()
     except UploadException as ex:
         return TruncateResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result()
 
@@ -78,11 +80,11 @@ def truncate():
 @app.post('/uploader/cancel')
 def cancel():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
         return lib.partes_cancel().get_result()
     except UploadException as ex:
         return CancelResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
             ex
         ).get_result()
 
@@ -90,7 +92,7 @@ def cancel():
 @app.post('/uploader/done')
 def done():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
         result = lib.partes_done()
         # check uploaded content and move it on drive
         print([result.get_target_file(), result.get_file_name()])
@@ -98,7 +100,7 @@ def done():
         return result.get_result()
     except UploadException as ex:
         return DoneResponse.init_error(
-            bottle.request.forms.get('driver'),
+            bottle.request.forms.get('sharedKey'),
             UploadData(),
             ex
         ).get_result()

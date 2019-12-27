@@ -24,7 +24,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
             ));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\InitResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));
@@ -35,12 +35,12 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         try {
             $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('driver')
+                $this->getHttpRequest()->getPost()->__get('sharedKey')
             );
             $this->sendResponse($lib->partesCheck((int)$this->getHttpRequest()->getPost()->__get('segment')));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\CheckResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 $ex
             ));
         }
@@ -50,14 +50,15 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         try {
             $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('driver')
+                $this->getHttpRequest()->getPost()->__get('sharedKey')
             );
             $this->sendResponse($lib->partesUpload(
                 base64_decode($this->getHttpRequest()->getPost()->__get('content'))
             ));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\UploadResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
+                UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));
         }
@@ -67,12 +68,13 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         try {
             $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('driver')
+                $this->getHttpRequest()->getPost()->__get('sharedKey')
             );
             $this->sendResponse($lib->partesTruncateFrom($this->getHttpRequest()->getPost()->__get('segment')));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\TruncateResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
+                UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));
         }
@@ -82,12 +84,12 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         try {
             $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('driver')
+                $this->getHttpRequest()->getPost()->__get('sharedKey')
             );
             $this->sendResponse($lib->partesCancel());
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\CancelResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 $ex
             ));
         }
@@ -97,7 +99,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         try {
             $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('driver')
+                $this->getHttpRequest()->getPost()->__get('sharedKey')
             );
             $result = $lib->partesDone();
 
@@ -113,13 +115,13 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
 
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));
         } catch (Lib\Content\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
-                $this->getHttpRequest()->getPost()->__get('driver'),
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 UploadPerPartes\DriveFile\Data::init(),
                 $ex
             ));

@@ -15,28 +15,16 @@ class InitResponse extends AResponse
     /** @var null|DriveFile\Data */
     protected $data = null;
 
-    public static function initBegin(string $sharedKey, DriveFile\Data $data): InitResponse
+    public static function initOk(string $sharedKey, DriveFile\Data $data): InitResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, $data, static::STATUS_BEGIN);
-    }
-
-    public static function initContinue(string $sharedKey, DriveFile\Data $data): InitResponse
-    {
-        $l = new static();
-        return $l->setData($sharedKey, $data, static::STATUS_CONTINUE);
+        return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
     public static function initError(string $sharedKey, DriveFile\Data $data, Exception $ex): InitResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
-    }
-
-    public static function initContinueFail(string $sharedKey, DriveFile\Data $data, string $message): InitResponse
-    {
-        $l = new static();
-        return $l->setData($sharedKey, $data, static::STATUS_FAILED_CONTINUE, $message);
     }
 
     public function setData(string $sharedKey, DriveFile\Data $data, string $status, string $errorMessage = self::STATUS_OK)
@@ -52,7 +40,7 @@ class InitResponse extends AResponse
     {
         return [
             "name" => (string)$this->data->fileName,
-            "driver" => (string)$this->sharedKey,
+            "sharedKey" => (string)$this->sharedKey,
             "totalParts" => (int)$this->data->partsCount,
             "lastKnownPart" => (int)$this->data->lastKnownPart,
             "partSize" => (int)$this->data->bytesPerPart,

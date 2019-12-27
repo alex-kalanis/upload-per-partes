@@ -20,7 +20,7 @@ class CommonTestClass(unittest.TestCase):
     def _mock_data(self) -> UploadData:
         return UploadData().set_data(
             'abcdef',
-            'abcdef',
+            self._get_test_dir() + 'abcdef',
             123456,
             12,
             64,

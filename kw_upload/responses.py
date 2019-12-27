@@ -10,10 +10,6 @@ class AResponse:
 
     STATUS_OK = 'OK'
     STATUS_FAIL = 'FAIL'
-    STATUS_COMPLETE = 'COMPLETE'
-    STATUS_BEGIN = 'BEGIN'
-    STATUS_CONTINUE = 'CONTINUE'
-    STATUS_FAILED_CONTINUE = 'FAILED_CONTINUE'
 
     def __init__(self):
         super().__init__()
@@ -46,7 +42,7 @@ class CancelResponse(AResponse):
 
     def get_result(self) -> dict:
         return {
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
             "status": str(self._status),
             "errorMessage": str(self._error_message),
         }
@@ -78,7 +74,7 @@ class CheckResponse(AResponse):
 
     def get_result(self) -> dict:
         return {
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
             "checksum": str(self._checksum),
             "status": str(self._status),
             "errorMessage": str(self._error_message),
@@ -93,32 +89,29 @@ class DoneResponse(AResponse):
     def __init__(self):
         super().__init__()
         self._data = None
-        self._target_path = ''
 
     @staticmethod
-    def init_done(shared_key: str, target_path: str, data: UploadData):
-        return DoneResponse().set_data(shared_key, data, target_path, AResponse.STATUS_COMPLETE)
+    def init_done(shared_key: str, data: UploadData):
+        return DoneResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
     def init_error(shared_key: str, data: UploadData, ex: PortException):
-        return DoneResponse().set_data(shared_key, data, '', AResponse.STATUS_FAIL, ex.get_message())
+        return DoneResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
 
     def set_data(self,
                  shared_key: str,
                  data: UploadData,
-                 target_path: str,
                  status: str,
                  error_message: str = AResponse.STATUS_OK
                  ):
         self._shared_key = shared_key
-        self._target_path = target_path
         self._data = data
         self._status = status
         self._error_message = error_message
         return self
 
     def get_target_file(self) -> str:
-        return self._target_path + self._data.temp_name
+        return self._data.temp_path
 
     def get_file_name(self) -> str:
         return self._data.file_name
@@ -126,7 +119,7 @@ class DoneResponse(AResponse):
     def get_result(self) -> dict:
         return {
             "name": str(self._data.file_name),
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
             "status": str(self._status),
             "errorMessage": str(self._error_message),
         }
@@ -142,20 +135,12 @@ class InitResponse(AResponse):
         self._data = None
 
     @staticmethod
-    def init_begin(shared_key: str, data: UploadData):
-        return InitResponse().set_data(shared_key, data, AResponse.STATUS_BEGIN)
-
-    @staticmethod
-    def init_continue(shared_key: str, data: UploadData):
-        return InitResponse().set_data(shared_key, data, AResponse.STATUS_CONTINUE)
+    def init_ok(shared_key: str, data: UploadData):
+        return InitResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
     def init_error(shared_key: str, data: UploadData, ex: PortException):
         return InitResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
-
-    @staticmethod
-    def init_continue_fail(shared_key: str, data: UploadData, message: str):
-        return InitResponse().set_data(shared_key, data, AResponse.STATUS_FAILED_CONTINUE, message)
 
     def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
@@ -167,7 +152,7 @@ class InitResponse(AResponse):
     def get_result(self) -> dict:
         return {
             "name": str(self._data.file_name),
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
             "totalParts": int(self._data.parts_count),
             "lastKnownPart": int(self._data.last_known_part),
             "partSize": int(self._data.bytes_per_part),
@@ -181,23 +166,29 @@ class TruncateResponse(AResponse):
      * Responses sent during file truncation
     """
 
-    @staticmethod
-    def init_ok(shared_key: str):
-        return TruncateResponse().set_data(shared_key, AResponse.STATUS_OK)
+    def __init__(self):
+        super().__init__()
+        self._data = None
 
     @staticmethod
-    def init_error(shared_key: str, ex: PortException):
-        return TruncateResponse().set_data(shared_key, AResponse.STATUS_FAIL, ex.get_message())
+    def init_ok(shared_key: str, data: UploadData):
+        return TruncateResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
-    def set_data(self, shared_key: str, status: str, error_message: str = AResponse.STATUS_OK):
+    @staticmethod
+    def init_error(shared_key: str, data: UploadData, ex: PortException):
+        return TruncateResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
+
+    def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
+        self._data = data
         self._status = status
         self._error_message = error_message
         return self
 
     def get_result(self) -> dict:
         return {
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
+            "lastKnownPart": int(self._data.last_known_part),
             "status": str(self._status),
             "errorMessage": str(self._error_message),
         }
@@ -205,27 +196,29 @@ class TruncateResponse(AResponse):
 
 class UploadResponse(AResponse):
 
-    @staticmethod
-    def init_ok(shared_key: str):
-        return UploadResponse().set_data(shared_key, AResponse.STATUS_OK)
+    def __init__(self):
+        super().__init__()
+        self._data = None
 
     @staticmethod
-    def init_error(shared_key: str, ex: PortException):
-        return UploadResponse().set_data(shared_key, AResponse.STATUS_FAIL, ex.get_message())
+    def init_ok(shared_key: str, data: UploadData):
+        return UploadResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
-    def init_complete(shared_key: str):
-        return UploadResponse().set_data(shared_key, AResponse.STATUS_COMPLETE)
+    def init_error(shared_key: str, data: UploadData, ex: PortException):
+        return UploadResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
 
-    def set_data(self, shared_key: str, status: str, error_message: str = AResponse.STATUS_OK):
+    def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
+        self._data = data
         self._status = status
         self._error_message = error_message
         return self
 
     def get_result(self) -> dict:
         return {
-            "driver": str(self._shared_key),
+            "sharedKey": str(self._shared_key),
+            "lastKnownPart": int(self._data.last_known_part),
             "status": str(self._status),
             "errorMessage": str(self._error_message),
         }

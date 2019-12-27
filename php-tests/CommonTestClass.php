@@ -36,7 +36,7 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
     {
         return DriveFile\Data::init()->setData(
             'abcdef',
-            'abcdef',
+            $this->getTestDir() . 'abcdef',
             123456,
             12,
             64,

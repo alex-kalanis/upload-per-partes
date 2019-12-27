@@ -30,9 +30,6 @@ class Translations:
     def read_too_early(self) -> str:
         return 'READ TOO EARLY'
 
-    def different_file_sizes(self) -> str:
-        return 'DIFFERENT FILE SIZES'
-
     def cannot_open_file(self) -> str:
         return 'CANNOT OPEN FILE'
 

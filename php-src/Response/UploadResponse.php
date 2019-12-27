@@ -11,27 +11,25 @@ use Exception;
  */
 class UploadResponse extends AResponse
 {
-    public static function initOK(string $sharedKey): UploadResponse
+    /** @var null|DriveFile\Data */
+    protected $data = null;
+
+    public static function initOK(string $sharedKey, DriveFile\Data $data): UploadResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, static::STATUS_OK);
+        return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, Exception $ex): UploadResponse
+    public static function initError(string $sharedKey, DriveFile\Data $data, Exception $ex): UploadResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, static::STATUS_FAIL, $ex->getMessage());
+        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public static function initComplete(string $sharedKey): UploadResponse
-    {
-        $l = new static();
-        return $l->setData($sharedKey, static::STATUS_COMPLETE);
-    }
-
-    public function setData(string $sharedKey, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, DriveFile\Data $data, string $status, string $errorMessage = self::STATUS_OK)
     {
         $this->sharedKey = $sharedKey;
+        $this->data = $data;
         $this->status = $status;
         $this->errorMessage = $errorMessage;
         return $this;
@@ -40,7 +38,8 @@ class UploadResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            "driver" => $this->sharedKey,
+            "sharedKey" => $this->sharedKey,
+            "lastKnownPart" => (int)$this->data->lastKnownPart,
             "status" => $this->status,
             "errorMessage" => $this->errorMessage,
         ];

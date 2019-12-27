@@ -30,7 +30,7 @@ class Upload extends \UploadPerPartes\Upload
         ));
     }
 
-    protected function getSharedName(string $fileName): string
+    protected function getSharedKey(string $fileName): string
     {
         return md5(\Lib_String::generateRandomText(256));
     }

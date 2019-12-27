@@ -44,7 +44,7 @@ class Upload:
         try:
             drive_data = self._driver.read()
             try:
-                os.unlink(self._target_path + drive_data.temp_name)
+                os.unlink(drive_data.temp_path)
             except IOError:
                 raise UploadException(self._lang.cannot_remove_data())
             self._driver.remove()
@@ -60,7 +60,7 @@ class Upload:
         try:
             drive_data = self._driver.read()
             self._driver.remove()
-            return DoneResponse.init_done(self._shared_key, self._target_path, drive_data)
+            return DoneResponse.init_done(self._shared_key, drive_data)
         except UploadException as ex:
             return DoneResponse.init_error(self._shared_key, UploadData(), ex)
 
@@ -77,18 +77,15 @@ class Upload:
             if not segment:
                 segment = drive_data.last_known_part + 1
                 self._save_file_part(drive_data, content)
-                self._driver.update_last_part(segment)
+                self._driver.update_last_part(drive_data, segment)
             else:
                 if segment > drive_data.last_known_part + 1:
                     raise UploadException(self._lang.read_too_early())
                 self._save_file_part(drive_data, content, segment * drive_data.bytes_per_part)
 
-            if drive_data.last_known_part + 1 >= drive_data.parts_count:
-                return UploadResponse.init_complete(self._shared_key)
-
-            return UploadResponse.init_ok(self._shared_key)
+            return UploadResponse.init_ok(self._shared_key, drive_data)
         except UploadException as ex:
-            return UploadResponse.init_error(self._shared_key, ex)
+            return UploadResponse.init_error(self._shared_key, UploadData(), ex)
 
     def partes_truncate_from(self, segment: int) -> AResponse:
         """
@@ -97,10 +94,9 @@ class Upload:
         :return: AResponse
         """
         try:
-            self._partes_truncate_from_part(segment)
-            return TruncateResponse.init_ok(self._shared_key)
+            return TruncateResponse.init_ok(self._shared_key, self._partes_truncate_from_part(segment))
         except UploadException as ex:
-            return TruncateResponse.init_error(self._shared_key, ex)
+            return TruncateResponse.init_error(self._shared_key, UploadData(), ex)
 
     def partes_check(self, segment: int) -> AResponse:
         """
@@ -121,22 +117,21 @@ class Upload:
         :return: AResponse
         """
         file_name = self._find_name(remote_file_name)
-        shared_key = self._get_shared_name(file_name)
-        temp_name = self._get_temp_file_name(file_name)
-        parts_counter = int(length / self._bytes_per_part)
-        parts_counter = int(parts_counter) if (length % self._bytes_per_part) == 0 else int(parts_counter + 1)
+        shared_key = self._get_shared_key(file_name)
+        temp_path = self._target_path + self._get_temp_file_name(file_name)
+        parts_counter = self._calc_parts(length)
         try:
             self._init_driver(shared_key)
-            data_pack = UploadData().set_data(file_name, temp_name, length, parts_counter, self._bytes_per_part)
-            self._driver.create(data_pack)
-            return InitResponse.init_begin(shared_key, data_pack)
-
-        except ContinuityUploadException:  # continue from previous?
-            return self._partes_continuity(file_name, temp_name, length, parts_counter)
+            data_pack = UploadData().set_data(file_name, temp_path, length, parts_counter, self._bytes_per_part)
+            try:
+                self._driver.create(data_pack)
+            except ContinuityUploadException:  # continue from previous?
+                data_pack = self._driver.read()
+            return InitResponse.init_ok(shared_key, data_pack)
 
         except UploadException as ex:  # something bad happen
             return InitResponse.init_error(shared_key, UploadData().set_data(
-                file_name, temp_name, length, parts_counter, self._bytes_per_part, 0
+                file_name, temp_path, length, parts_counter, self._bytes_per_part, 0
             ), ex)
 
     def _find_name(self, name: str) -> str:
@@ -185,31 +180,9 @@ class Upload:
         except ValueError:
             return file_name
 
-    def _partes_continuity(self, file_name: str, temp_name: str, length: int, parts_counter: int) -> AResponse:
-        """
-         * Upload - continue from previously scrapped run; return info to manage steps on user side
-        :param file_name: str
-        :param temp_name: str
-        :param length:  int
-        :param parts_counter: int
-        :return: AResponse
-        """
-        shared_key = self._get_shared_name(file_name)
-        try:
-            drive_data = self._driver.read()
-            if length != drive_data.file_size:  # different size
-                drive_data.file_name = file_name  # pass failed name
-                return InitResponse.init_continue_fail(
-                    shared_key,
-                    drive_data,
-                    self._lang.different_file_sizes()
-                )
-            return InitResponse.init_continue(shared_key, drive_data)
-
-        except UploadException as ex:  # dead on continue
-            return InitResponse.init_error(shared_key, UploadData().set_data(
-                file_name, temp_name, length, parts_counter, self._bytes_per_part, 0
-            ), ex)
+    def _calc_parts(self, length: int) -> int:
+        parts_counter = int(length / self._bytes_per_part)
+        return int(parts_counter) if (length % self._bytes_per_part) == 0 else int(parts_counter + 1)
 
     def _init_driver(self, shared_key: str):
         self._driver = DriveFile(self._lang, ADriveFile.init(
@@ -221,7 +194,7 @@ class Upload:
     def _get_driver_variant(self) -> int:
         return ADriveFile.VARIANT_TEXT
 
-    def _get_shared_name(self, file_name: str) -> str:
+    def _get_shared_key(self, file_name: str) -> str:
         return self._file_base(file_name) + self.FILE_DRIVER_SUFF
 
     def _get_temp_file_name(self, file_name: str) -> str:
@@ -237,7 +210,7 @@ class Upload:
         """
         if seek:
             try:
-                handle = open(self._target_path + data.temp_name, 'wb')
+                handle = open(data.temp_path, 'wb')
             except IOError:
                 raise UploadException(self._lang.cannot_open_file())
             try:
@@ -251,7 +224,7 @@ class Upload:
             handle.close()
         else:
             try:
-                handle = open(self._target_path + data.temp_name, 'ab')
+                handle = open(data.temp_path, 'ab')
             except IOError:
                 raise UploadException(self._lang.cannot_open_file())
             try:
@@ -270,7 +243,7 @@ class Upload:
         data = self._driver.read()
         self._check_segment(data, segment)
         try:
-            handle = open(self._target_path + data.temp_name)
+            handle = open(data.temp_path)
             handle.seek(data.bytes_per_part * segment)
             content = handle.read(data.bytes_per_part)
             handle.close()
@@ -278,16 +251,17 @@ class Upload:
         except IOError:
             raise UploadException(self._lang.segment_out_of_bounds())
 
-    def _partes_truncate_from_part(self, segment: int):
+    def _partes_truncate_from_part(self, segment: int) -> UploadData:
         """
         :param segment: int where it will be
+        :return UploadData:
         :raise UploadException:
         """
         data = self._driver.read()
         self._check_segment(data, segment)
         handle = None
         try:
-            handle = open(self._target_path + data.temp_name, 'rw+')
+            handle = open(data.temp_path, 'rw+')
             handle.truncate(data.bytes_per_part * segment)
             handle.seek(0)
             handle.close()
@@ -295,6 +269,9 @@ class Upload:
             if handle:
                 handle.close()
             raise UploadException(self._lang.cannot_truncate_file())
+
+        self._driver.update_last_part(data, segment, False)
+        return data
 
     def _check_segment(self, data: UploadData, segment: int):
         """

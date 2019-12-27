@@ -50,15 +50,18 @@ class DriveFile
 
     /**
      * Update upload info
+     * @param DriveFile\Data $data
      * @param int $last
+     * @param bool $checkContinuous
      * @return bool
      * @throws Exceptions\UploadException
      */
-    public function updateLastPart(int $last): bool
+    public function updateLastPart(DriveFile\Data $data, int $last, bool $checkContinuous = true): bool
     {
-        $data = $this->libDriver->load();
-        if (($data->lastKnownPart + 1) != $last) {
-            throw new Exceptions\UploadException($this->lang->driveFileNotContinuous());
+        if ($checkContinuous) {
+            if (($data->lastKnownPart + 1) != $last) {
+                throw new Exceptions\UploadException($this->lang->driveFileNotContinuous());
+            }
         }
         $data->lastKnownPart = $last;
         $this->libDriver->save($data);

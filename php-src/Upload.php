@@ -53,7 +53,7 @@ class Upload
     {
         try {
             $data = $this->driver->read();
-            if (! @unlink($this->targetPath . $data->tempName)) {
+            if (! @unlink($data->tempPath)) {
                 throw new Exceptions\UploadException($this->lang->cannotRemoveData());
             }
             $this->driver->remove();
@@ -72,7 +72,7 @@ class Upload
         try {
             $data = $this->driver->read();
             $this->driver->remove();
-            return Response\DoneResponse::initDone($this->sharedKey, $this->targetPath, $data);
+            return Response\DoneResponse::initDone($this->sharedKey, $data);
         } catch (Exceptions\UploadException $ex) {
             return Response\DoneResponse::initError($this->sharedKey, DriveFile\Data::init(), $ex);
         }
@@ -92,7 +92,7 @@ class Upload
             if (!is_numeric($segment)) {
                 $segment = $data->lastKnownPart + 1;
                 $this->saveFilePart($data, $content);
-                $this->driver->updateLastPart($segment);
+                $this->driver->updateLastPart($data, $segment);
             } else {
                 if ($segment > $data->lastKnownPart + 1) {
                     throw new Exceptions\UploadException($this->lang->readTooEarly());
@@ -100,13 +100,10 @@ class Upload
                 $this->saveFilePart($data, $content, $segment * $data->bytesPerPart);
             }
 
-            if ($data->lastKnownPart + 1 >= $data->partsCount) {
-                return Response\UploadResponse::initComplete($this->sharedKey);
-            }
-            return Response\UploadResponse::initOK($this->sharedKey);
+            return Response\UploadResponse::initOK($this->sharedKey, $data);
 
         } catch (Exceptions\UploadException $e) {
-            return Response\UploadResponse::initError($this->sharedKey, $e);
+            return Response\UploadResponse::initError($this->sharedKey, DriveFile\Data::init(), $e);
         }
     }
 
@@ -118,10 +115,9 @@ class Upload
     public function partesTruncateFrom(int $segment): Response\AResponse
     {
         try {
-            $this->partesTruncateFromPart($segment);
-            return Response\TruncateResponse::initOK($this->sharedKey);
+            return Response\TruncateResponse::initOK($this->sharedKey, $this->partesTruncateFromPart($segment));
         } catch (Exceptions\UploadException $e) {
-            return Response\TruncateResponse::initError($this->sharedKey, $e);
+            return Response\TruncateResponse::initError($this->sharedKey, DriveFile\Data::init(), $e);
         }
     }
 
@@ -148,22 +144,22 @@ class Upload
     public function partesInit(string $remoteFileName, int $length): Response\AResponse
     {
         $fileName = $this->findName($remoteFileName);
-        $sharedKey = $this->getSharedName($fileName);
-        $tempName = $this->getTempFileName($fileName);
-        $partsCounter = (int)($length / $this->bytesPerPart);
-        $partsCounter = (($length % $this->bytesPerPart) == 0) ? (int)$partsCounter : (int)($partsCounter + 1);
+        $sharedKey = $this->getSharedKey($fileName);
+        $tempPath = $this->targetPath . $this->getTempFileName($fileName);
+        $partsCounter = $this->calcParts($length);
         try {
             $this->initDriver($sharedKey);
-            $dataPack = DriveFile\Data::init()->setData($fileName, $tempName, $length, $partsCounter, $this->bytesPerPart);
-            $this->driver->create($dataPack);
-            return Response\InitResponse::initBegin($sharedKey, $dataPack);
+            $dataPack = DriveFile\Data::init()->setData($fileName, $tempPath, $length, $partsCounter, $this->bytesPerPart);
+            try {
+                $this->driver->create($dataPack);
+            } catch (Exceptions\ContinuityUploadException $e) { // navazani na predchozi - datapack uz mame, tak ho nacpeme na front
+                $dataPack = $this->driver->read();
+            }
+            return Response\InitResponse::initOk($sharedKey, $dataPack);
 
-        } catch (Exceptions\ContinuityUploadException $e) { // continue from previous?
-            return $this->partesContinuity($fileName, $tempName, $length, $partsCounter);
-
-        } catch (Exceptions\UploadException $e) { // something bad happen
+        } catch (Exceptions\UploadException $e) { // obecne neco spatne
             return Response\InitResponse::initError($sharedKey, DriveFile\Data::init()->setData(
-                $fileName, $tempName, $length, $partsCounter, $this->bytesPerPart, 0
+                $fileName, $tempPath, $length, $partsCounter, $this->bytesPerPart, 0
             ), $e);
         }
     }
@@ -222,34 +218,10 @@ class Upload
         ) : $fileName);
     }
 
-    /**
-     * Upload - continue from previously scrapped run; return info to manage steps on user side
-     * @param string $fileName
-     * @param string $tempName
-     * @param int $length
-     * @param int $partsCounter
-     * @return Response\AResponse
-     */
-    protected function partesContinuity(string $fileName, string $tempName, int $length, int $partsCounter): Response\AResponse
+    protected function calcParts(int $length): int
     {
-        $sharedKey = $this->getSharedName($fileName);
-        try {
-            $data = $this->driver->read();
-            if ($length != $data->fileSize) { // different size
-                $data->fileName = $fileName; // failed name
-                return Response\InitResponse::initContinueFail(
-                    $sharedKey,
-                    $data,
-                    $this->lang->differentFileSizes()
-                );
-            }
-            return Response\InitResponse::initContinue($sharedKey, $data);
-
-        } catch (Exceptions\UploadException $e) { // dead on continue
-            return Response\InitResponse::initError($sharedKey, DriveFile\Data::init()->setData(
-                $fileName, $tempName, $length, $partsCounter, $this->bytesPerPart, 0
-            ), $e);
-        }
+        $partsCounter = (int)($length / $this->bytesPerPart);
+        return (($length % $this->bytesPerPart) == 0) ? (int)$partsCounter : (int)($partsCounter + 1);
     }
 
     /**
@@ -270,7 +242,7 @@ class Upload
         return DriveFile\ADriveFile::VARIANT_TEXT;
     }
 
-    protected function getSharedName(string $fileName): string
+    protected function getSharedKey(string $fileName): string
     {
         return $this->fileBase($fileName) . static::FILE_DRIVER_SUFF;
     }
@@ -290,7 +262,7 @@ class Upload
     protected function saveFilePart(DriveFile\Data $data, string $content, ?int $seek = null)
     {
         if (is_numeric($seek)) {
-            $pointer = fopen($this->targetPath . $data->tempName, 'wb');
+            $pointer = fopen($data->tempPath, 'wb');
             if (false === $pointer) {
                 throw new Exceptions\UploadException($this->lang->cannotOpenFile());
             }
@@ -303,7 +275,7 @@ class Upload
             }
             fclose($pointer);
         } else {
-            $pointer = fopen($this->targetPath . $data->tempName, 'ab');
+            $pointer = fopen($data->tempPath, 'ab');
             if (false == $pointer) {
                 throw new Exceptions\UploadException($this->lang->cannotOpenFile());
             }
@@ -326,7 +298,7 @@ class Upload
         $this->checkSegment($data, $segment);
 
         return md5(file_get_contents(
-            $this->targetPath . $data->tempName,
+            $data->tempPath,
             false,
             null,
             $data->bytesPerPart * $segment,
@@ -336,21 +308,23 @@ class Upload
 
     /**
      * @param int $segment where it will be
-     * @return void
+     * @return DriveFile\Data
      * @throws Exceptions\UploadException
      */
-    protected function partesTruncateFromPart(int $segment): void
+    protected function partesTruncateFromPart(int $segment): DriveFile\Data
     {
         $data = $this->driver->read();
         $this->checkSegment($data, $segment);
 
-        $handle = fopen($this->targetPath . $data->tempName, 'r+');
+        $handle = fopen($data->tempPath, 'r+');
         if (!ftruncate($handle, $data->bytesPerPart * $segment)) {
             fclose($handle);
             throw new Exceptions\UploadException($this->lang->cannotTruncateFile());
         }
         rewind($handle);
         fclose($handle);
+        $this->driver->updateLastPart($data, $segment, false);
+        return $data;
     }
 
     /**

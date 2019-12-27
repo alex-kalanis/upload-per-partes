@@ -21,27 +21,28 @@ class UploadTest(CommonTestClass):
     def test_simple_upload(self):
         # step 1 - init driver
         lib1 = UploadMock(self._get_test_dir())
-        result1 = lib1.partes_init('lorem-ipsum.txt', os.path.getsize(self._get_test_file()))
-        assert InitResponse.STATUS_BEGIN == result1.get_result()['status']
+        max_size = os.path.getsize(self._get_test_file())
+        result1 = lib1.partes_init('lorem-ipsum.txt', max_size)
+        assert InitResponse.STATUS_OK == result1.get_result()['status']
 
         # step 2 - send data
-        lib2 = UploadMock(self._get_test_dir(), result1.get_result()['driver'])
+        lib2 = UploadMock(self._get_test_dir(), result1.get_result()['sharedKey'])
         try:
             i = 0
             result2 = self._read_file(lib2, i)
-            while UploadResponse.STATUS_OK == result2.get_result()['status']:
+            while i * lib2._bytes_per_part < max_size:
                 i += 1
                 result2 = self._read_file(lib2, i)
-            assert UploadResponse.STATUS_COMPLETE == result2.get_result()['status']
+            assert UploadResponse.STATUS_OK == result2.get_result()['status']
         except IOError as ex:
             assert False, 'There is some problem with files'
 
         # step 3 - close upload
-        lib3 = UploadMock(self._get_test_dir(), result1.get_result()['driver'])
+        lib3 = UploadMock(self._get_test_dir(), result1.get_result()['sharedKey'])
         result3 = lib3.partes_done()
 
         # check content
-        assert DoneResponse.STATUS_COMPLETE == result3.get_result()['status']
+        assert DoneResponse.STATUS_OK == result3.get_result()['status']
         assert filecmp.cmp(result3.get_target_file(), self._get_test_file()) is True
 
         if os.path.isfile(result3.get_target_file()):

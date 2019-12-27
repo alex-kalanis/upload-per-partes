@@ -56,11 +56,6 @@ class Translations
         return 'READ TOO EARLY';
     }
 
-    public function differentFileSizes(): string
-    {
-        return 'DIFFERENT FILE SIZES';
-    }
-
     public function cannotOpenFile(): string
     {
         return 'CANNOT OPEN FILE';

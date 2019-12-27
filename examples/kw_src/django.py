@@ -24,7 +24,7 @@ def view_begin(request):
         ).get_result())
     except UploadException as ex:
         return JsonResponse(InitResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
             UploadData(),
             ex
         ).get_result())
@@ -32,57 +32,59 @@ def view_begin(request):
 
 def view_check(request):
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('sharedKey'))
         return JsonResponse(lib.partes_check(
             int(request.POST.get('segment'))
         ).get_result())
     except UploadException as ex:
         return JsonResponse(CheckResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
             ex
         ).get_result())
 
 
 def view_part(request):
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('sharedKey'))
         return JsonResponse(lib.partes_upload(
             bytearray(base64.b64decode(request.POST.get('content')))
         ).get_result())
     except UploadException as ex:
         return JsonResponse(UploadResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result())
 
 
 def view_truncate(request):
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('sharedKey'))
         return JsonResponse(lib.partes_truncate_from(
             int(request.POST.get('segment'))
         ).get_result())
     except UploadException as ex:
         return JsonResponse(TruncateResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result())
 
 
 def view_cancel(request):
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('sharedKey'))
         return JsonResponse(lib.partes_cancel().get_result())
     except UploadException as ex:
         return JsonResponse(CancelResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
             ex
         ).get_result())
 
 
 def view_done(request):
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.POST.get('sharedKey'))
         result = lib.partes_done()
         # check uploaded content and move it on drive
         print([result.get_target_file(), result.get_file_name()])
@@ -90,7 +92,7 @@ def view_done(request):
         return JsonResponse(result.get_result())
     except UploadException as ex:
         return JsonResponse(DoneResponse.init_error(
-            request.POST.get('driver'),
+            request.POST.get('sharedKey'),
             UploadData(),
             ex
         ).get_result())

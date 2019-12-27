@@ -26,7 +26,7 @@ def begin():
         ).get_result())
     except UploadException as ex:
         return jsonify(InitResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
             UploadData(),
             ex
         ).get_result())
@@ -35,13 +35,13 @@ def begin():
 @app.route('/uploader/check', methods=['POST'])
 def check():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('sharedKey'))
         return jsonify(lib.partes_check(
             int(request.form.get('segment'))
         ).get_result())
     except UploadException as ex:
         return jsonify(CheckResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
             ex
         ).get_result())
 
@@ -49,13 +49,14 @@ def check():
 @app.route('/uploader/part', methods=['POST'])
 def part():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('sharedKey'))
         return jsonify(lib.partes_upload(
             bytearray(base64.b64decode(request.form.get('content')))
         ).get_result())
     except UploadException as ex:
         return jsonify(UploadResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result())
 
@@ -63,13 +64,14 @@ def part():
 @app.route('/uploader/truncate', methods=['POST'])
 def truncate():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('sharedKey'))
         return jsonify(lib.partes_truncate_from(
             int(request.form.get('segment'))
         ).get_result())
     except UploadException as ex:
         return jsonify(TruncateResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
+            UploadData(),
             ex
         ).get_result())
 
@@ -77,11 +79,11 @@ def truncate():
 @app.route('/uploader/cancel', methods=['POST'])
 def cancel():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('sharedKey'))
         return jsonify(lib.partes_cancel().get_result())
     except UploadException as ex:
         return jsonify(CancelResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
             ex
         ).get_result())
 
@@ -89,7 +91,7 @@ def cancel():
 @app.route('/uploader/done', methods=['POST'])
 def done():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('driver'))
+        lib = Upload(ENCODING_UPLOAD_PATH, request.form.get('sharedKey'))
         result = lib.partes_done()
         # check uploaded content and move it on drive
         print([result.get_target_file(), result.get_file_name()])
@@ -97,7 +99,7 @@ def done():
         return jsonify(result.get_result())
     except UploadException as ex:
         return jsonify(DoneResponse.init_error(
-            request.form.get('driver'),
+            request.form.get('sharedKey'),
             UploadData(),
             ex
         ).get_result())

@@ -10,7 +10,7 @@ namespace UploadPerPartes\DriveFile;
 class Data
 {
     public $fileName = '';
-    public $tempName = '';
+    public $tempPath = '';
     public $fileSize = 0;
     public $partsCount = 0;
     public $bytesPerPart = 0;
@@ -21,10 +21,10 @@ class Data
         return new static();
     }
 
-    public function setData(string $fileName, string $tempName, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0)
+    public function setData(string $fileName, string $tempPath, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0)
     {
         $this->fileName = $fileName;
-        $this->tempName = $tempName;
+        $this->tempPath = $tempPath;
         $this->fileSize = $fileSize;
         $this->partsCount = $partsCount;
         $this->bytesPerPart = $bytesPerPart;

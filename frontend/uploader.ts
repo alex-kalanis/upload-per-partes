@@ -8,10 +8,11 @@ class UploadTargetConfig {
 }
 
 class UploadTranslations {
+    readFileCannotSlice = "Cannot slice file";
     initReturnsFollowingError = "Init returns following error: ";
     initReturnsSomethingFailed = "Init does not return a JSON data. More at console.";
+    checkerReturnsSomethingFailed = "Data check does not return a JSON data. More at console.";
     dataUploadReturnsSomethingFailed = "Data upload does not return a JSON. More at console.";
-    doneReturnsFollowingError = "Done returns following error: ";
     doneReturnsSomethingFailed = "Done does not return a JSON data. More at console.";
 }
 
@@ -23,6 +24,8 @@ class UploadedFile {
     STATUS_INIT = 1;
     STATUS_RUN = 2;
     STATUS_FINISH = 3;
+    STATUS_RETRY = 4;
+    STATUS_DESTROY = 5;
 
     // initial
     /** @var {string} */
@@ -37,13 +40,15 @@ class UploadedFile {
     // processing
     /** @var {number} upload status */
     readStatus = this.STATUS_STOP;
-    /** @var {string} driver file - need to remember during init and then sent repeatedly!!! */
-    driver = "";
+    /** @var {string} shared key - need to remember during init and then sent repeatedly!!! */
+    sharedKey = "";
     /** @var {number} total parts number */
     totalParts = 0;
     /** @var {number} last known part on both sides is... */
     lastKnownPart = 0;
-    /** @var {number} part size in bytes */
+    /** @var {number} last checked part on both sides is... */
+    lastCheckedPart = 0;
+    /** @var {number} max part size in bytes */
     partSize = 0;
     /** @var {string} when it dies... */
     errorMessage = "";
@@ -83,11 +88,21 @@ class UploadedFile {
      */
     setInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_RUN;
-        this.driver = serverResponse.driver;
+        this.sharedKey = serverResponse.sharedKey;
         this.totalParts = parseInt(serverResponse.totalParts);
         this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         this.partSize = parseInt(serverResponse.partSize);
         this.errorMessage = serverResponse.errorMessage;
+        return this;
+    }
+
+    /**
+     * @returns {UploadedFile}
+     */
+    setInfoFromClearer() {
+        this.readStatus = this.STATUS_RUN;
+        this.lastCheckedPart = 0;
+        this.errorMessage = '';
         return this;
     }
 
@@ -109,45 +124,627 @@ class UploadedFile {
         this.lastKnownPart++;
         return this;
     }
+
+    /**
+     * @returns {UploadedFile}
+     */
+    nextCheckedPart() {
+        this.lastCheckedPart++;
+        return this;
+    }
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    setTruncatedFromServer(serverResponse) {
+        this.lastCheckedPart = this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
+        return this;
+    }
 }
 
 class UploaderProcessor {
     // main processing class
 
     RESULT_OK = "OK";
-    RESULT_BEGIN = "BEGIN";
-    RESULT_CONTINUE = "CONTINUE";
-    RESULT_COMPLETE = "COMPLETE";
     RESULT_STOP = "FAIL";
-    RESULT_FAILED = "FAILED_CONTINUE";
 
     /** @var {jQuery} */
     jQ = null;
     /** @var {UploadTargetConfig} */
     targetConfig = null;
     /** @var {UploadTranslations} */
-    langs = null;
-    /** @var {uploaderRenderer} */
+    translations = null;
+    /** @var {UploaderRenderer} */
     upRenderer = null;
-    /** @var {CheckSumMD5} */
-    checksum = null;
+    /** @var {UploaderInit} */
+    upInit = null;
+    /** @var {UploaderReader} */
+    upReader = null;
+    /** @var {UploaderEncoder} */
+    upEncoder = null;
+    /** @var {UploaderChecksum} */
+    upChecksum = null;
+    /** @var {UploaderChecker} */
+    upCheck = null;
+    /** @var {UploaderRunner} */
+    upRunner = null;
+    /** @var {UploaderFailure} */
+    upFailure = null;
 
     /**
      * @param {jQuery} jQ
-     * @param {UploadTranslations} langs
+     * @param {UploadTranslations} translations
      * @param {UploadTargetConfig} targetConfig
      * @param {UploaderRenderer} renderer
      * @param {CheckSumMD5} checksum
      */
-    constructor(jQ, langs, targetConfig, renderer, checksum = null) {
+    constructor(jQ, translations, targetConfig, renderer, checksum = null) {
         this.jQ = jQ;
-        this.langs = langs;
+        this.translations = translations;
         this.targetConfig = targetConfig;
         this.upRenderer = renderer;
-        this.checksum = checksum;
+        this.upEncoder = new UploaderEncoder();
+        this.upChecksum = new UploaderChecksum(checksum);
+        this.upReader = new UploaderReader(this);
+        this.upInit = new UploadInit(this);
+        this.upCheck = new UploaderChecker(this);
+        this.upRunner = new UploaderRunner(this);
+        this.upFailure = new UploaderFailure(this);
     }
 
-    static base64_encode(data) {
+    /**
+     * Sent initial request and get driving instructions
+     * @param {UploadedFile} uploadedFile
+     */
+    firstRead(uploadedFile) {
+        this.upInit.process(uploadedFile);
+    }
+
+    /**
+     * Call checking of file
+     * @param {UploadedFile} uploadedFile
+     */
+    checkParts(uploadedFile) {
+        this.upCheck.process(uploadedFile);
+    }
+
+    /**
+     * Call uploading of file
+     * @param {UploadedFile} uploadedFile
+     */
+    uploadParts(uploadedFile) {
+        this.upRunner.process(uploadedFile);
+    }
+
+    /**
+     * Call dumpster when something fails
+     * @param {UploadedFile} uploadedFile
+     * @param {*} event
+     */
+    failProcess(uploadedFile, event: any = null) {
+        this.upFailure.process(uploadedFile, event);
+    }
+
+    /**
+     * Call dumpster when something fails
+     * @param {UploadedFile} uploadedFile
+     * @param {*} event
+     */
+    failEnd(uploadedFile, event: any = null) {
+        this.upFailure.end(uploadedFile, event);
+    }
+
+    getJQuery() {
+        return this.jQ;
+    }
+
+    getFileReader() {
+        return this.upReader;
+    }
+
+    getEncoder() {
+        return this.upEncoder;
+    }
+
+    getChecksum() {
+        return this.upChecksum;
+    }
+
+    getRenderer() {
+        return this.upRenderer;
+    }
+
+    getLang() {
+        return this.translations;
+    }
+
+    getTargetLinks() {
+        return this.targetConfig;
+    }
+}
+
+class UploadInit {
+    /** @var {UploaderProcessor} */
+    upProcessor = null;
+
+    /**
+     * @param {UploaderProcessor} processor
+     */
+    constructor(processor) {
+        this.upProcessor = processor;
+    }
+
+    /**
+     * Sent initial request and get driving instructions
+     * @param {UploadedFile} uploadedFile
+     */
+    process(uploadedFile) {
+        let self = this;
+        this.upProcessor.getJQuery().post(
+            this.upProcessor.getTargetLinks().targetInitPath,
+            {
+                fileName: uploadedFile.fileName,
+                fileSize: uploadedFile.fileSize
+            },
+            function(responseData) {
+                if (typeof responseData == "object") {
+                    self.processServerInfo(uploadedFile, responseData);
+                } else {
+                    // Query dead, sent user info
+                    uploadedFile.setError(self.upProcessor.getLang().initReturnsSomethingFailed);
+                    self.upProcessor.getRenderer().consoleError(uploadedFile, responseData);
+                }
+            },
+            function(err) {
+                self.upProcessor.getRenderer().consoleError(uploadedFile, err);
+            }
+        );
+    }
+
+    /**
+     * Processing driving instruction that came from server
+     * @param {UploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processServerInfo(uploadedFile, responseData: any) {
+        // is anything to upload
+        if (this.upProcessor.RESULT_OK === responseData.status) {
+            // start checking content
+            uploadedFile.setInfoFromServer(responseData);
+            this.upProcessor.getRenderer().renderReaded(uploadedFile);
+            this.upProcessor.checkParts(uploadedFile);
+        } else {
+            // File is dead, sent user info
+            uploadedFile.setError(this.upProcessor.getLang().initReturnsFollowingError + responseData.errorMessage);
+            this.upProcessor.getRenderer().consoleError(uploadedFile, responseData);
+        }
+    }
+}
+
+class UploaderChecker {
+    /** @var {UploaderProcessor} */
+    upProcessor = null;
+
+    /**
+     * @param {UploaderProcessor} processor
+     */
+    constructor(processor) {
+        this.upProcessor = processor;
+    }
+
+    /**
+     * Sent initial request and get driving instructions
+     * @param {UploadedFile} uploadedFile
+     */
+    process(uploadedFile) {
+        this.stillCheck(uploadedFile);
+    }
+
+    continueChecking(uploadedFile) {
+        if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
+            this.stillCheck(uploadedFile);
+        } else {
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+
+    stillCheck(uploadedFile) {
+        if (uploadedFile.lastCheckedPart < uploadedFile.lastKnownPart) {
+            this.checkPart(uploadedFile);
+        } else {
+            this.nextStep(uploadedFile);
+        }
+    }
+
+    /**
+     * Check data on server - for each already uploaded part
+     * @param {UploadedFile} uploadedFile
+     */
+    checkPart(uploadedFile) {
+        let self = this;
+        this.upProcessor.getJQuery().post(
+            this.upProcessor.getTargetLinks().targetCheckPath,
+            {
+                sharedKey: uploadedFile.sharedKey,
+                segment: uploadedFile.lastCheckedPart
+            },
+            function(responseData) {
+                if (typeof responseData == "object") {
+                    self.processCheckPart(uploadedFile, responseData);
+                } else {
+                    // Query dead, sent user info
+                    uploadedFile.setError(self.upProcessor.getLang().initReturnsSomethingFailed);
+                    self.upProcessor.getRenderer().consoleError(uploadedFile, responseData);
+                }
+            },
+            function(err) {
+                self.upProcessor.failProcess(uploadedFile, err);
+            }
+        );
+    }
+
+    nextStep(uploadedFile) {
+        if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
+            this.upProcessor.uploadParts(uploadedFile);
+        } else {
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+
+    /**
+     * Processing check response that came from server
+     * @param {UploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processCheckPart(uploadedFile, responseData: any) {
+        if (this.upProcessor.RESULT_OK === responseData.status) {
+            // got known checksum on remote - check it against local file
+            let self = this;
+            this.upProcessor.getFileReader().processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
+                if (responseData.checksum == self.upProcessor.getChecksum().md5(result)) {
+                    // this part is OK, onto the next one
+                    uploadedFile.nextCheckedPart();
+                    self.upProcessor.getRenderer().renderReaded(uploadedFile);
+                    self.continueChecking(uploadedFile);
+                } else {
+                    // Check failed, time to truncate
+                    self.truncatePart(uploadedFile);
+                }
+            }, function (event) {
+                self.upProcessor.getRenderer().updateStatus(uploadedFile, event.error);
+            });
+        } else {
+            // failed query
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+
+    /**
+     * Truncate failed data on server, to upload them correctly
+     * @param {UploadedFile} uploadedFile
+     */
+    truncatePart(uploadedFile) {
+        let self = this;
+        this.upProcessor.getJQuery().post(
+            this.upProcessor.getTargetLinks().targetTrimPath,
+            {
+                sharedKey: uploadedFile.sharedKey,
+                segment: uploadedFile.lastCheckedPart
+            },
+            function(responseData) {
+                if (typeof responseData == "object") {
+                    self.processTruncatePart(uploadedFile, responseData);
+                } else {
+                    // Query dead, sent user info
+                    uploadedFile.setError(self.upProcessor.getLang().checkerReturnsSomethingFailed);
+                    self.upProcessor.getRenderer().consoleError(uploadedFile, responseData);
+                }
+            },
+            function(err) {
+                self.upProcessor.getRenderer().consoleError(uploadedFile, err);
+            }
+        );
+    }
+
+    /**
+     * Processing truncate response that came from server
+     * @param {UploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processTruncatePart(uploadedFile, responseData: any) {
+        // is anything to upload
+        if (this.upProcessor.RESULT_OK === responseData.status) {
+            // Truncate came OK, time to upload the rest
+            uploadedFile.setTruncatedFromServer(responseData);
+            this.upProcessor.getRenderer().renderReaded(uploadedFile);
+            this.nextStep(uploadedFile);
+        } else {
+            // Truncate failed, time say something
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+}
+
+class UploaderRunner {
+    /** @var {UploaderProcessor} */
+    upProcessor = null;
+
+    /**
+     * @param {UploaderProcessor} processor
+     */
+    constructor(processor) {
+        this.upProcessor = processor;
+    }
+
+    /**
+     * Sent initial request and get driving instructions
+     * @param {UploadedFile} uploadedFile
+     */
+    process(uploadedFile) {
+        this.stillRunning(uploadedFile);
+    }
+
+    stillRunning(uploadedFile) {
+        if (uploadedFile.lastKnownPart < uploadedFile.totalParts) {
+            this.continueRunning(uploadedFile);
+        } else {
+            this.closePart(uploadedFile);
+        }
+    }
+
+    continueRunning(uploadedFile) {
+        if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
+            this.uploadPart(uploadedFile);
+        } else {
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+
+    /**
+     * Sent request which contains part of uploaded file
+     * @param {UploadedFile} uploadedFile
+     */
+    uploadPart(uploadedFile) {
+        let self = this;
+        this.upProcessor.getFileReader().processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
+            self.upProcessor.getJQuery().post(
+                self.upProcessor.getTargetLinks().targetFilePath,
+                {
+                    sharedKey: uploadedFile.sharedKey,
+                    content: self.upProcessor.getEncoder().base64(result),
+                    // lastKnownPart: uploadedFile.lastKnownPart
+                },
+                function(responseData) {
+                    if (typeof responseData == "object") {
+                        self.processUploadPart(uploadedFile, responseData);
+                    } else {
+                        uploadedFile.setError(self.upProcessor.getLang().dataUploadReturnsSomethingFailed);
+                        self.upProcessor.getRenderer().consoleError(uploadedFile, responseData);
+                    }
+                }
+            );
+        }, function (event) {
+            self.upProcessor.failProcess(uploadedFile, event);
+        });
+    }
+
+    /**
+     * Process response about uploaded part
+     * @param {uploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processUploadPart(uploadedFile, responseData: any) {
+        this.upProcessor.getRenderer().updateBar(uploadedFile);
+        this.upProcessor.getRenderer().updateStatus(uploadedFile, responseData.status);
+        uploadedFile.nextCheckedPart().nextFilePart();
+        this.stillRunning(uploadedFile);
+    }
+
+    /**
+     * Send request about upload closure
+     * @param {UploadedFile} uploadedFile
+     */
+    closePart(uploadedFile) {
+        let self = this;
+        this.upProcessor.getJQuery().post(
+            this.upProcessor.getTargetLinks().targetDonePath,
+            {
+                sharedKey: uploadedFile.sharedKey
+            },
+            function(responseData) {
+                if (typeof responseData == "object") {
+                    self.processCloseInfo(uploadedFile, responseData);
+                } else {
+                    // dead query, user info
+                    uploadedFile.setError(this.getLang().doneReturnsSomethingFailed);
+                    this.upRenderer.consoleError(uploadedFile, responseData);
+                }
+            }
+        );
+    }
+
+    /**
+     * Process response about file closure
+     * @param {UploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processCloseInfo(uploadedFile, responseData: any) {
+        // is anything to close
+        if (this.upProcessor.RESULT_OK === responseData.status) {
+            // everything ok
+            uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
+            this.upProcessor.getRenderer().renderFinished(uploadedFile);
+            this.upProcessor.getRenderer().updateStatus(uploadedFile, responseData.errorMessage);
+        } else {
+            // dead file, user info
+            this.upProcessor.failProcess(uploadedFile);
+        }
+    }
+}
+
+class UploaderFailure {
+    /** @var {UploaderProcessor} */
+    upProcessor = null;
+
+    /**
+     * @param {UploaderProcessor} processor
+     */
+    constructor(processor) {
+        this.upProcessor = processor;
+    }
+
+    /**
+     * Show instructions for user
+     * @param {UploadedFile} uploadedFile
+     * @param {*} event
+     */
+    process(uploadedFile, event: any = null) {
+        // render output, want user input
+        // we need info if is necessary to use total clear and if continue
+        // this.stillRunning(uploadedFile);
+    }
+
+    continue(uploadedFile) {
+        // init, finish, retry, destroy
+        // cr-cont; end; cont; cr-end
+        if ((uploadedFile.STATUS_INIT == uploadedFile.status) || (uploadedFile.STATUS_DESTROY == uploadedFile.status)) {
+            this.contentRemoval(uploadedFile);
+        } else {
+            this.checkContinue(uploadedFile);
+        }
+    }
+
+    checkContinue(uploadedFile) {
+        if (uploadedFile.STATUS_INIT == uploadedFile.status) {
+            this.upProcessor.firstRead(uploadedFile);
+        } else if (uploadedFile.STATUS_RETRY == uploadedFile.status) {
+            uploadedFile.setInfoFromClearer();
+            this.upProcessor.checkPart(uploadedFile);
+        } else {
+            this.upProcessor.failEnd(uploadedFile);
+        }
+    }
+
+    /**
+     * Send request about upload closure
+     * @param {UploadedFile} uploadedFile
+     */
+    contentRemoval(uploadedFile) {
+        let self = this;
+        this.upProcessor.getJQuery().post(
+            this.upProcessor.getTargetLinks().targetCancelPath,
+            {
+                sharedKey: uploadedFile.sharedKey
+            },
+            function(responseData) {
+                if (typeof responseData == "object") {
+                    self.processContentRemoval(uploadedFile, responseData);
+                } else {
+                    // dead query, user info
+                    uploadedFile.setError(this.getLang().doneReturnsSomethingFailed);
+                    this.upRenderer.consoleError(uploadedFile, responseData);
+                }
+            }
+        );
+    }
+
+    /**
+     * Process response about file closure
+     * @param {UploadedFile} uploadedFile
+     * @param {*} responseData
+     */
+    processContentRemoval(uploadedFile, responseData: any) {
+        if (this.upProcessor.RESULT_OK === responseData.status) {
+            // everything done
+            this.checkContinue(uploadedFile);
+        } else {
+            // dead file, user info
+            this.end(uploadedFile);
+        }
+    }
+
+    /**
+     * Show instructions, cannot be done more
+     * @param {UploadedFile} uploadedFile
+     * @param {*} event
+     */
+    end(uploadedFile, event: any = null) {
+        // render output, no user input need
+    }
+}
+
+class UploaderReader {
+    /** @var {UploaderProcessor} */
+    upProcessor = null;
+
+    /**
+     * @param {UploaderProcessor} processor
+     */
+    constructor(processor) {
+        this.upProcessor = processor;
+    }
+
+    /**
+     * Processing check response that came from server
+     * @param {UploadedFile} uploadedFile
+     * @param {number} segment
+     * @param {*} onSuccess
+     * @param {*} onFailure
+     */
+    processFileRead(uploadedFile, segment, onSuccess: any, onFailure: any) {
+        let reader = new FileReader();
+        reader.onload = (event: any) => {
+            if (event.target.readyState === reader.DONE) {
+                // DONE == 2
+                onSuccess(event.target.result);
+            }
+        };
+        reader.onabort = (event: any) => {
+            onFailure(event);
+        };
+        reader.onerror = (event: any) => {
+            onFailure(event);
+        };
+        let blob = UploaderReader.fileSlice(
+            uploadedFile,
+            uploadedFile.partSize * segment,
+            (segment + 1 === uploadedFile.totalParts) ? uploadedFile.fileSize : uploadedFile.partSize * (segment + 1)
+        );
+        if (null == blob) {
+            uploadedFile.setError(this.upProcessor.getLang().readFileCannotSlice);
+        } else {
+            reader.readAsBinaryString(blob);
+        }
+    }
+
+    /**
+     * @param {UploadedFile} uploadedFile
+     * @param {number} begin seek at beginning of segment
+     * @param {number} end   seek of ending of segment
+     * @returns {null|Blob}
+     */
+    static fileSlice(uploadedFile, begin, end) {
+        if (uploadedFile.fileHandler.slice) {
+            return uploadedFile.fileHandler.slice(begin, end);
+        } else if (uploadedFile.fileHandler.mozSlice) {
+            return uploadedFile.fileHandler.mozSlice(begin, end);
+        } else if (uploadedFile.fileHandler.webkitSlice) {
+            return uploadedFile.fileHandler.webkitSlice(begin, end);
+        } else {
+            return null;
+        }
+    }
+}
+
+class UploaderEncoder {
+
+    /**
+     * Encode data into Base64
+     * @param {string} data
+     * @return {string}
+     */
+    base64(data) {
         // phpjs.org
         // http://kevin.vanzonneveld.net
         // *     example 1: base64_encode('Kevin van Zonneveld');
@@ -186,212 +783,26 @@ class UploaderProcessor {
         let r = data.length % 3;
         return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
     }
+}
+
+class UploaderChecksum {
+    /** @var {CheckSumMD5} */
+    checksum = null;
+
+    /**
+     * @param {CheckSumMD5} checksum
+     */
+    constructor(checksum = null) {
+        this.checksum = checksum;
+    }
 
     /**
      * Create file checksum
      * @param {Blob} file
      * @return {string}
      */
-    md5_checksum (file) {
+    md5 (file) {
         return (this.checksum) ? this.checksum.calcMD5(file) : '';
-    }
-    /**
-     * Sent initial request and get driving instructions
-     * @param {UploadedFile} uploadedFile
-     */
-    firstRead(uploadedFile) {
-        let self = this;
-        this.jQ.post(
-            this.targetConfig.targetInitPath,
-            {
-                fileName: uploadedFile.fileName,
-                fileSize: uploadedFile.fileSize
-            },
-            function(responseData) {
-                self.processServerInfo(uploadedFile, responseData);
-            }
-        );
-    }
-
-    /**
-     * Processing driving instruction that came from server
-     * @param {UploadedFile} uploadedFile
-     * @param {*} responseData
-     */
-    processServerInfo(uploadedFile, responseData: any) {
-        if (typeof responseData == "object") {
-            // is anything to upload
-            if (this.RESULT_CONTINUE === responseData.status || this.RESULT_BEGIN === responseData.status) {
-                // begin or continue?
-                uploadedFile.setInfoFromServer(responseData);
-                this.upRenderer.renderReaded(uploadedFile);
-                this.uploadPart(uploadedFile);
-            } else {
-                // File is dead, sent user info
-                uploadedFile.setError(this.langs.initReturnsFollowingError + responseData.errorMessage);
-                this.upRenderer.consoleError(uploadedFile, responseData);
-            }
-        } else {
-            // Query dead, sent user info
-            uploadedFile.setError(this.langs.initReturnsSomethingFailed);
-            this.upRenderer.consoleError(uploadedFile, responseData);
-        }
-    }
-
-    /**
-     * Sent request which contains part of uploaded file
-     * @param {UploadedFile} uploadedFile
-     */
-    uploadPart(uploadedFile) {
-        let self = this;
-        let reader = new FileReader();
-        reader.onload = (event: any) => {
-            if (event.target.readyState === reader.DONE) {
-                // DONE == 2
-                this.jQ.post(
-                    this.targetConfig.targetFilePath,
-                    {
-                        driver: uploadedFile.driver,
-                        content: UploaderProcessor.base64_encode(event.target.result),
-                        // checksum: this.md5_checksum(event.target.result),
-                        lastKnownPart: uploadedFile.lastKnownPart
-                    },
-                    function(responseData) {
-                        self.processUploadPart(uploadedFile, responseData);
-                    }
-                );
-            }
-        };
-        reader.onabort = (event: any) => {};
-        reader.onerror = (event: any) => {
-            self.upRenderer.updateStatus(uploadedFile, event.error);
-        };
-        UploaderProcessor.fileRead(reader, uploadedFile);
-    }
-
-    /**
-     * Process response about uploaded part
-     * @param {uploadedFile} uploadedFile
-     * @param {*} responseData
-     */
-    processUploadPart(uploadedFile, responseData: any) {
-        if (typeof responseData == "object") {
-            this.upRenderer.updateBar(uploadedFile);
-            this.upRenderer.updateStatus(uploadedFile, responseData.status);
-            uploadedFile.nextFilePart();
-            if (uploadedFile.STATUS_RUN === uploadedFile.readStatus) {
-                if (uploadedFile.lastKnownPart < uploadedFile.totalParts) {
-                    this.uploadPart(uploadedFile);
-                } else {
-                    this.closePart(uploadedFile);
-                }
-            }
-        } else {
-            uploadedFile.setError(this.langs.dataUploadReturnsSomethingFailed);
-            this.upRenderer.consoleError(uploadedFile, responseData);
-        }
-    }
-
-    /**
-     * Send request about upload closure
-     * @param {UploadedFile} uploadedFile
-     */
-    closePart(uploadedFile) {
-        let self = this;
-        this.jQ.post(
-            this.targetConfig.targetDonePath,
-            {
-                driver: uploadedFile.driver
-            },
-            function(responseData) {
-                self.processCloseInfo(uploadedFile, responseData);
-            }
-        );
-    }
-
-    /**
-     * Process response about file closure
-     * @param {UploadedFile} uploadedFile
-     * @param {*} responseData
-     */
-    processCloseInfo(uploadedFile, responseData: any) {
-        if (typeof responseData == "object") {
-            // is anything to upload
-            if (this.RESULT_COMPLETE === responseData.status) {
-                // everything ok
-                uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
-                this.upRenderer.renderFinished(uploadedFile);
-                this.upRenderer.updateStatus(uploadedFile, responseData.errorMessage);
-            } else {
-                // dead file, user info
-                uploadedFile.setError(this.langs.doneReturnsFollowingError + responseData.errorMessage);
-                this.upRenderer.consoleError(uploadedFile, responseData);
-            }
-        } else {
-            // dead query, user info
-            uploadedFile.setError(this.langs.doneReturnsSomethingFailed);
-            this.upRenderer.consoleError(uploadedFile, responseData);
-        }
-    }
-
-    /**
-     * @param {FileReader} reader
-     * @param {UploadedFile} uploadedFile
-     */
-    static fileRead(reader, uploadedFile) {
-        let blob = UploaderProcessor.fileSlice(
-            uploadedFile,
-            UploaderProcessor.segmentBegins(uploadedFile),
-            UploaderProcessor.segmentEnds(uploadedFile)
-        );
-        if (null == blob) {
-            uploadedFile.setError("Cannot slice file");
-        } else {
-            reader.readAsBinaryString(blob);
-        }
-    }
-
-    /**
-     * @param {UploadedFile} uploadedFile
-     * @returns {number}
-     */
-    static segmentBegins(uploadedFile) {
-        return uploadedFile.partSize * uploadedFile.lastKnownPart;
-    }
-
-    /**
-     * @param {UploadedFile} uploadedFile
-     * @returns {number}
-     */
-    static segmentEnds(uploadedFile) {
-        if (uploadedFile.lastKnownPart + 1 === uploadedFile.totalParts) {
-            // fileSize - only rest is need
-            return uploadedFile.fileSize;
-        } else {
-            return uploadedFile.partSize * (uploadedFile.lastKnownPart + 1);
-        }
-    }
-
-    /**
-     * @param {UploadedFile} uploadedFile
-     * @param {number} begin seek at beginning of segment
-     * @param {number} end   seek of ending of segment
-     * @returns {null|Blob}
-     */
-    static fileSlice(uploadedFile, begin, end) {
-        if (uploadedFile.fileHandler.slice) {
-            return uploadedFile.fileHandler.slice(begin, end);
-        } else if (uploadedFile.fileHandler.mozSlice) {
-            return uploadedFile.fileHandler.mozSlice(begin, end);
-        } else if (uploadedFile.fileHandler.webkitSlice) {
-            return uploadedFile.fileHandler.webkitSlice(begin, end);
-        } else {
-            return null;
-        }
-    }
-
-    getRenderer() {
-        return this.upRenderer;
     }
 }
 
@@ -437,7 +848,7 @@ class UploaderHandler {
         if (null != file) {
             // one
             file.readStatus = file.STATUS_INIT;
-            this.upProcessor.getRenderer().startRead(file);
+            this.upProcessor.getRenderer().process(file);
             this.upProcessor.firstRead(file);
         } else {
             // all
@@ -550,7 +961,7 @@ class UploaderRenderer {
         let node: any = this.jQ('#' + uploadedFile.localId);
         let button: any = node.find("button").eq(1);
         button.removeAttr("disabled");
-        node.attr("id", uploadedFile.driver);
+        node.attr("id", uploadedFile.sharedKey);
     }
 
     /**

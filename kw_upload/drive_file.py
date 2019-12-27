@@ -7,7 +7,7 @@ class UploadData:
 
     def __init__(self):
         self.file_name = ''
-        self.temp_name = ''
+        self.temp_path = ''
         self.file_size = 0
         self.parts_count = 0
         self.bytes_per_part = 0
@@ -22,7 +22,7 @@ class UploadData:
                  last_known_part: int = 0
                  ):
         self.file_name = file_name
-        self.temp_name = temp_name
+        self.temp_path = temp_name
         self.file_size = file_size
         self.parts_count = parts_count
         self.bytes_per_part = bytes_per_part
@@ -31,7 +31,7 @@ class UploadData:
 
     def sanitize_data(self):
         self.file_name = str(self.file_name)
-        self.temp_name = str(self.temp_name)
+        self.temp_path = str(self.temp_path)
         self.file_size = int(self.file_size)
         self.parts_count = int(self.parts_count)
         self.bytes_per_part = int(self.bytes_per_part)
@@ -203,16 +203,18 @@ class DriveFile:
         """
         return self._lib_driver.load()
 
-    def update_last_part(self, last: int) -> bool:
+    def update_last_part(self, data: UploadData, last: int, check_continuous: bool = True) -> bool:
         """
          * Update upload info
+        :param data: UploadData
         :param last: int
+        :param check_continuous: bool
         :return: bool
         :raise UploadException:
         """
-        data = self._lib_driver.load()
-        if (data.last_known_part + 1) != last:
-            raise UploadException(self._lang.drive_file_not_continuous())
+        if check_continuous:
+            if (data.last_known_part + 1) != last:
+                raise UploadException(self._lang.drive_file_not_continuous())
         data.last_known_part = last
         self._lib_driver.save(data)
         return True

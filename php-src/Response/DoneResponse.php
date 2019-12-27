@@ -14,24 +14,22 @@ class DoneResponse extends AResponse
 {
     /** @var null|DriveFile\Data */
     protected $data = null;
-    protected $targetPath = '';
 
-    public static function initDone(string $sharedKey, string $targetPath, DriveFile\Data $data): DoneResponse
+    public static function initDone(string $sharedKey, DriveFile\Data $data): DoneResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, $data, $targetPath, static::STATUS_COMPLETE);
+        return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
     public static function initError(string $sharedKey, DriveFile\Data $data, Exception $ex): DoneResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, $data, '', static::STATUS_FAIL, $ex->getMessage());
+        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, DriveFile\Data $data, string $targetPath, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, DriveFile\Data $data, string $status, string $errorMessage = self::STATUS_OK)
     {
         $this->sharedKey = $sharedKey;
-        $this->targetPath = $targetPath;
         $this->data = $data;
         $this->status = $status;
         $this->errorMessage = $errorMessage;
@@ -40,7 +38,7 @@ class DoneResponse extends AResponse
 
     public function getTargetFile(): string
     {
-        return $this->targetPath . $this->data->tempName;
+        return $this->data->tempPath;
     }
 
     public function getFileName(): string
@@ -52,7 +50,7 @@ class DoneResponse extends AResponse
     {
         return [
             "name" => (string)$this->data->fileName,
-            "driver" => (string)$this->sharedKey,
+            "sharedKey" => (string)$this->sharedKey,
             "status" => (string)$this->status,
             "errorMessage" => (string)$this->errorMessage,
         ];

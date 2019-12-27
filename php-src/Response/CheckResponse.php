@@ -37,7 +37,7 @@ class CheckResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            "driver" => (string)$this->sharedKey,
+            "sharedKey" => (string)$this->sharedKey,
             "checksum" => (string)$this->checksum,
             "status" => (string)$this->status,
             "errorMessage" => (string)$this->errorMessage,
