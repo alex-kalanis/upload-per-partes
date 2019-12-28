@@ -22,7 +22,7 @@ class Json extends ADriveFile
         foreach ($jsonData as $key => $value) {
             $libData->{$key} = $value;
         }
-        return $libData;
+        return $libData->sanitizeData();
     }
 
     public function save(Data $data): void

@@ -27,7 +27,7 @@ class Text extends ADriveFile
                 $libData->{$key} = $value;
             }
         }
-        return $libData;
+        return $libData->sanitizeData();
     }
 
     public function save(Data $data): void

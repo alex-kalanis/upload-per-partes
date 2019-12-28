@@ -31,4 +31,15 @@ class Data
         $this->lastKnownPart = $lastKnownPart;
         return $this;
     }
+
+    public function sanitizeData()
+    {
+        $this->fileName = (string)$this->fileName;
+        $this->tempPath = (string)$this->tempPath;
+        $this->fileSize = (int)$this->fileSize;
+        $this->partsCount = (int)$this->partsCount;
+        $this->bytesPerPart = (int)$this->bytesPerPart;
+        $this->lastKnownPart = (int)$this->lastKnownPart;
+        return $this;
+    }
 }

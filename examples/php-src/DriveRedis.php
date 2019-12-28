@@ -40,7 +40,7 @@ class DriveRedis extends UploadPerPartes\DriveFile\ADriveFile
         foreach ($jsonData as $key => $value) {
             $libData->{$key} = $value;
         }
-        return $libData;
+        return $libData->sanitizeData();
     }
 
     public function save(UploadPerPartes\DriveFile\Data $data): void
