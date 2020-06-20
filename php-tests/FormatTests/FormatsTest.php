@@ -3,7 +3,7 @@
 namespace FormatTests;
 
 use UploadPerPartes\DataFormat;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\Translations;
 
 class FormatsTest extends AFormats
 {

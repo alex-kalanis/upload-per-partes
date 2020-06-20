@@ -3,7 +3,7 @@
 namespace UploadPerPartes\DataFormat;
 
 use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\Translations;
 
 /**
  * Class AFormat

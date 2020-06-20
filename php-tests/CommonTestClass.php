@@ -1,7 +1,5 @@
 <?php
 
-use UploadPerPartes\DataFormat;
-
 class CommonTestClass extends \PHPUnit\Framework\TestCase
 {
 //    public function providerBasic()

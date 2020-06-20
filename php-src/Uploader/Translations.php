@@ -1,6 +1,6 @@
 <?php
 
-namespace UploadPerPartes;
+namespace UploadPerPartes\Uploader;
 
 /**
  * Class Translations
@@ -14,6 +14,16 @@ class Translations
     public static function init(): Translations
     {
         return new static();
+    }
+
+    public function sentNameIsEmpty(): string
+    {
+        return 'SENT FILE NAME IS EMPTY';
+    }
+
+    public function targetDirIsEmpty(): string
+    {
+        return 'TARGET DIR IS NOT SET';
     }
 
     public function driveFileAlreadyExists(): string

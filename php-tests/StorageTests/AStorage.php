@@ -4,7 +4,7 @@ namespace StorageTests;
 
 use CommonTestClass;
 use UploadPerPartes\Storage;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\Translations;
 
 abstract class AStorage extends CommonTestClass
 {

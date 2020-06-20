@@ -3,7 +3,7 @@
 namespace UploadPerPartes\Storage;
 
 use Rc;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\Translations;
 use UploadPerPartes\Exceptions\UploadException;
 
 /**

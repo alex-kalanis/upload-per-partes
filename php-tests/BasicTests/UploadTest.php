@@ -3,18 +3,19 @@
 namespace BasicTests;
 
 use CommonTestClass;
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\Keys;
 use UploadPerPartes\Response;
-use UploadPerPartes\Translations;
-use UploadPerPartes\Upload;
+use UploadPerPartes\Storage;
+use UploadPerPartes\Uploader;
+use UploadPerPartes\Uploader\Translations;
 
 class UploadTest extends CommonTestClass
 {
     public function tearDown()
     {
         if (is_file($this->mockTestFile())) {
-            $lib = new DataFormat\Text(Translations::init(), $this->mockTestFile());
-            $lib->remove();
+            $lib = new Storage\Volume(Translations::init());
+            $lib->remove($this->mockTestFile());
         }
         parent::tearDown();
     }
@@ -22,16 +23,16 @@ class UploadTest extends CommonTestClass
     public function testSimpleUpload()
     {
         // step 1 - init driver
-        $lib1 = new UploadMock($this->getTestDir());
+        $lib1 = new UploaderMock();
         $maxSize = filesize($this->getTestFile());
-        $result1 = $lib1->partesInit('lorem-ipsum.txt', $maxSize);
+        $result1 = $lib1->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
 
         // step 2 - send data
-        $lib2 = new UploadMock($this->getTestDir(), $result1->jsonSerialize()['sharedKey']);
+        $lib2 = new UploaderMock();
         $i = 0;
         do {
-            $result2 = $lib2->partesUpload(file_get_contents(
+            $result2 = $lib2->upload($result1->jsonSerialize()['sharedKey'], file_get_contents(
                 $this->getTestFile(), false, null, $i * $lib2->bytesPerPart, $lib2->bytesPerPart
             ));
             $i++;
@@ -39,8 +40,8 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
 
         // step 3 - close upload
-        $lib3 = new UploadMock($this->getTestDir(), $result1->jsonSerialize()['sharedKey']);
-        $result3 = $lib3->partesDone();
+        $lib3 = new UploaderMock();
+        $result3 = $lib3->done($result1->jsonSerialize()['sharedKey']);
 
         // check content
         $this->assertTrue(file_get_contents($result3->getTargetFile()) == file_get_contents($this->getTestFile()));
@@ -50,7 +51,7 @@ class UploadTest extends CommonTestClass
     }
 }
 
-class UploadMock extends Upload
+class UploaderMock extends Uploader
 {
     public $bytesPerPart = 512;
 }

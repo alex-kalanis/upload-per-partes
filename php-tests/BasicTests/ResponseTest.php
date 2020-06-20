@@ -3,6 +3,7 @@
 namespace BasicTests;
 
 use CommonTestClass;
+use UploadPerPartes\DataFormat;
 use UploadPerPartes\Response;
 use UploadPerPartes\Exceptions;
 
@@ -23,9 +24,8 @@ class ResponseTest extends CommonTestClass
     public function testInitError()
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\InitResponse::initError($this->mockSharedKey(), $this->mockData(), $ex);
+        $lib = Response\InitResponse::initError($this->mockData(), $ex);
 
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals('abcdef', $lib->jsonSerialize()['name']);
         $this->assertEquals(Response\InitResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
@@ -128,5 +128,17 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\CancelResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
+    }
+
+    protected function mockData(): DataFormat\Data
+    {
+        return DataFormat\Data::init()->setData(
+            'abcdef',
+            $this->getTestDir() . 'abcdef',
+            123456,
+            12,
+            64,
+            7
+        );
     }
 }

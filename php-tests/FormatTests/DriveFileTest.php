@@ -3,10 +3,10 @@
 namespace FormatTests;
 
 use UploadPerPartes\DataFormat\AFormat;
-use UploadPerPartes\DriveFile;
 use UploadPerPartes\Exceptions;
 use UploadPerPartes\Storage\Volume;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\DriveFile;
+use UploadPerPartes\Uploader\Translations;
 
 class DriveFileTest extends AFormats
 {
@@ -67,6 +67,6 @@ class DriveFileTest extends AFormats
     protected function mockDriveFile(int $format = AFormat::FORMAT_TEXT): DriveFile
     {
         $lang = Translations::init();
-        return new DriveFile($lang, new Volume($lang), AFormat::getFormat($lang, $format));
+        return new DriveFile($lang, new Volume($lang), AFormat::getFormat($lang, $format), new Key($lang));
     }
 }

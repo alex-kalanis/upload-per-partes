@@ -17,8 +17,9 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesInit()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH); // here temp path and init everytime with it
-            $this->sendResponse($lib->partesInit(
+            $lib = new UploadPerPartes\examples\Uploader(); // here temp path and init everytime with it
+            $this->sendResponse($lib->init(
+                static::ENCODING_UPLOAD_PATH,
                 $this->getHttpRequest()->getPost()->__get('fileName'),
                 $this->getHttpRequest()->getPost()->__get('fileSize')
             ));
@@ -34,10 +35,11 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesCheck()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('sharedKey')
+            $lib = new UploadPerPartes\examples\Uploader();
+            $this->sendResponse($lib->check(
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
+                (int)$this->getHttpRequest()->getPost()->__get('segment'))
             );
-            $this->sendResponse($lib->partesCheck((int)$this->getHttpRequest()->getPost()->__get('segment')));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\CheckResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
@@ -49,10 +51,9 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesPart()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('sharedKey')
-            );
-            $this->sendResponse($lib->partesUpload(
+            $lib = new UploadPerPartes\examples\Uploader();
+            $this->sendResponse($lib->upload(
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
                 base64_decode($this->getHttpRequest()->getPost()->__get('content'))
             ));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
@@ -67,10 +68,11 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesTruncate()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('sharedKey')
-            );
-            $this->sendResponse($lib->partesTruncateFrom($this->getHttpRequest()->getPost()->__get('segment')));
+            $lib = new UploadPerPartes\examples\Uploader();
+            $this->sendResponse($lib->truncateFrom(
+                $this->getHttpRequest()->getPost()->__get('sharedKey'),
+                $this->getHttpRequest()->getPost()->__get('segment')
+            ));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\TruncateResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
@@ -83,10 +85,10 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesCancel()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
+            $lib = new UploadPerPartes\examples\Uploader();
+            $this->sendResponse($lib->cancel(
                 $this->getHttpRequest()->getPost()->__get('sharedKey')
-            );
-            $this->sendResponse($lib->partesCancel());
+            ));
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\CancelResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
@@ -98,10 +100,8 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesDone()
     {
         try {
-            $lib = new UploadPerPartes\examples\Upload(static::ENCODING_UPLOAD_PATH,
-                $this->getHttpRequest()->getPost()->__get('sharedKey')
-            );
-            $result = $lib->partesDone();
+            $lib = new UploadPerPartes\examples\Uploader();
+            $result = $lib->done($this->getHttpRequest()->getPost()->__get('sharedKey'));
 
             // check uploaded content and move it on drive
             $libMove = new Lib\Content\FileSave($this->getUser());

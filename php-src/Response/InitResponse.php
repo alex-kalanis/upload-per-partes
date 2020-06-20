@@ -21,10 +21,10 @@ class InitResponse extends AResponse
         return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, DataFormat\Data $data, Exception $ex): InitResponse
+    public static function initError(DataFormat\Data $data, Exception $ex): InitResponse
     {
         $l = new static();
-        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
+        return $l->setData('', $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
     public function setData(string $sharedKey, DataFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)

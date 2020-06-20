@@ -5,7 +5,7 @@ namespace FormatTests;
 use CommonTestClass;
 use UploadPerPartes\DataFormat;
 use UploadPerPartes\Storage;
-use UploadPerPartes\Translations;
+use UploadPerPartes\Uploader\Translations;
 
 abstract class AFormats extends CommonTestClass
 {
