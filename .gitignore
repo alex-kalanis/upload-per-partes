@@ -1,5 +1,7 @@
 # Editor configuration
 .idea/
+phpunit.phar
+phpunit
 
 # Compiled modules
 *.pyc

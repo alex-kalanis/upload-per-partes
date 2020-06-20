@@ -74,7 +74,7 @@ class Upload
             $this->driver->remove();
             return Response\DoneResponse::initDone($this->sharedKey, $data);
         } catch (Exceptions\UploadException $ex) {
-            return Response\DoneResponse::initError($this->sharedKey, DriveFile\Data::init(), $ex);
+            return Response\DoneResponse::initError($this->sharedKey, DataFormat\Data::init(), $ex);
         }
     }
 
@@ -103,7 +103,7 @@ class Upload
             return Response\UploadResponse::initOK($this->sharedKey, $data);
 
         } catch (Exceptions\UploadException $e) {
-            return Response\UploadResponse::initError($this->sharedKey, DriveFile\Data::init(), $e);
+            return Response\UploadResponse::initError($this->sharedKey, DataFormat\Data::init(), $e);
         }
     }
 
@@ -117,7 +117,7 @@ class Upload
         try {
             return Response\TruncateResponse::initOK($this->sharedKey, $this->partesTruncateFromPart($segment));
         } catch (Exceptions\UploadException $e) {
-            return Response\TruncateResponse::initError($this->sharedKey, DriveFile\Data::init(), $e);
+            return Response\TruncateResponse::initError($this->sharedKey, DataFormat\Data::init(), $e);
         }
     }
 
@@ -149,16 +149,16 @@ class Upload
         $partsCounter = $this->calcParts($length);
         try {
             $this->initDriver($sharedKey);
-            $dataPack = DriveFile\Data::init()->setData($fileName, $tempPath, $length, $partsCounter, $this->bytesPerPart);
+            $dataPack = DataFormat\Data::init()->setData($fileName, $tempPath, $length, $partsCounter, $this->bytesPerPart);
             try {
-                $this->driver->create($dataPack);
+                $this->driver->write($dataPack);
             } catch (Exceptions\ContinuityUploadException $e) { // navazani na predchozi - datapack uz mame, tak ho nacpeme na front
                 $dataPack = $this->driver->read();
             }
             return Response\InitResponse::initOk($sharedKey, $dataPack);
 
         } catch (Exceptions\UploadException $e) { // obecne neco spatne
-            return Response\InitResponse::initError($sharedKey, DriveFile\Data::init()->setData(
+            return Response\InitResponse::initError($sharedKey, DataFormat\Data::init()->setData(
                 $fileName, $tempPath, $length, $partsCounter, $this->bytesPerPart, 0
             ), $e);
         }
@@ -230,7 +230,7 @@ class Upload
      */
     protected function initDriver(string $sharedKey)
     {
-        $this->driver = new DriveFile($this->lang, DriveFile\ADriveFile::init(
+        $this->driver = new DriveFile($this->lang, DataFormat\AFormat::getFormat(
             $this->lang,
             $this->getDriverVariant(),
             $this->targetPath . $sharedKey
@@ -239,7 +239,7 @@ class Upload
 
     protected function getDriverVariant(): int
     {
-        return DriveFile\ADriveFile::VARIANT_TEXT;
+        return DataFormat\AFormat::FORMAT_TEXT;
     }
 
     protected function getSharedKey(string $fileName): string
@@ -253,13 +253,13 @@ class Upload
     }
 
     /**
-     * @param DriveFile\Data $data
+     * @param DataFormat\Data $data
      * @param string $content binary content
      * @param int|null $seek where it save
      * @return bool
      * @throws Exceptions\UploadException
      */
-    protected function saveFilePart(DriveFile\Data $data, string $content, ?int $seek = null)
+    protected function saveFilePart(DataFormat\Data $data, string $content, ?int $seek = null)
     {
         if (is_numeric($seek)) {
             $pointer = fopen($data->tempPath, 'wb');
@@ -308,10 +308,10 @@ class Upload
 
     /**
      * @param int $segment where it will be
-     * @return DriveFile\Data
+     * @return DataFormat\Data
      * @throws Exceptions\UploadException
      */
-    protected function partesTruncateFromPart(int $segment): DriveFile\Data
+    protected function partesTruncateFromPart(int $segment): DataFormat\Data
     {
         $data = $this->driver->read();
         $this->checkSegment($data, $segment);
@@ -328,11 +328,11 @@ class Upload
     }
 
     /**
-     * @param DriveFile\Data $data
+     * @param DataFormat\Data $data
      * @param int $segment
      * @throws Exceptions\UploadException
      */
-    protected function checkSegment(DriveFile\Data $data, int $segment): void
+    protected function checkSegment(DataFormat\Data $data, int $segment): void
     {
         if ($segment < 0) {
             throw new Exceptions\UploadException($this->lang->segmentOutOfBounds());

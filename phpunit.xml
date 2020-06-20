@@ -11,7 +11,7 @@
         convertWarningsToExceptions="true"
         forceCoversAnnotation="false"
         processIsolation="false"
-        stopOnError="true"
+        stopOnError="false"
         stopOnFailure="false"
         stopOnIncomplete="false"
         stopOnSkipped="false"
@@ -19,6 +19,7 @@
         timeoutForSmallTests="1"
         timeoutForMediumTests="10"
         timeoutForLargeTests="60"
+        defaultTestSuite="ALL"
         verbose="true">
     <logging>
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
@@ -32,6 +33,18 @@
     <testsuites>
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
+            <directory>php-tests/FormatTests</directory>
+            <directory>php-tests/StorageTests</directory>
+            <directory>php-tests/ResponsesTests</directory>
+        </testsuite>
+        <testsuite name="Formats">
+            <directory>php-tests/FormatTests</directory>
+        </testsuite>
+        <testsuite name="Storage">
+            <directory>php-tests/StorageTests</directory>
+        </testsuite>
+        <testsuite name="Responses">
+            <directory>php-tests/ResponsesTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

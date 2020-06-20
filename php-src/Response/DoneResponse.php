@@ -2,8 +2,8 @@
 
 namespace UploadPerPartes\Response;
 
-use UploadPerPartes\DriveFile;
 use Exception;
+use UploadPerPartes\DataFormat;
 
 /**
  * Class DoneResponse
@@ -12,22 +12,22 @@ use Exception;
  */
 class DoneResponse extends AResponse
 {
-    /** @var null|DriveFile\Data */
+    /** @var null|DataFormat\Data */
     protected $data = null;
 
-    public static function initDone(string $sharedKey, DriveFile\Data $data): DoneResponse
+    public static function initDone(string $sharedKey, DataFormat\Data $data): DoneResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, DriveFile\Data $data, Exception $ex): DoneResponse
+    public static function initError(string $sharedKey, DataFormat\Data $data, Exception $ex): DoneResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, DriveFile\Data $data, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, DataFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
     {
         $this->sharedKey = $sharedKey;
         $this->data = $data;

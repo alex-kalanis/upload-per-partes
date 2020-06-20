@@ -1,6 +1,6 @@
 <?php
 
-namespace UploadPerPartes\DriveFile;
+namespace UploadPerPartes\DataFormat;
 
 /**
  * Class Data

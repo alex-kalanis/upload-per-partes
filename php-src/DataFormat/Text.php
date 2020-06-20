@@ -1,0 +1,37 @@
+<?php
+
+namespace UploadPerPartes\DataFormat;
+
+/**
+ * Class Text
+ * @package UploadPerPartes\DriveFile
+ * Driver file - format plaintext
+ */
+class Text extends AFormat
+{
+    const DATA_SEPARATOR = ':';
+    const LINE_SEPARATOR = "\r\n";
+
+    public function fromFormat(string $content): Data
+    {
+        $lines = explode(static::LINE_SEPARATOR, $content);
+        $libData = new Data();
+        foreach ($lines as $line) {
+            if (mb_strlen($line) > 0) {
+                list($key, $value, $nothing) = explode(static::DATA_SEPARATOR, $line);
+                $libData->{$key} = $value;
+            }
+        }
+        return $libData->sanitizeData();
+    }
+
+    public function toFormat(Data $data): string
+    {
+        $dataArray = (array)$data;
+        $dataLines = [];
+        foreach ($dataArray as $key => $value) {
+            $dataLines[] = implode(static::DATA_SEPARATOR, [$key, $value, '']);
+        }
+        return implode(static::LINE_SEPARATOR, $dataLines);
+    }
+}

@@ -1,5 +1,8 @@
 <?php
 
+namespace BasicTests;
+
+use CommonTestClass;
 use UploadPerPartes\Response;
 use UploadPerPartes\Exceptions;
 

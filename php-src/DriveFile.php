@@ -11,52 +11,59 @@ use UploadPerPartes\Exceptions;
  */
 class DriveFile
 {
-    /** @var DriveFile\ADriveFile */
-    protected $libDriver = null;
+    /** @var Storage\AStorage */
+    protected $storage = null;
+    /** @var DataFormat\AFormat */
+    protected $format = null;
     /** @var Translations */
     protected $lang = null;
 
-    public function __construct(Translations $lang, DriveFile\ADriveFile $libDriver)
+    public function __construct(Translations $lang, Storage\AStorage $storage, DataFormat\AFormat $format)
     {
-        $this->libDriver = $libDriver;
+        $this->storage = $storage;
+        $this->format = $format;
         $this->lang = $lang;
     }
 
     /**
      * Create new drive file
-     * @param DriveFile\Data $data
+     * @param string $key
+     * @param DataFormat\Data $data
+     * @param bool $isNew
      * @return bool
      * @throws Exceptions\UploadException
      * @throws Exceptions\ContinuityUploadException
      */
-    public function create(DriveFile\Data $data)
+    public function write(string $key, DataFormat\Data $data, bool $isNew = false)
     {
-        if ($this->libDriver->exists()) {
+        if ($isNew && $this->storage->exists($key)) {
             throw new Exceptions\ContinuityUploadException($this->lang->driveFileAlreadyExists());
         }
-        $this->libDriver->save($data);
+        $this->storage->save($key, $this->format->toFormat($data));
         return true;
     }
 
     /**
      * Read drive file
-     * @return DriveFile\Data
+     * @param string $key
+     * @return DataFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function read(): DriveFile\Data
+    public function read(string $key): DataFormat\Data
     {
-        return $this->libDriver->load();
+        return $this->format->fromFormat($this->storage->load($key));
     }
 
     /**
      * Update upload info
-     * @param DriveFile\Data $data
+     * @param string $key
+     * @param DataFormat\Data $data
      * @param int $last
      * @param bool $checkContinuous
      * @return bool
      * @throws Exceptions\UploadException
      */
-    public function updateLastPart(DriveFile\Data $data, int $last, bool $checkContinuous = true): bool
+    public function updateLastPart(string $key, DataFormat\Data $data, int $last, bool $checkContinuous = true): bool
     {
         if ($checkContinuous) {
             if (($data->lastKnownPart + 1) != $last) {
@@ -64,18 +71,19 @@ class DriveFile
             }
         }
         $data->lastKnownPart = $last;
-        $this->libDriver->save($data);
+        $this->storage->save($key, $this->format->toFormat($data));
         return true;
     }
 
     /**
      * Delete drive file - usually on finish or discard
+     * @param string $key
      * @return bool
      * @throws Exceptions\UploadException
      */
-    public function remove(): bool
+    public function remove(string $key): bool
     {
-        $this->libDriver->remove();
+        $this->storage->remove($key);
         return true;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use UploadPerPartes\DriveFile;
+use UploadPerPartes\DataFormat;
 
 class CommonTestClass extends \PHPUnit\Framework\TestCase
 {
@@ -24,23 +24,12 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
 
     protected function getTestDir(): string
     {
-        return realpath(__DIR__ . '/tmp/') . '/';
+//        return realpath(__DIR__ . '/tmp/') . '/';
+        return realpath('/tmp/') . '/';
     }
 
     protected function getTestFile(): string
     {
         return realpath(__DIR__ . '/testing-ipsum.txt');
-    }
-
-    protected function mockData(): DriveFile\Data
-    {
-        return DriveFile\Data::init()->setData(
-            'abcdef',
-            $this->getTestDir() . 'abcdef',
-            123456,
-            12,
-            64,
-            7
-        );
     }
 }

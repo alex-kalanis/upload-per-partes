@@ -1,6 +1,9 @@
 <?php
 
-use UploadPerPartes\DriveFile;
+namespace BasicTests;
+
+use CommonTestClass;
+use UploadPerPartes\DataFormat;
 use UploadPerPartes\Response;
 use UploadPerPartes\Translations;
 use UploadPerPartes\Upload;
@@ -10,7 +13,7 @@ class UploadTest extends CommonTestClass
     public function tearDown()
     {
         if (is_file($this->mockTestFile())) {
-            $lib = new DriveFile\Text(Translations::init(), $this->mockTestFile());
+            $lib = new DataFormat\Text(Translations::init(), $this->mockTestFile());
             $lib->remove();
         }
         parent::tearDown();
