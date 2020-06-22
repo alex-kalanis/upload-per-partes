@@ -34,11 +34,15 @@
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
             <directory>php-tests/FormatTests</directory>
+            <directory>php-tests/KeysTests</directory>
             <directory>php-tests/StorageTests</directory>
             <directory>php-tests/ResponsesTests</directory>
         </testsuite>
         <testsuite name="Formats">
             <directory>php-tests/FormatTests</directory>
+        </testsuite>
+        <testsuite name="Keys">
+            <directory>php-tests/KeysTests</directory>
         </testsuite>
         <testsuite name="Storage">
             <directory>php-tests/StorageTests</directory>

@@ -22,6 +22,7 @@ class VolumeTest extends AStorage
 
     /**
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage CANNOT READ DRIVEFILE
      */
     public function testUnreadable()
     {
@@ -35,6 +36,7 @@ class VolumeTest extends AStorage
 
     /**
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage CANNOT WRITE DRIVEFILE
      */
     public function testUnwriteable()
     {
@@ -47,6 +49,7 @@ class VolumeTest extends AStorage
 
     /**
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage DRIVEFILE CANNOT BE REMOVED
      */
     public function testDeleted()
     {

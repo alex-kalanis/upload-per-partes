@@ -19,6 +19,7 @@ class FormatsTest extends AFormats
 
     /**
      * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage DRIVEFILE VARIANT NOT SET
      */
     public function testInitFail()
     {

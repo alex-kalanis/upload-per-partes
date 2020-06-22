@@ -2,6 +2,8 @@
 
 namespace UploadPerPartes;
 
+use UploadPerPartes\Storage\TargetSearch;
+use UploadPerPartes\Uploader\Calculates;
 use UploadPerPartes\Uploader\Translations;
 
 /**
@@ -13,10 +15,12 @@ class Uploader
 {
     /** @var Keys\AKey */
     protected $key = null;
+    /** @var TargetSearch */
+    protected $targetSearch = null;
+    /** @var Calculates */
+    protected $calculations = null;
     /** @var Uploader\Processor */
     protected $processor = null;
-    /** @var int */
-    protected $bytesPerPart = 262144; // 1024*256
 
     /**
      * @throws Exceptions\UploadException
@@ -25,16 +29,32 @@ class Uploader
     {
         $lang = new Uploader\Translations();
         $storage = new Storage\Volume($lang);
-        $format = DataFormat\AFormat::getFormat($lang, DataFormat\AFormat::FORMAT_JSON);
-        $this->key = $this->getKey($lang);
+        $format = DataFormat\AFormat::getFormat($lang, $this->getFormat());
+        $this->targetSearch = $this->getTarget($lang);
+        $this->calculations = $this->getCalc();
+        $this->key = Keys\AKey::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
         $driver = new Uploader\DriveFile($lang, $storage, $format, $this->key);
         $this->processor = $this->getProcessor($lang, $driver);
     }
 
-    protected function getKey(Translations $lang): Keys\AKey
+    protected function getFormat(): int
     {
-        $keys = new Keys\Volume($lang);
-        return $keys->setTargetDir('/');
+        return DataFormat\AFormat::FORMAT_JSON;
+    }
+
+    protected function getKeyVariant(): int
+    {
+        return Keys\AKey::VARIANT_VOLUME;
+    }
+
+    protected function getTarget(Translations $lang): TargetSearch
+    {
+        return new TargetSearch($lang);
+    }
+
+    protected function getCalc(): Calculates
+    {
+        return new Calculates(262144);
     }
 
     protected function getProcessor(Translations $lang, Uploader\DriveFile $driver): Uploader\Processor
@@ -126,23 +146,23 @@ class Uploader
      */
     public function init(string $targetPath, string $remoteFileName, int $length): Response\AResponse
     {
-        $partsCounter = $this->calcParts($length);
+        $partsCounter = $this->calculations->calcParts($length);
         try {
-            $this->key->setTargetDir($targetPath)->setRemoteFileName($remoteFileName)->process();
-            $sharedKey = $this->key->getNewSharedKey();
-            $dataPack = DataFormat\Data::init()->setData($this->key->getFileName(), $this->key->getTargetLocation(), $length, $partsCounter, $this->bytesPerPart);
-            return Response\InitResponse::initOk($sharedKey, $this->processor->init($dataPack, $sharedKey));
+            $this->targetSearch->setTargetDir($targetPath)->setRemoteFileName($remoteFileName)->process();
+            $this->key->generateKeys();
+            $dataPack = DataFormat\Data::init()->setData(
+                $this->targetSearch->getFinalTargetName(),
+                $this->targetSearch->getTemporaryTargetLocation(),
+                $length,
+                $partsCounter,
+                $this->calculations->getBytesPerPart()
+            );
+            return Response\InitResponse::initOk($this->key->getSharedKey(), $this->processor->init($dataPack, $this->key->getSharedKey()));
 
         } catch (Exceptions\UploadException $e) { // obecne neco spatne
             return Response\InitResponse::initError(DataFormat\Data::init()->setData(
-                $remoteFileName, '', $length, $partsCounter, $this->bytesPerPart, 0
+                $remoteFileName, '', $length, $partsCounter, $this->calculations->getBytesPerPart()
             ), $e);
         }
-    }
-
-    protected function calcParts(int $length): int
-    {
-        $partsCounter = (int)($length / $this->bytesPerPart);
-        return (($length % $this->bytesPerPart) == 0) ? (int)$partsCounter : (int)($partsCounter + 1);
     }
 }

@@ -7,6 +7,7 @@ use UploadPerPartes\Keys;
 use UploadPerPartes\Response;
 use UploadPerPartes\Storage;
 use UploadPerPartes\Uploader;
+use UploadPerPartes\Uploader\Calculates;
 use UploadPerPartes\Uploader\Translations;
 
 class UploadTest extends CommonTestClass
@@ -30,13 +31,14 @@ class UploadTest extends CommonTestClass
 
         // step 2 - send data
         $lib2 = new UploaderMock();
+        $bytesPerPart = $lib2->calculations->getBytesPerPart();
         $i = 0;
         do {
             $result2 = $lib2->upload($result1->jsonSerialize()['sharedKey'], file_get_contents(
-                $this->getTestFile(), false, null, $i * $lib2->bytesPerPart, $lib2->bytesPerPart
+                $this->getTestFile(), false, null, $i * $bytesPerPart, $bytesPerPart
             ));
             $i++;
-        } while ($i * $lib2->bytesPerPart < $maxSize);
+        } while ($i * $bytesPerPart < $maxSize);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
 
         // step 3 - close upload
@@ -44,7 +46,7 @@ class UploadTest extends CommonTestClass
         $result3 = $lib3->done($result1->jsonSerialize()['sharedKey']);
 
         // check content
-        $this->assertTrue(file_get_contents($result3->getTargetFile()) == file_get_contents($this->getTestFile()));
+        $this->assertTrue(file_get_contents($result3->getTemporaryLocation()) == file_get_contents($this->getTestFile()));
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         @unlink($result3->getTargetFile());
@@ -53,5 +55,11 @@ class UploadTest extends CommonTestClass
 
 class UploaderMock extends Uploader
 {
-    public $bytesPerPart = 512;
+    /** @var Calculates */
+    public $calculations;
+
+    protected function getCalc(): Calculates
+    {
+        return new Calculates(512);
+    }
 }

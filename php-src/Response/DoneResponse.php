@@ -36,9 +36,9 @@ class DoneResponse extends AResponse
         return $this;
     }
 
-    public function getTargetFile(): string
+    public function getTemporaryLocation(): string
     {
-        return $this->data->tempPath;
+        return $this->data->tempLocation;
     }
 
     public function getFileName(): string

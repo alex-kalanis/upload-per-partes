@@ -36,7 +36,7 @@ class Processor
     public function cancel(string $sharedKey): void
     {
         $data = $this->driver->read($sharedKey);
-        if (! @unlink($data->tempPath)) {
+        if (! @unlink($data->tempLocation)) {
             throw new Exceptions\UploadException($this->lang->cannotRemoveData());
         }
         $this->driver->remove($sharedKey);
@@ -93,7 +93,7 @@ class Processor
         $data = $this->driver->read($sharedKey);
         $this->checkSegment($data, $segment);
 
-        $handle = fopen($data->tempPath, 'r+');
+        $handle = fopen($data->tempLocation, 'r+');
         if (!ftruncate($handle, $data->bytesPerPart * $segment)) {
             fclose($handle);
             throw new Exceptions\UploadException($this->lang->cannotTruncateFile());
@@ -117,7 +117,7 @@ class Processor
         $this->checkSegment($data, $segment);
 
         return md5(file_get_contents(
-            $data->tempPath,
+            $data->tempLocation,
             false,
             null,
             $data->bytesPerPart * $segment,
@@ -152,7 +152,7 @@ class Processor
     protected function saveFilePart(DataFormat\Data $data, string $content, ?int $seek = null)
     {
         if (is_numeric($seek)) {
-            $pointer = fopen($data->tempPath, 'wb');
+            $pointer = fopen($data->tempLocation, 'wb');
             if (false === $pointer) {
                 throw new Exceptions\UploadException($this->lang->cannotOpenFile());
             }
@@ -165,7 +165,7 @@ class Processor
             }
             fclose($pointer);
         } else {
-            $pointer = fopen($data->tempPath, 'ab');
+            $pointer = fopen($data->tempLocation, 'ab');
             if (false == $pointer) {
                 throw new Exceptions\UploadException($this->lang->cannotOpenFile());
             }

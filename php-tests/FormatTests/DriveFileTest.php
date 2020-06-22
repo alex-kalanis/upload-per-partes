@@ -4,6 +4,7 @@ namespace FormatTests;
 
 use UploadPerPartes\DataFormat\AFormat;
 use UploadPerPartes\Exceptions;
+use UploadPerPartes\Storage\TargetSearch;
 use UploadPerPartes\Storage\Volume;
 use UploadPerPartes\Uploader\DriveFile;
 use UploadPerPartes\Uploader\Translations;
@@ -40,7 +41,7 @@ class DriveFileTest extends AFormats
         $data = $lib->read($this->mockTestFile());
 
         $this->assertEquals('abcdef', $data->fileName);
-        $this->assertEquals($this->getTestDir() . 'abcdef', $data->tempPath);
+        $this->assertEquals($this->getTestDir() . 'abcdef', $data->tempLocation);
         $this->assertEquals(123456, $data->fileSize);
         $this->assertEquals(12, $data->partsCount);
         $this->assertEquals(64, $data->bytesPerPart);
@@ -67,6 +68,7 @@ class DriveFileTest extends AFormats
     protected function mockDriveFile(int $format = AFormat::FORMAT_TEXT): DriveFile
     {
         $lang = Translations::init();
-        return new DriveFile($lang, new Volume($lang), AFormat::getFormat($lang, $format), new Key($lang));
+        $target = new TargetSearch($lang);
+        return new DriveFile($lang, new Volume($lang), AFormat::getFormat($lang, $format), new Key($lang, $target));
     }
 }

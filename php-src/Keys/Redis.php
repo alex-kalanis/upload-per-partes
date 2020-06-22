@@ -9,18 +9,21 @@ namespace UploadPerPartes\Keys;
  */
 class Redis extends AKey
 {
-    public function fromShared(string $key): string
+    const PREFIX = 'aupload_content_';
+
+    public function fromSharedKey(string $key): string
     {
-        return $this->getRedisKey($key);
+        return $this->getPrefix() . $key;
     }
 
-    public function getNewSharedKey(): string
+    public function generateKeys(): parent
     {
-        return md5($this->remoteFileName);
+        $this->sharedKey = md5($this->target->getFinalTargetName());
+        return $this;
     }
 
-    protected function getRedisKey($key): string
+    protected function getPrefix(): string
     {
-        return 'aupload_content_' . $key;
+        return static::PREFIX;
     }
 }

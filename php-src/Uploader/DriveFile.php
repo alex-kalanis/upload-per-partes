@@ -42,7 +42,7 @@ class DriveFile
      */
     public function write(string $sharedKey, DataFormat\Data $data, bool $isNew = false)
     {
-        $key = $this->key->fromShared($sharedKey);
+        $key = $this->key->fromSharedKey($sharedKey);
         if ($isNew && $this->storage->exists($key)) {
             throw new Exceptions\ContinuityUploadException($this->lang->driveFileAlreadyExists());
         }
@@ -58,7 +58,7 @@ class DriveFile
      */
     public function read(string $sharedKey): DataFormat\Data
     {
-        return $this->format->fromFormat($this->storage->load($this->key->fromShared($sharedKey)));
+        return $this->format->fromFormat($this->storage->load($this->key->fromSharedKey($sharedKey)));
     }
 
     /**
@@ -78,7 +78,7 @@ class DriveFile
             }
         }
         $data->lastKnownPart = $last;
-        $this->storage->save($this->key->fromShared($sharedKey), $this->format->toFormat($data));
+        $this->storage->save($this->key->fromSharedKey($sharedKey), $this->format->toFormat($data));
         return true;
     }
 
@@ -90,7 +90,7 @@ class DriveFile
      */
     public function remove(string $sharedKey): bool
     {
-        $this->storage->remove($this->key->fromShared($sharedKey));
+        $this->storage->remove($this->key->fromSharedKey($sharedKey));
         return true;
     }
 }

@@ -21,6 +21,21 @@ class Translations
         return 'SENT FILE NAME IS EMPTY';
     }
 
+    public function uploadNameIsEmpty(): string
+    {
+        return 'UPLOAD FILE NAME IS EMPTY';
+    }
+
+    public function sharedKeyIsEmpty(): string
+    {
+        return 'SHARED KEY IS EMPTY';
+    }
+
+    public function keyVariantNotSet(): string
+    {
+        return 'KEY VARIANT NOT SET';
+    }
+
     public function targetDirIsEmpty(): string
     {
         return 'TARGET DIR IS NOT SET';

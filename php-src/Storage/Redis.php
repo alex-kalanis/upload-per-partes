@@ -2,23 +2,23 @@
 
 namespace UploadPerPartes\Storage;
 
-use Rc;
+use Predis;
 use UploadPerPartes\Uploader\Translations;
 use UploadPerPartes\Exceptions\UploadException;
 
 /**
- * Class DriveRedis
+ * Class Redis
  * @package UploadPerPartes\Storage
- * Processing info file in Redis cluster
+ * Processing info file in Redis
  */
 class Redis extends AStorage
 {
-    /** @var null|Rc */
+    /** @var null|Predis\Client */
     protected $redis = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(Translations $lang, Rc $redis, int $timeout = 3600)
+    public function __construct(Translations $lang, Predis\Client $redis, int $timeout = 3600)
     {
         // path is not a route but redis key
         parent::__construct($lang);
