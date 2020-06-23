@@ -1,25 +1,28 @@
 <?php
 
-namespace UploadPerPartes\Storage;
+namespace BasicTests;
 
 use UploadPerPartes\Exceptions\UploadException;
+use UploadPerPartes\Storage\AStorage;
 
 /**
  * Class Volume
  * @package UploadPerPartes\DriveFile
- * Processing info file on disk volume
+ * Processing info file on ram volume
  */
-class Volume extends AStorage
+class Ram extends AStorage
 {
+    protected $data = '';
+
     public function exists(string $key): bool
     {
-        return is_file($key);
+        return !empty($this->data);
     }
 
     public function load(string $key): string
     {
-        $content = @file_get_contents($key);
-        if (false === $content) {
+        $content = $this->data;
+        if (empty($content)) {
             throw new UploadException($this->lang->driveFileCannotRead());
         }
         return $content;
@@ -27,15 +30,11 @@ class Volume extends AStorage
 
     public function save(string $key, string $data): void
     {
-        if (false === @file_put_contents($key, $data)) {
-            throw new UploadException($this->lang->driveFileCannotWrite());
-        }
+        $this->data = $data;
     }
 
     public function remove(string $key): void
     {
-        if (!@unlink($key)) {
-            throw new UploadException($this->lang->driveFileCannotRemove());
-        }
+        $this->data = '';
     }
 }

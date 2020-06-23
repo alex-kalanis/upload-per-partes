@@ -3,7 +3,6 @@
 namespace FormatTests;
 
 use CommonTestClass;
-use UploadPerPartes\DataFormat;
 use UploadPerPartes\Storage;
 use UploadPerPartes\Uploader\Translations;
 
@@ -16,17 +15,5 @@ abstract class AFormats extends CommonTestClass
             $lib->remove($this->mockTestFile());
         }
         parent::tearDown();
-    }
-
-    protected function mockData(): DataFormat\Data
-    {
-        return DataFormat\Data::init()->setData(
-            'abcdef',
-            $this->getTestDir() . 'abcdef',
-            123456,
-            12,
-            64,
-            7
-        );
     }
 }

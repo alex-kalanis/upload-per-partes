@@ -40,13 +40,12 @@ class DriveFile
      * @throws Exceptions\UploadException
      * @throws Exceptions\ContinuityUploadException
      */
-    public function write(string $sharedKey, DataFormat\Data $data, bool $isNew = false)
+    public function write(string $sharedKey, DataFormat\Data $data, bool $isNew = false): bool
     {
-        $key = $this->key->fromSharedKey($sharedKey);
-        if ($isNew && $this->storage->exists($key)) {
+        if ($isNew && $this->exists($sharedKey)) {
             throw new Exceptions\ContinuityUploadException($this->lang->driveFileAlreadyExists());
         }
-        $this->storage->save($key, $this->format->toFormat($data));
+        $this->storage->save($this->key->fromSharedKey($sharedKey), $this->format->toFormat($data));
         return true;
     }
 
@@ -92,5 +91,15 @@ class DriveFile
     {
         $this->storage->remove($this->key->fromSharedKey($sharedKey));
         return true;
+    }
+
+    /**
+     * Has driver data? Mainly for testing
+     * @param string $sharedKey
+     * @return bool
+     */
+    public function exists(string $sharedKey): bool
+    {
+        return $this->storage->exists($this->key->fromSharedKey($sharedKey));
     }
 }

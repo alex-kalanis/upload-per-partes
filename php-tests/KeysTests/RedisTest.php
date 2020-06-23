@@ -16,7 +16,7 @@ class RedisTest extends CommonTestClass
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);
-        $target->setRemoteFileName('poiuztrewq')->setTargetDir('/tmp/')->process();
+        $target->setRemoteFileName('poiuztrewq')->setTargetDir($this->getTestDir())->process();
         $lib = new Keys\Redis($lang, $target);
         $lib->generateKeys();
 

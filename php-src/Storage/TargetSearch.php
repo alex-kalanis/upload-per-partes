@@ -6,7 +6,7 @@ use UploadPerPartes\Exceptions\UploadException;
 use UploadPerPartes\Uploader\Translations;
 
 /**
- * Class SearchTarget
+ * Class TargetSearch
  * @package UploadPerPartes\Keys
  * Search possible target path
  */

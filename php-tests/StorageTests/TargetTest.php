@@ -46,10 +46,10 @@ class TargetTest extends CommonTestClass
     public function testProcessClear()
     {
         $lib = new TargetSearch(Translations::init());
-        $lib->setTargetDir('/tmp/')->setRemoteFileName('what can be found$.here')->process();
+        $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what can be found$.here')->process();
         $this->assertEquals('what_can_be_found.here', $lib->getFinalTargetName());
-        $this->assertEquals('/tmp/what_can_be_found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
-        $this->assertEquals('/tmp/what_can_be_found.here' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        $this->assertEquals($this->getTestDir() . 'what_can_be_found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
+        $this->assertEquals($this->getTestDir() . 'what_can_be_found.here' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
     }
 
     /**
@@ -58,10 +58,10 @@ class TargetTest extends CommonTestClass
     public function testProcessNoClear()
     {
         $lib = new TargetSearch(Translations::init(), false, false);
-        $lib->setTargetDir('/tmp/')->setRemoteFileName('what el$e can be found')->process();
+        $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what el$e can be found')->process();
         $this->assertEquals('what el$e can be found', $lib->getFinalTargetName());
-        $this->assertEquals('/tmp/what el$e can be found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
-        $this->assertEquals('/tmp/what el$e can be found' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        $this->assertEquals($this->getTestDir() . 'what el$e can be found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
+        $this->assertEquals($this->getTestDir() . 'what el$e can be found' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
     }
 
     /**
@@ -69,16 +69,16 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessNameLookup()
     {
-        file_put_contents('/tmp/dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents('/tmp/dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents('/tmp/dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents('/tmp/dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        file_put_contents($this->getTestDir() . 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        file_put_contents($this->getTestDir() . 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        file_put_contents($this->getTestDir() . 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        file_put_contents($this->getTestDir() . 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm');
         $lib = new TargetSearch(Translations::init(), false, false);
-        $lib->setTargetDir('/tmp/')->setRemoteFileName('dummyFile.tst')->process();
-        $this->assertEquals('/tmp/dummyFile.3.tst' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
-        unlink('/tmp/dummyFile.tst');
-        unlink('/tmp/dummyFile.0.tst');
-        unlink('/tmp/dummyFile.1.tst');
-        unlink('/tmp/dummyFile.2.tst');
+        $lib->setTargetDir($this->getTestDir())->setRemoteFileName('dummyFile.tst')->process();
+        $this->assertEquals($this->getTestDir() . 'dummyFile.3.tst' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        unlink($this->getTestDir() . 'dummyFile.tst');
+        unlink($this->getTestDir() . 'dummyFile.0.tst');
+        unlink($this->getTestDir() . 'dummyFile.1.tst');
+        unlink($this->getTestDir() . 'dummyFile.2.tst');
     }
 }

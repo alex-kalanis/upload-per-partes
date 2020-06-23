@@ -30,7 +30,6 @@ abstract class AKey
     /**
      * @param string $key
      * @return string
-     * @throws UploadException
      */
     abstract public function fromSharedKey(string $key): string;
 
