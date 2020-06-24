@@ -18,7 +18,7 @@ class DataRam extends AStorage
         $this->data = ( is_null($seek) ? $this->data : substr($this->data, 0, $seek) ) . $content;
     }
 
-    public function getPart(string $location, int $offset, int $limit): string
+    public function getPart(string $location, int $offset, ?int $limit = null): string
     {
         return substr($this->data, $offset, $limit);
     }
@@ -28,7 +28,7 @@ class DataRam extends AStorage
         $this->data = substr($this->data, 0, $offset);
     }
 
-    public function remove(string $key): void
+    public function remove(string $location): void
     {
         $this->data = '';
     }

@@ -14,7 +14,7 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
 
     protected function mockTestFile(): string
     {
-        return $this->getTestDir() . 'testing.partial';
+        return $this->getTestDir() . 'testing.upload';
     }
 
     protected function mockSharedKey(): string

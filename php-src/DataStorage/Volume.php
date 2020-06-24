@@ -8,60 +8,88 @@ use UploadPerPartes\Exceptions\UploadException;
  * Class Volume
  * @package UploadPerPartes\DataStorage
  * Processing info file on disk volume
+ * Filesystem behaves oddly - beware of fucked up caching!
+ * When someone got idea how to test it without ignoring failed states, please tell me.
  */
 class Volume extends AStorage
 {
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
-        if (is_numeric($seek)) {
-            $pointer = fopen($location, 'wb');
-            if (false === $pointer) {
-                throw new UploadException($this->lang->cannotOpenFile());
-            }
-            $position = fseek($pointer, $seek);
-            if ($position == -1) {
-                throw new UploadException($this->lang->cannotSeekFile());
-            }
-            if (false === fwrite($pointer, $content, strlen($content))) {
-                throw new UploadException($this->lang->cannotWriteFile());
-            }
-            fclose($pointer);
-        } else {
-            $pointer = fopen($location, 'ab');
+        if (is_null($seek)) {  // append to end
+            $pointer = @fopen($location, 'a');
             if (false == $pointer) {
                 throw new UploadException($this->lang->cannotOpenFile());
             }
-            if (false === fwrite($pointer, $content, strlen($content))) {
+            if (false === @fwrite($pointer, $content)) {
+                // @codeCoverageIgnoreStart
+                @fclose($pointer);
+                throw new UploadException($this->lang->cannotWriteFile());
+                // @codeCoverageIgnoreEnd
+            }
+            @fclose($pointer);
+        } else { // append from position
+            $pointer = @fopen($location, 'r+');
+            if (false === $pointer) {
+                throw new UploadException($this->lang->cannotOpenFile());
+            }
+            // @codeCoverageIgnoreStart
+            $position = @fseek($pointer, $seek);
+            if ($position == -1) {
+                @fclose($pointer);
+                throw new UploadException($this->lang->cannotSeekFile());
+            }
+            // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreStart
+            if (false === @fwrite($pointer, $content)) {
+                @fclose($pointer);
                 throw new UploadException($this->lang->cannotWriteFile());
             }
-            fclose($pointer);
+            @fclose($pointer);
+            // @codeCoverageIgnoreEnd
         }
     }
 
-    public function getPart(string $location, int $offset, int $limit): string
+    public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        $data = file_get_contents(
-            $location,
-            false,
-            null,
-            $offset,
-            $limit
-        );
+        $pointer = @fopen($location, 'r');
+        if (false == $pointer) {
+            // @codeCoverageIgnoreStart
+            throw new UploadException($this->lang->cannotOpenFile());
+            // @codeCoverageIgnoreEnd
+        }
+        if (empty($limit)) {
+            @fseek($pointer, 0, SEEK_END);
+            $limit = @ftell($pointer) - $offset;
+        }
+        // @codeCoverageIgnoreStart
+        $position = @fseek($pointer, $offset, SEEK_SET);
+        if ($position == -1) {
+            @fclose($pointer);
+            throw new UploadException($this->lang->cannotSeekFile());
+        }
+        // @codeCoverageIgnoreEnd
+        $data = @fread($pointer, (int)$limit);
+
         if (false === $data) {
+            // @codeCoverageIgnoreStart
             throw new UploadException($this->lang->cannotReadFile());
+            // @codeCoverageIgnoreEnd
         }
         return $data;
     }
 
     public function truncate(string $location, int $offset): void
     {
-        $handle = fopen($location, 'r+');
-        if (!ftruncate($handle, $offset)) {
-            fclose($handle);
+        $pointer = @fopen($location, 'r+');
+        @rewind($pointer);
+        if (!ftruncate($pointer, $offset)) {
+            // @codeCoverageIgnoreStart
+            @fclose($pointer);
             throw new UploadException($this->lang->cannotTruncateFile());
+            // @codeCoverageIgnoreEnd
         }
-        rewind($handle);
-        fclose($handle);
+        @rewind($pointer);
+        @fclose($pointer);
     }
 
     public function remove(string $location): void

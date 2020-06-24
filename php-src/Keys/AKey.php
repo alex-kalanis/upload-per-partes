@@ -17,8 +17,11 @@ abstract class AKey
     const VARIANT_RANDOM = 2;
     const VARIANT_REDIS = 3;
 
+    /** @var Translations */
     protected $lang = null;
+    /** @var TargetSearch */
     protected $target = null;
+    /** @var string */
     protected $sharedKey = '';
 
     public function __construct(Translations $lang, TargetSearch $target)

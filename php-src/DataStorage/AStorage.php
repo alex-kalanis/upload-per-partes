@@ -12,6 +12,7 @@ use UploadPerPartes\Uploader\Translations;
  */
 abstract class AStorage
 {
+    /** @var Translations */
     protected $lang = null;
 
     public function __construct(Translations $lang)
@@ -24,7 +25,7 @@ abstract class AStorage
      * @param string $location
      * @param string $content binary content
      * @param int|null $seek where it save
-     * @return bool
+     * @return void
      * @throws UploadException
      */
     abstract public function addPart(string $location, string $content, ?int $seek = null): void;
@@ -37,7 +38,7 @@ abstract class AStorage
      * @return string
      * @throws UploadException
      */
-    abstract public function getPart(string $location, int $offset, int $limit): string;
+    abstract public function getPart(string $location, int $offset, ?int $limit = null): string;
 
     /**
      * Truncate data file

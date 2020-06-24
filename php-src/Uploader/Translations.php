@@ -86,21 +86,40 @@ class Translations
         return 'CANNOT OPEN FILE';
     }
 
+    /**
+     * @return string
+     * @codeCoverageIgnore
+     * @see \UploadPerPartes\DataStorage\Volume::getPart
+     */
     public function cannotReadFile(): string
     {
         return 'CANNOT READ FILE';
     }
 
+    /**
+     * @return string
+     * @codeCoverageIgnore   no ideas how to fail seek
+     */
     public function cannotSeekFile(): string
     {
         return 'CANNOT SEEK FILE';
     }
 
+    /**
+     * @return string
+     * @codeCoverageIgnore
+     * @see \UploadPerPartes\DataStorage\Volume::addPart
+     */
     public function cannotWriteFile(): string
     {
         return 'CANNOT WRITE FILE';
     }
 
+    /**
+     * @return string
+     * @codeCoverageIgnore
+     * @see \UploadPerPartes\DataStorage\Volume::truncate
+     */
     public function cannotTruncateFile(): string
     {
         return 'FILE CANNOT TRUNCATE';

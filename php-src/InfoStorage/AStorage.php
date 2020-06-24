@@ -12,6 +12,7 @@ use UploadPerPartes\Uploader\Translations;
  */
 abstract class AStorage
 {
+    /** @var Translations */
     protected $lang = null;
 
     public function __construct(Translations $lang)
