@@ -1,6 +1,6 @@
 <?php
 
-namespace StorageTests;
+namespace InfoStorageTests;
 
 use UploadPerPartes\Exceptions\UploadException;
 

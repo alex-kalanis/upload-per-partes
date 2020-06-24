@@ -3,7 +3,7 @@
 namespace UploadPerPartes\Response;
 
 use Exception;
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 
 /**
  * Class DoneResponse
@@ -12,22 +12,22 @@ use UploadPerPartes\DataFormat;
  */
 class DoneResponse extends AResponse
 {
-    /** @var null|DataFormat\Data */
+    /** @var null|InfoFormat\Data */
     protected $data = null;
 
-    public static function initDone(string $sharedKey, DataFormat\Data $data): DoneResponse
+    public static function initDone(string $sharedKey, InfoFormat\Data $data): DoneResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, DataFormat\Data $data, Exception $ex): DoneResponse
+    public static function initError(string $sharedKey, InfoFormat\Data $data, Exception $ex): DoneResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, DataFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, InfoFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
     {
         $this->sharedKey = $sharedKey;
         $this->data = $data;

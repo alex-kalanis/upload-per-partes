@@ -2,10 +2,10 @@
 
 namespace UploadPerPartes\Uploader;
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 use UploadPerPartes\Exceptions;
 use UploadPerPartes\Keys;
-use UploadPerPartes\Storage;
+use UploadPerPartes\InfoStorage;
 
 /**
  * Class DriveFile
@@ -14,16 +14,16 @@ use UploadPerPartes\Storage;
  */
 class DriveFile
 {
-    /** @var Storage\AStorage */
+    /** @var InfoStorage\AStorage */
     protected $storage = null;
-    /** @var DataFormat\AFormat */
+    /** @var InfoFormat\AFormat */
     protected $format = null;
     /** @var Keys\AKey */
     protected $key = null;
     /** @var Translations */
     protected $lang = null;
 
-    public function __construct(Translations $lang, Storage\AStorage $storage, DataFormat\AFormat $format, Keys\AKey $key)
+    public function __construct(Translations $lang, InfoStorage\AStorage $storage, InfoFormat\AFormat $format, Keys\AKey $key)
     {
         $this->storage = $storage;
         $this->format = $format;
@@ -34,13 +34,13 @@ class DriveFile
     /**
      * Create new drive file
      * @param string $sharedKey
-     * @param DataFormat\Data $data
+     * @param InfoFormat\Data $data
      * @param bool $isNew
      * @return bool
      * @throws Exceptions\UploadException
      * @throws Exceptions\ContinuityUploadException
      */
-    public function write(string $sharedKey, DataFormat\Data $data, bool $isNew = false): bool
+    public function write(string $sharedKey, InfoFormat\Data $data, bool $isNew = false): bool
     {
         if ($isNew && $this->exists($sharedKey)) {
             throw new Exceptions\ContinuityUploadException($this->lang->driveFileAlreadyExists());
@@ -52,10 +52,10 @@ class DriveFile
     /**
      * Read drive file
      * @param string $sharedKey
-     * @return DataFormat\Data
+     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function read(string $sharedKey): DataFormat\Data
+    public function read(string $sharedKey): InfoFormat\Data
     {
         return $this->format->fromFormat($this->storage->load($this->key->fromSharedKey($sharedKey)));
     }
@@ -63,13 +63,13 @@ class DriveFile
     /**
      * Update upload info
      * @param string $sharedKey
-     * @param DataFormat\Data $data
+     * @param InfoFormat\Data $data
      * @param int $last
      * @param bool $checkContinuous
      * @return bool
      * @throws Exceptions\UploadException
      */
-    public function updateLastPart(string $sharedKey, DataFormat\Data $data, int $last, bool $checkContinuous = true): bool
+    public function updateLastPart(string $sharedKey, InfoFormat\Data $data, int $last, bool $checkContinuous = true): bool
     {
         if ($checkContinuous) {
             if (($data->lastKnownPart + 1) != $last) {

@@ -1,13 +1,13 @@
 <?php
 
-namespace UploadPerPartes\Storage;
+namespace UploadPerPartes\InfoStorage;
 
 use UploadPerPartes\Exceptions\UploadException;
 use UploadPerPartes\Uploader\Translations;
 
 /**
  * Class AStorage
- * @package UploadPerPartes\Storage
+ * @package UploadPerPartes\InfoStorage
  * Target storage for data stream
  */
 abstract class AStorage

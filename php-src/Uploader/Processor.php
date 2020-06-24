@@ -2,7 +2,8 @@
 
 namespace UploadPerPartes\Uploader;
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
+use UploadPerPartes\DataStorage;
 use UploadPerPartes\Exceptions;
 
 /**
@@ -14,17 +15,21 @@ class Processor
 {
     /** @var DriveFile */
     protected $driver = null;
+    /** @var DataStorage\AStorage */
+    protected $storage = null;
     /** @var Translations */
     protected $lang = null;
 
     /**
      * @param Translations $lang
      * @param DriveFile $driver
+     * @param DataStorage\AStorage $storage
      */
-    public function __construct(Translations $lang, DriveFile $driver)
+    public function __construct(Translations $lang, DriveFile $driver, DataStorage\AStorage $storage = null)
     {
         $this->lang = $lang;
         $this->driver = $driver;
+        $this->storage = $storage;
     }
 
     /**
@@ -36,19 +41,17 @@ class Processor
     public function cancel(string $sharedKey): void
     {
         $data = $this->driver->read($sharedKey);
-        if (! @unlink($data->tempLocation)) {
-            throw new Exceptions\UploadException($this->lang->cannotRemoveData());
-        }
+        $this->storage->remove($data->tempLocation);
         $this->driver->remove($sharedKey);
     }
 
     /**
      * Upload file by parts, final status
      * @param string $sharedKey
-     * @return DataFormat\Data
+     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function done(string $sharedKey): DataFormat\Data
+    public function done(string $sharedKey): InfoFormat\Data
     {
         $data = $this->driver->read($sharedKey);
         $this->driver->remove($sharedKey);
@@ -60,22 +63,22 @@ class Processor
      * @param string $sharedKey
      * @param string $content binary content
      * @param int|null $segment where it save
-     * @return DataFormat\Data
+     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function upload(string $sharedKey, string $content, ?int $segment = null): DataFormat\Data
+    public function upload(string $sharedKey, string $content, ?int $segment = null): InfoFormat\Data
     {
         $data = $this->driver->read($sharedKey);
 
         if (!is_numeric($segment)) {
             $segment = $data->lastKnownPart + 1;
-            $this->saveFilePart($data, $content);
+            $this->storage->addPart($data->tempLocation, $content);
             $this->driver->updateLastPart($sharedKey, $data, $segment);
         } else {
             if ($segment > $data->lastKnownPart + 1) {
                 throw new Exceptions\UploadException($this->lang->readTooEarly());
             }
-            $this->saveFilePart($data, $content, $segment * $data->bytesPerPart);
+            $this->storage->addPart($data->tempLocation, $content, $segment * $data->bytesPerPart);
         }
 
         return $data;
@@ -85,21 +88,14 @@ class Processor
      * Delete problematic segments
      * @param string $sharedKey
      * @param int $segment
-     * @return DataFormat\Data
+     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function truncateFrom(string $sharedKey, int $segment): DataFormat\Data
+    public function truncateFrom(string $sharedKey, int $segment): InfoFormat\Data
     {
         $data = $this->driver->read($sharedKey);
         $this->checkSegment($data, $segment);
-
-        $handle = fopen($data->tempLocation, 'r+');
-        if (!ftruncate($handle, $data->bytesPerPart * $segment)) {
-            fclose($handle);
-            throw new Exceptions\UploadException($this->lang->cannotTruncateFile());
-        }
-        rewind($handle);
-        fclose($handle);
+        $this->storage->truncate($data->tempLocation, $data->bytesPerPart * $segment);
         $this->driver->updateLastPart($sharedKey, $data, $segment, false);
         return $data;
     }
@@ -115,24 +111,17 @@ class Processor
     {
         $data = $this->driver->read($sharedKey);
         $this->checkSegment($data, $segment);
-
-        return md5(file_get_contents(
-            $data->tempLocation,
-            false,
-            null,
-            $data->bytesPerPart * $segment,
-            $data->bytesPerPart
-        ));
+        return md5($this->storage->getPart($data->tempLocation, $data->bytesPerPart * $segment, $data->bytesPerPart));
     }
 
     /**
      * Upload file by parts, create driving file, returns correct one (because it can exist)
-     * @param DataFormat\Data $dataPack
+     * @param InfoFormat\Data $dataPack
      * @param string $sharedKey
-     * @return DataFormat\Data
+     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
      */
-    public function init(DataFormat\Data $dataPack, string $sharedKey): DataFormat\Data
+    public function init(InfoFormat\Data $dataPack, string $sharedKey): InfoFormat\Data
     {
         try {
             $this->driver->write($sharedKey, $dataPack, true);
@@ -143,46 +132,11 @@ class Processor
     }
 
     /**
-     * @param DataFormat\Data $data
-     * @param string $content binary content
-     * @param int|null $seek where it save
-     * @return bool
-     * @throws Exceptions\UploadException
-     */
-    protected function saveFilePart(DataFormat\Data $data, string $content, ?int $seek = null)
-    {
-        if (is_numeric($seek)) {
-            $pointer = fopen($data->tempLocation, 'wb');
-            if (false === $pointer) {
-                throw new Exceptions\UploadException($this->lang->cannotOpenFile());
-            }
-            $position = fseek($pointer, $seek);
-            if ($position == -1) {
-                throw new Exceptions\UploadException($this->lang->cannotSeekFile());
-            }
-            if (false === fwrite($pointer, $content, strlen($content))) {
-                throw new Exceptions\UploadException($this->lang->cannotWriteFile());
-            }
-            fclose($pointer);
-        } else {
-            $pointer = fopen($data->tempLocation, 'ab');
-            if (false == $pointer) {
-                throw new Exceptions\UploadException($this->lang->cannotOpenFile());
-            }
-            if (false === fwrite($pointer, $content, strlen($content))) {
-                throw new Exceptions\UploadException($this->lang->cannotWriteFile());
-            }
-            fclose($pointer);
-        }
-        return true;
-    }
-
-    /**
-     * @param DataFormat\Data $data
+     * @param InfoFormat\Data $data
      * @param int $segment
      * @throws Exceptions\UploadException
      */
-    protected function checkSegment(DataFormat\Data $data, int $segment): void
+    protected function checkSegment(InfoFormat\Data $data, int $segment): void
     {
         if ($segment < 0) {
             throw new Exceptions\UploadException($this->lang->segmentOutOfBounds());

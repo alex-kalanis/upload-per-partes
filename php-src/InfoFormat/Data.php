@@ -1,6 +1,6 @@
 <?php
 
-namespace UploadPerPartes\DataFormat;
+namespace UploadPerPartes\InfoFormat;
 
 /**
  * Class Data

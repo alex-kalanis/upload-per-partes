@@ -2,7 +2,7 @@
 
 namespace UploadPerPartes;
 
-use UploadPerPartes\Storage\TargetSearch;
+use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Uploader\Calculates;
 use UploadPerPartes\Uploader\Translations;
 
@@ -28,18 +28,19 @@ class Uploader
     public function __construct()
     {
         $lang = new Uploader\Translations();
-        $storage = new Storage\Volume($lang);
-        $format = DataFormat\AFormat::getFormat($lang, $this->getFormat());
+        $infoStorage = new InfoStorage\Volume($lang);
+        $dataStorage = new DataStorage\Volume($lang);
+        $format = InfoFormat\AFormat::getFormat($lang, $this->getFormat());
         $this->targetSearch = $this->getTarget($lang);
         $this->calculations = $this->getCalc();
         $this->key = Keys\AKey::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
-        $driver = new Uploader\DriveFile($lang, $storage, $format, $this->key);
-        $this->processor = $this->getProcessor($lang, $driver);
+        $driver = new Uploader\DriveFile($lang, $infoStorage, $format, $this->key);
+        $this->processor = $this->getProcessor($lang, $driver, $dataStorage);
     }
 
     protected function getFormat(): int
     {
-        return DataFormat\AFormat::FORMAT_JSON;
+        return InfoFormat\AFormat::FORMAT_JSON;
     }
 
     protected function getKeyVariant(): int
@@ -57,9 +58,9 @@ class Uploader
         return new Calculates(262144);
     }
 
-    protected function getProcessor(Translations $lang, Uploader\DriveFile $driver): Uploader\Processor
+    protected function getProcessor(Translations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage): Uploader\Processor
     {
-        return new Uploader\Processor($lang, $driver);
+        return new Uploader\Processor($lang, $driver, $storage);
     }
 
     /**
@@ -87,7 +88,7 @@ class Uploader
         try {
             return Response\DoneResponse::initDone($sharedKey, $this->processor->done($sharedKey));
         } catch (Exceptions\UploadException $ex) {
-            return Response\DoneResponse::initError($sharedKey, DataFormat\Data::init(), $ex);
+            return Response\DoneResponse::initError($sharedKey, InfoFormat\Data::init(), $ex);
         }
     }
 
@@ -103,7 +104,7 @@ class Uploader
         try {
             return Response\UploadResponse::initOK($sharedKey, $this->processor->upload($sharedKey, $content, $segment));
         } catch (Exceptions\UploadException $e) {
-            return Response\UploadResponse::initError($sharedKey, DataFormat\Data::init(), $e);
+            return Response\UploadResponse::initError($sharedKey, InfoFormat\Data::init(), $e);
         }
     }
 
@@ -118,7 +119,7 @@ class Uploader
         try {
             return Response\TruncateResponse::initOK($sharedKey, $this->processor->truncateFrom($sharedKey, $segment));
         } catch (Exceptions\UploadException $e) {
-            return Response\TruncateResponse::initError($sharedKey, DataFormat\Data::init(), $e);
+            return Response\TruncateResponse::initError($sharedKey, InfoFormat\Data::init(), $e);
         }
     }
 
@@ -150,7 +151,7 @@ class Uploader
         try {
             $this->targetSearch->setTargetDir($targetPath)->setRemoteFileName($remoteFileName)->process();
             $this->key->generateKeys();
-            $dataPack = DataFormat\Data::init()->setData(
+            $dataPack = InfoFormat\Data::init()->setData(
                 $this->targetSearch->getFinalTargetName(),
                 $this->targetSearch->getTemporaryTargetLocation(),
                 $length,
@@ -160,7 +161,7 @@ class Uploader
             return Response\InitResponse::initOk($this->key->getSharedKey(), $this->processor->init($dataPack, $this->key->getSharedKey()));
 
         } catch (Exceptions\UploadException $e) { // obecne neco spatne
-            return Response\InitResponse::initError(DataFormat\Data::init()->setData(
+            return Response\InitResponse::initError(InfoFormat\Data::init()->setData(
                 $remoteFileName, '', $length, $partsCounter, $this->calculations->getBytesPerPart()
             ), $e);
         }

@@ -1,16 +1,16 @@
 <?php
 
-namespace BasicTests;
+namespace Support;
 
 use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Storage\AStorage;
+use UploadPerPartes\InfoStorage\AStorage;
 
 /**
- * Class Volume
+ * Class InfoRam
  * @package UploadPerPartes\DriveFile
  * Processing info file on ram volume
  */
-class Ram extends AStorage
+class InfoRam extends AStorage
 {
     protected $data = '';
 

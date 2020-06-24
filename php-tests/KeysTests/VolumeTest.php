@@ -3,8 +3,8 @@
 namespace KeysTests;
 
 use CommonTestClass;
+use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Keys;
-use UploadPerPartes\Storage\TargetSearch;
 use UploadPerPartes\Uploader\Translations;
 
 class VolumeTest extends CommonTestClass

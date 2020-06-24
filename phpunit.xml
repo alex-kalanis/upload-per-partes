@@ -33,22 +33,22 @@
     <testsuites>
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
-            <directory>php-tests/FormatTests</directory>
+            <directory>php-tests/DataStorageTests</directory>
+            <directory>php-tests/InfoFormatTests</directory>
+            <directory>php-tests/InfoStorageTests</directory>
             <directory>php-tests/KeysTests</directory>
-            <directory>php-tests/StorageTests</directory>
-            <directory>php-tests/ResponsesTests</directory>
+        </testsuite>
+        <testsuite name="Data">
+            <directory>php-tests/DataStorageTests</directory>
         </testsuite>
         <testsuite name="Formats">
-            <directory>php-tests/FormatTests</directory>
+            <directory>php-tests/InfoFormatTests</directory>
+        </testsuite>
+        <testsuite name="Storage">
+            <directory>php-tests/InfoStorageTests</directory>
         </testsuite>
         <testsuite name="Keys">
             <directory>php-tests/KeysTests</directory>
-        </testsuite>
-        <testsuite name="Storage">
-            <directory>php-tests/StorageTests</directory>
-        </testsuite>
-        <testsuite name="Responses">
-            <directory>php-tests/ResponsesTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

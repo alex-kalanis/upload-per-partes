@@ -1,9 +1,9 @@
 <?php
 
-namespace BasicTests;
+namespace Support;
 
+use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Keys\AKey;
-use UploadPerPartes\Storage\TargetSearch;
 use UploadPerPartes\Uploader\Translations;
 
 class Key extends AKey

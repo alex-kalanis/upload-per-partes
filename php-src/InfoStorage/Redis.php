@@ -1,6 +1,6 @@
 <?php
 
-namespace UploadPerPartes\Storage;
+namespace UploadPerPartes\InfoStorage;
 
 use Predis;
 use UploadPerPartes\Uploader\Translations;
@@ -8,7 +8,7 @@ use UploadPerPartes\Exceptions\UploadException;
 
 /**
  * Class Redis
- * @package UploadPerPartes\Storage
+ * @package UploadPerPartes\InfoStorage
  * Processing info file in Redis
  */
 class Redis extends AStorage

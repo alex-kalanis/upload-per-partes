@@ -1,12 +1,12 @@
 <?php
 
-namespace UploadPerPartes\Storage;
+namespace UploadPerPartes\InfoStorage;
 
 use UploadPerPartes\Exceptions\UploadException;
 
 /**
  * Class Volume
- * @package UploadPerPartes\DriveFile
+ * @package UploadPerPartes\InfoStorage
  * Processing info file on disk volume
  */
 class Volume extends AStorage

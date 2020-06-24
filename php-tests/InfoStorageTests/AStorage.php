@@ -1,9 +1,9 @@
 <?php
 
-namespace StorageTests;
+namespace InfoStorageTests;
 
 use CommonTestClass;
-use UploadPerPartes\Storage;
+use UploadPerPartes\InfoStorage;
 use UploadPerPartes\Uploader\Translations;
 
 abstract class AStorage extends CommonTestClass
@@ -16,8 +16,8 @@ abstract class AStorage extends CommonTestClass
         parent::tearDown();
     }
 
-    protected function mockStorage(): Storage\AStorage
+    protected function mockStorage(): InfoStorage\AStorage
     {
-        return new Storage\Volume(Translations::init());
+        return new InfoStorage\Volume(Translations::init());
     }
 }

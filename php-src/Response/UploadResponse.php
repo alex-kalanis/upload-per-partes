@@ -3,7 +3,7 @@
 namespace UploadPerPartes\Response;
 
 use Exception;
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 
 /**
  * Class UploadResponse
@@ -12,22 +12,22 @@ use UploadPerPartes\DataFormat;
  */
 class UploadResponse extends AResponse
 {
-    /** @var null|DataFormat\Data */
+    /** @var null|InfoFormat\Data */
     protected $data = null;
 
-    public static function initOK(string $sharedKey, DataFormat\Data $data): UploadResponse
+    public static function initOK(string $sharedKey, InfoFormat\Data $data): UploadResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, DataFormat\Data $data, Exception $ex): UploadResponse
+    public static function initError(string $sharedKey, InfoFormat\Data $data, Exception $ex): UploadResponse
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, DataFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, InfoFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
     {
         $this->sharedKey = $sharedKey;
         $this->data = $data;

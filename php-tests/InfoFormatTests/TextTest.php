@@ -1,14 +1,14 @@
 <?php
 
-namespace FormatTests;
+namespace InfoFormatTests;
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 
 class TextTest extends AFormats
 {
     public function testThru()
     {
-        $lib = new DataFormat\Text();
+        $lib = new InfoFormat\Text();
         $target = $lib->toFormat($this->mockData());
         $data = $lib->fromFormat($target);
 

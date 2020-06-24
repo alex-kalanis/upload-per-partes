@@ -5,7 +5,7 @@ namespace BasicTests;
 use CommonTestClass;
 use UploadPerPartes\Keys;
 use UploadPerPartes\Response;
-use UploadPerPartes\Storage;
+use UploadPerPartes\InfoStorage;
 use UploadPerPartes\Uploader;
 use UploadPerPartes\Uploader\Calculates;
 use UploadPerPartes\Uploader\Translations;
@@ -15,7 +15,7 @@ class UploadTest extends CommonTestClass
     public function tearDown()
     {
         if (is_file($this->mockTestFile())) {
-            $lib = new Storage\Volume(Translations::init());
+            $lib = new InfoStorage\Volume(Translations::init());
             $lib->remove($this->mockTestFile());
         }
         parent::tearDown();

@@ -1,6 +1,6 @@
 <?php
 
-namespace UploadPerPartes\DataFormat;
+namespace UploadPerPartes\InfoFormat;
 
 use UploadPerPartes\Exceptions\UploadException;
 use UploadPerPartes\Uploader\Translations;

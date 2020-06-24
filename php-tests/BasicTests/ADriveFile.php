@@ -3,8 +3,9 @@
 namespace BasicTests;
 
 use CommonTestClass;
-use UploadPerPartes\DataFormat;
-use UploadPerPartes\Storage;
+use Support;
+use UploadPerPartes\DataStorage;
+use UploadPerPartes\InfoFormat;
 use UploadPerPartes\Uploader\DriveFile;
 use UploadPerPartes\Uploader\Translations;
 
@@ -21,16 +22,16 @@ class ADriveFile extends CommonTestClass
 
     protected function mockKey(): string
     {
-        return 'fghjkl' . Storage\TargetSearch::FILE_DRIVER_SUFF;
+        return 'fghjkl' . DataStorage\TargetSearch::FILE_DRIVER_SUFF;
     }
 
     protected function getDriveFile(): DriveFile
     {
         $lang = Translations::init();
-        $storage = new Ram($lang);
-        $target = new Storage\TargetSearch($lang);
-        $key = new Key($lang, $target);
-        $format = new DataFormat\Json();
+        $storage = new Support\InfoRam($lang);
+        $target = new DataStorage\TargetSearch($lang);
+        $key = new Support\Key($lang, $target);
+        $format = new InfoFormat\Json();
         return new DriveFile($lang, $storage, $format, $key);
     }
 }

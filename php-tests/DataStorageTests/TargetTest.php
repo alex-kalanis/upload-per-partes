@@ -1,10 +1,10 @@
 <?php
 
-namespace StorageTests;
+namespace DataStorageTests;
 
 use CommonTestClass;
 use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Storage\TargetSearch;
+use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Uploader\Translations;
 
 class TargetTest extends CommonTestClass

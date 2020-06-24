@@ -1,6 +1,6 @@
 <?php
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 
 class CommonTestClass extends \PHPUnit\Framework\TestCase
 {
@@ -32,9 +32,9 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
         return realpath(__DIR__ . '/testing-ipsum.txt');
     }
 
-    protected function mockData(): DataFormat\Data
+    protected function mockData(): InfoFormat\Data
     {
-        return DataFormat\Data::init()->setData(
+        return InfoFormat\Data::init()->setData(
             'abcdef',
             $this->getTestDir() . 'abcdef',
             123456,

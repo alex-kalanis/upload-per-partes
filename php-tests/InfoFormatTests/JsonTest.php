@@ -1,14 +1,14 @@
 <?php
 
-namespace FormatTests;
+namespace InfoFormatTests;
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 
 class JsonTest extends AFormats
 {
     public function testThru()
     {
-        $lib = new DataFormat\Json();
+        $lib = new InfoFormat\Json();
         $target = $lib->toFormat($this->mockData());
         $data = $lib->fromFormat($target);
 

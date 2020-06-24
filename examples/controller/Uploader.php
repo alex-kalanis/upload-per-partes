@@ -26,7 +26,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\InitResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                UploadPerPartes\DataFormat\Data::init(),
+                UploadPerPartes\InfoFormat\Data::init(),
                 $ex
             ));
         }
@@ -59,7 +59,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\UploadResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                UploadPerPartes\DataFormat\Data::init(),
+                UploadPerPartes\InfoFormat\Data::init(),
                 $ex
             ));
         }
@@ -76,7 +76,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\TruncateResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                UploadPerPartes\DataFormat\Data::init(),
+                UploadPerPartes\InfoFormat\Data::init(),
                 $ex
             ));
         }
@@ -116,13 +116,13 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         } catch (UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                UploadPerPartes\DataFormat\Data::init(),
+                UploadPerPartes\InfoFormat\Data::init(),
                 $ex
             ));
         } catch (Lib\Content\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
                 $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                UploadPerPartes\DataFormat\Data::init(),
+                UploadPerPartes\InfoFormat\Data::init(),
                 $ex
             ));
         }

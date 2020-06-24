@@ -1,8 +1,8 @@
 <?php
 
-namespace FormatTests;
+namespace InfoFormatTests;
 
-use UploadPerPartes\DataFormat;
+use UploadPerPartes\InfoFormat;
 use UploadPerPartes\Uploader\Translations;
 
 class FormatsTest extends AFormats
@@ -13,8 +13,8 @@ class FormatsTest extends AFormats
     public function testInit()
     {
         $lang = Translations::init();
-        $this->assertInstanceOf('\UploadPerPartes\DataFormat\Text', DataFormat\AFormat::getFormat($lang, DataFormat\AFormat::FORMAT_TEXT));
-        $this->assertInstanceOf('\UploadPerPartes\DataFormat\Json', DataFormat\AFormat::getFormat($lang, DataFormat\AFormat::FORMAT_JSON));
+        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Text', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_TEXT));
+        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Json', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_JSON));
     }
 
     /**
@@ -23,6 +23,6 @@ class FormatsTest extends AFormats
      */
     public function testInitFail()
     {
-        DataFormat\AFormat::getFormat(Translations::init(), 0);
+        InfoFormat\AFormat::getFormat(Translations::init(), 0);
     }
 }

@@ -86,6 +86,11 @@ class Translations
         return 'CANNOT OPEN FILE';
     }
 
+    public function cannotReadFile(): string
+    {
+        return 'CANNOT READ FILE';
+    }
+
     public function cannotSeekFile(): string
     {
         return 'CANNOT SEEK FILE';
