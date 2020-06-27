@@ -3,63 +3,101 @@
 namespace BasicTests;
 
 use CommonTestClass;
-use UploadPerPartes\Keys;
+use Support;
+use UploadPerPartes\DataStorage;
 use UploadPerPartes\Response;
 use UploadPerPartes\InfoStorage;
 use UploadPerPartes\Uploader;
-use UploadPerPartes\Uploader\Calculates;
-use UploadPerPartes\Uploader\Translations;
 
 class UploadTest extends CommonTestClass
 {
-    public function tearDown()
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testSimpleUpload(): void
     {
-        if (is_file($this->mockTestFile())) {
-            $lib = new InfoStorage\Volume(Translations::init());
-            $lib->remove($this->mockTestFile());
-        }
-        parent::tearDown();
-    }
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
 
-    public function testSimpleUpload()
-    {
         // step 1 - init driver
-        $lib1 = new UploaderMock();
-        $maxSize = filesize($this->getTestFile());
-        $result1 = $lib1->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $bytesPerPart = $result1->jsonSerialize()['partSize'];
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $this->assertEquals(1024, $bytesPerPart);
 
         // step 2 - send data
-        $lib2 = new UploaderMock();
-        $bytesPerPart = $lib2->calculations->getBytesPerPart();
-        $i = 0;
-        do {
-            $result2 = $lib2->upload($result1->jsonSerialize()['sharedKey'], file_get_contents(
-                $this->getTestFile(), false, null, $i * $bytesPerPart, $bytesPerPart
-            ));
-            $i++;
-        } while ($i * $bytesPerPart < $maxSize);
-        $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
+        for ($i = 0; $i * $bytesPerPart <= $maxSize; $i++) {
+            $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
+            $result2 = $lib->upload($sharedKey, $part);
+            $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
+        };
 
         // step 3 - close upload
-        $lib3 = new UploaderMock();
-        $result3 = $lib3->done($result1->jsonSerialize()['sharedKey']);
-
-        // check content
-        $this->assertTrue(file_get_contents($result3->getTemporaryLocation()) == file_get_contents($this->getTestFile()));
+        /** @var Response\DoneResponse $result3 */
+        $result3 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
-        @unlink($result3->getTargetFile());
+        // check content
+        $uploaded = $lib->getStorage()->getAll();
+        $this->assertGreaterThan(0, strlen($uploaded));
+        $this->assertTrue($content == $uploaded);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testCancel(): void
+    {
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+
+        // step 2 - send data
+        $result2 = $lib->upload($sharedKey, $content); // flush it all
+        $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
+
+        // step 3 - cancel upload
+        /** @var Response\CancelResponse $result3 */
+        $result3 = $lib->cancel($sharedKey);
+        $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
+
+        // check content
+        $this->assertEmpty($lib->getStorage()->getAll());
     }
 }
 
 class UploaderMock extends Uploader
 {
-    /** @var Calculates */
-    public $calculations;
-
-    protected function getCalc(): Calculates
+    protected function getInfoStorage(Uploader\Translations $lang): InfoStorage\AStorage
     {
-        return new Calculates(512);
+        parent::getInfoStorage($lang);
+        return new Support\InfoRam($lang);
+    }
+
+    protected function getDataStorage(Uploader\Translations $lang): DataStorage\AStorage
+    {
+        parent::getDataStorage($lang);
+        return new Support\DataRam($lang);
+    }
+
+    protected function getCalc(): Uploader\Calculates
+    {
+        parent::getCalc();
+        return new Uploader\Calculates(1024);
+    }
+
+    /**
+     * @return Support\DataRam
+     */
+    public function getStorage(): DataStorage\AStorage
+    {
+        return $this->dataStorage;
     }
 }

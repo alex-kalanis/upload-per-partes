@@ -6,7 +6,7 @@ use UploadPerPartes\InfoFormat;
 
 class JsonTest extends AFormats
 {
-    public function testThru()
+    public function testThru(): void
     {
         $lib = new InfoFormat\Json();
         $target = $lib->toFormat($this->mockData());

@@ -9,7 +9,7 @@ class VolumeTest extends AStorage
     /**
      * @throws UploadException
      */
-    public function testThru()
+    public function testThru(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
@@ -25,7 +25,7 @@ class VolumeTest extends AStorage
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      */
-    public function testUnreadable()
+    public function testUnreadable(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
@@ -37,7 +37,7 @@ class VolumeTest extends AStorage
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      */
-    public function testUnreadableSeek()
+    public function testUnreadableSeek(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
@@ -50,7 +50,7 @@ class VolumeTest extends AStorage
      * @expectedExceptionMessage CANNOT OPEN FILE
      * @-expectedExceptionMessage CANNOT WRITE FILE
      */
-    public function testUnwriteable()
+    public function testUnwriteable(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
@@ -64,7 +64,7 @@ class VolumeTest extends AStorage
      * @expectedExceptionMessage CANNOT OPEN FILE
      * @-expectedExceptionMessage CANNOT WRITE FILE
      */
-    public function testUnwriteableSeek()
+    public function testUnwriteableSeek(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
@@ -77,7 +77,7 @@ class VolumeTest extends AStorage
      * @expectedException  \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT REMOVE DATA
      */
-    public function testDeleted()
+    public function testDeleted(): void
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();

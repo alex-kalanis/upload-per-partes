@@ -6,7 +6,7 @@ use UploadPerPartes\InfoFormat;
 
 class TextTest extends AFormats
 {
-    public function testThru()
+    public function testThru(): void
     {
         $lib = new InfoFormat\Text();
         $target = $lib->toFormat($this->mockData());

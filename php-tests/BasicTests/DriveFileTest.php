@@ -11,7 +11,7 @@ use UploadPerPartes\Uploader\Translations;
 
 class DriveFileTest extends CommonTestClass
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         $driveFile = $this->getDriveFile();
         if ($driveFile->exists($this->mockKey())) {
@@ -23,7 +23,7 @@ class DriveFileTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testThru()
+    public function testThru(): void
     {
         $driveFile = $this->getDriveFile();
         $this->assertTrue($driveFile->write($this->mockKey(), $this->mockData()));
@@ -43,7 +43,7 @@ class DriveFileTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\ContinuityUploadException
      * @expectedExceptionMessage DRIVEFILE ALREADY EXISTS
      */
-    public function testWriteFail()
+    public function testWriteFail(): void
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
@@ -55,7 +55,7 @@ class DriveFileTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
@@ -68,7 +68,7 @@ class DriveFileTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage DRIVEFILE IS NOT CONTINUOUS
      */
-    public function testUpdateFail()
+    public function testUpdateFail(): void
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();

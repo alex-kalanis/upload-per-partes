@@ -7,9 +7,7 @@ use Support;
 use UploadPerPartes\DataStorage;
 use UploadPerPartes\InfoFormat;
 use UploadPerPartes\InfoStorage;
-use UploadPerPartes\Uploader\DriveFile;
-use UploadPerPartes\Uploader\Processor;
-use UploadPerPartes\Uploader\Translations;
+use UploadPerPartes\Uploader;
 
 class ProcessorTest extends CommonTestClass
 {
@@ -17,12 +15,12 @@ class ProcessorTest extends CommonTestClass
     protected $infoStorage = null;
     /** @var DataStorage\AStorage|null */
     protected $dataStorage = null;
-    /** @var DriveFile|null */
+    /** @var Uploader\DriveFile|null */
     protected $driveFile = null;
-    /** @var Processor|null */
+    /** @var Uploader\Processor|null */
     protected $processor = null;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->initProcessor();
         if ($this->driveFile->exists($this->mockKey())) {
@@ -34,7 +32,7 @@ class ProcessorTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testInit()
+    public function testInit(): void
     {
         $this->initProcessor();
 
@@ -63,7 +61,7 @@ class ProcessorTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testInitFail()
+    public function testInitFail(): void
     {
         $this->initProcessor();
 
@@ -80,6 +78,126 @@ class ProcessorTest extends CommonTestClass
         $this->assertNotEquals(8, $data2->lastKnownPart);
     }
 
+    /**
+     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage READ TOO EARLY
+     */
+    public function testUploadEarly(): void
+    {
+        $this->initProcessor();
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 4;
+        $pack->partsCount = 8;
+        $this->processor->init($pack, $this->mockSharedKey());
+        $datacont = 'asdfghjklyxcvbnmqwertzuiop1234567890';
+        $this->processor->upload($this->mockSharedKey(), $datacont, 5); // pass, last is 4, wanted 5
+        $this->processor->upload($this->mockSharedKey(), $datacont, 7); // fail, last is 5, wanted 6
+    }
+
+    /**
+     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
+     */
+    public function testCheckSegmentSubZero(): void
+    {
+        $this->initProcessor();
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 4;
+        $pack->partsCount = 8;
+        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->check($this->mockSharedKey(), -5); // fail, sub zero
+    }
+
+    /**
+     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
+     */
+    public function testCheckSegmentAvailableParts(): void
+    {
+        $this->initProcessor();
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 4;
+        $pack->partsCount = 8;
+        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->check($this->mockSharedKey(), 10); // fail, out of size
+    }
+
+    /**
+     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedExceptionMessage SEGMENT NOT UPLOADED YET
+     */
+    public function testCheckSegmentNotUploaded(): void
+    {
+        $this->initProcessor();
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 4;
+        $pack->partsCount = 8;
+        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->check($this->mockSharedKey(), 6); // fail, outside upload
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testSimpleThru(): void
+    {
+        $this->initProcessor();
+        $cont = file_get_contents($this->getTestFile(), false, null, 0, 80);
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 4;
+        $pack->partsCount = 8;
+        $data = $this->processor->init($pack, $this->mockSharedKey());
+        $dataCont = Support\Strings::substr($cont, 0, 30, '') . 'asdfghjklyxcvbnmqwer';
+        // set problematic content
+        $this->processor->upload($this->mockSharedKey(), $dataCont);
+        // now checks
+        for ($i = 0; $i < $data->lastKnownPart; $i++) {
+            $remoteMd5 = $this->processor->check($this->mockSharedKey(), $i);
+            $localMd5 = md5(Support\Strings::substr($cont, $i * $data->bytesPerPart, $data->bytesPerPart, ''));
+            if ($remoteMd5 != $localMd5) {
+                $this->processor->truncateFrom($this->mockSharedKey(), $i);
+                break;
+            }
+        }
+        $data = $this->driveFile->read($this->mockSharedKey());
+        $this->assertEquals(3, $data->lastKnownPart);
+        // set rest
+        for ($i = $data->lastKnownPart + 1; $i <= $data->partsCount; $i++) {
+            $dataPack = Support\Strings::substr($cont, $i * $data->lastKnownPart, $data->bytesPerPart, '');
+            $this->processor->upload($this->mockSharedKey(), $dataPack);
+        }
+        $this->processor->cancel($this->mockSharedKey()); // intended, because pass will be checked in upload itself
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testSimpleAll(): void
+    {
+        $this->initProcessor();
+        $cont = file_get_contents($this->getTestFile(), false, null, 0, 80);
+        $pack = $this->mockData();
+        $pack->fileSize = 80;
+        $pack->bytesPerPart = 10;
+        $pack->lastKnownPart = 7;
+        $pack->partsCount = 8;
+        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->upload($this->mockSharedKey(), $cont);
+        $data = $this->processor->done($this->mockSharedKey());
+        $this->assertEquals(8, $data->lastKnownPart);
+        $this->assertEquals(8, $data->partsCount);
+    }
+
     protected function mockKey(): string
     {
         return 'fghjkl' . DataStorage\TargetSearch::FILE_DRIVER_SUFF;
@@ -87,13 +205,14 @@ class ProcessorTest extends CommonTestClass
 
     protected function initProcessor(): void
     {
-        $lang = Translations::init();
+        $lang = Uploader\Translations::init();
         $target = new DataStorage\TargetSearch($lang);
         $key = new Support\Key($lang, $target);
         $format = new InfoFormat\Json();
+        $hashed = Uploader\Hashed::init();
         $this->infoStorage = new Support\InfoRam($lang);
         $this->dataStorage = new Support\DataRam($lang);
-        $this->driveFile = new DriveFile($lang, $this->infoStorage, $format, $key);
-        $this->processor = new Processor($lang, $this->driveFile, $this->dataStorage);
+        $this->driveFile = new Uploader\DriveFile($lang, $this->infoStorage, $format, $key);
+        $this->processor = new Uploader\Processor($lang, $this->driveFile, $this->dataStorage, $hashed);
     }
 }

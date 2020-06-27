@@ -8,7 +8,7 @@ use UploadPerPartes\Uploader\Translations;
 
 abstract class AStorage extends CommonTestClass
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         if (is_file($this->mockTestFile())) {
             unlink($this->mockTestFile());
@@ -21,6 +21,6 @@ abstract class AStorage extends CommonTestClass
 
     protected function mockStorage(): DataStorage\AStorage
     {
-        return new DataStorage\Volume(Translations::init());
+        return new DataStorage\VolumeBasic(Translations::init());
     }
 }

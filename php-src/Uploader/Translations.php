@@ -89,7 +89,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\Volume::getPart
+     * @see \UploadPerPartes\DataStorage\VolumeBasic::getPart
      */
     public function cannotReadFile(): string
     {
@@ -99,6 +99,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore   no ideas how to fail seek
+     * @see \UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
     public function cannotSeekFile(): string
     {
@@ -108,7 +109,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\Volume::addPart
+     * @see \UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
     public function cannotWriteFile(): string
     {
@@ -118,7 +119,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\Volume::truncate
+     * @see \UploadPerPartes\DataStorage\VolumeBasic::truncate
      */
     public function cannotTruncateFile(): string
     {

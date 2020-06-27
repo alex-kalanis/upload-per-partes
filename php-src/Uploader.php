@@ -2,8 +2,8 @@
 
 namespace UploadPerPartes;
 
-use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Uploader\Calculates;
+use UploadPerPartes\Uploader\Hashed;
 use UploadPerPartes\Uploader\Translations;
 
 /**
@@ -15,10 +15,16 @@ class Uploader
 {
     /** @var Keys\AKey */
     protected $key = null;
-    /** @var TargetSearch */
+    /** @var InfoStorage\AStorage */
+    protected $infoStorage = null;
+    /** @var DataStorage\AStorage */
+    protected $dataStorage = null;
+    /** @var DataStorage\TargetSearch */
     protected $targetSearch = null;
     /** @var Calculates */
     protected $calculations = null;
+    /** @var Hashed */
+    protected $hashed = null;
     /** @var Uploader\Processor */
     protected $processor = null;
 
@@ -28,14 +34,15 @@ class Uploader
     public function __construct()
     {
         $lang = new Uploader\Translations();
-        $infoStorage = new InfoStorage\Volume($lang);
-        $dataStorage = new DataStorage\Volume($lang);
+        $this->infoStorage = $this->getInfoStorage($lang);
+        $this->dataStorage = $this->getDataStorage($lang);
         $format = InfoFormat\AFormat::getFormat($lang, $this->getFormat());
         $this->targetSearch = $this->getTarget($lang);
         $this->calculations = $this->getCalc();
+        $this->hashed = $this->getHashed();
         $this->key = Keys\AKey::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
-        $driver = new Uploader\DriveFile($lang, $infoStorage, $format, $this->key);
-        $this->processor = $this->getProcessor($lang, $driver, $dataStorage);
+        $driver = new Uploader\DriveFile($lang, $this->infoStorage, $format, $this->key);
+        $this->processor = $this->getProcessor($lang, $driver, $this->dataStorage, $this->hashed);
     }
 
     protected function getFormat(): int
@@ -48,9 +55,19 @@ class Uploader
         return Keys\AKey::VARIANT_VOLUME;
     }
 
-    protected function getTarget(Translations $lang): TargetSearch
+    protected function getInfoStorage(Translations $lang): InfoStorage\AStorage
     {
-        return new TargetSearch($lang);
+        return new InfoStorage\Volume($lang);
+    }
+
+    protected function getDataStorage(Translations $lang): DataStorage\AStorage
+    {
+        return new DataStorage\VolumeBasic($lang);
+    }
+
+    protected function getTarget(Translations $lang): DataStorage\TargetSearch
+    {
+        return new DataStorage\TargetSearch($lang);
     }
 
     protected function getCalc(): Calculates
@@ -58,9 +75,14 @@ class Uploader
         return new Calculates(262144);
     }
 
-    protected function getProcessor(Translations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage): Uploader\Processor
+    protected function getHashed(): Hashed
     {
-        return new Uploader\Processor($lang, $driver, $storage);
+        return new Hashed();
+    }
+
+    protected function getProcessor(Translations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed): Uploader\Processor
+    {
+        return new Uploader\Processor($lang, $driver, $storage, $hashed);
     }
 
     /**

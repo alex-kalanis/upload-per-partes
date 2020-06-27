@@ -13,7 +13,7 @@ class TargetTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SENT FILE NAME IS EMPTY
      */
-    public function testFailNoRemote()
+    public function testFailNoRemote(): void
     {
         $lib = new TargetSearch(Translations::init());
         $lib->process();
@@ -23,7 +23,7 @@ class TargetTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage TARGET DIR IS NOT SET
      */
-    public function testFailNoTarget()
+    public function testFailNoTarget(): void
     {
         $lib = new TargetSearch(Translations::init());
         $lib->setRemoteFileName('abcdefg');
@@ -34,7 +34,7 @@ class TargetTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage UPLOAD FILE NAME IS EMPTY
      */
-    public function testFailNoBase()
+    public function testFailNoBase(): void
     {
         $lib = new TargetSearch(Translations::init());
         $lib->getFinalTargetName();
@@ -43,7 +43,7 @@ class TargetTest extends CommonTestClass
     /**
      * @throws UploadException
      */
-    public function testProcessClear()
+    public function testProcessClear(): void
     {
         $lib = new TargetSearch(Translations::init());
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what can be found$.here')->process();
@@ -55,7 +55,7 @@ class TargetTest extends CommonTestClass
     /**
      * @throws UploadException
      */
-    public function testProcessNoClear()
+    public function testProcessNoClear(): void
     {
         $lib = new TargetSearch(Translations::init(), false, false);
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what el$e can be found')->process();
@@ -67,7 +67,7 @@ class TargetTest extends CommonTestClass
     /**
      * @throws UploadException
      */
-    public function testProcessNameLookup()
+    public function testProcessNameLookup(): void
     {
         file_put_contents($this->getTestDir() . 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
         file_put_contents($this->getTestDir() . 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');

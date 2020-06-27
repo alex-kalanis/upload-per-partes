@@ -12,7 +12,7 @@ class RedisTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testThru()
+    public function testThru(): void
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);

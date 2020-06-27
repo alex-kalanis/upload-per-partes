@@ -5,13 +5,13 @@ namespace UploadPerPartes\DataStorage;
 use UploadPerPartes\Exceptions\UploadException;
 
 /**
- * Class Volume
+ * Class VolumeBasic
  * @package UploadPerPartes\DataStorage
  * Processing info file on disk volume
  * Filesystem behaves oddly - beware of fucked up caching!
  * When someone got idea how to test it without ignoring failed states, please tell me.
  */
-class Volume extends AStorage
+class VolumeBasic extends AStorage
 {
     public function addPart(string $location, string $content, ?int $seek = null): void
     {

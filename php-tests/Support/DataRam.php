@@ -3,6 +3,7 @@
 namespace Support;
 
 use UploadPerPartes\DataStorage\AStorage;
+use UploadPerPartes\Exceptions\UploadException;
 
 /**
  * Class DataRam
@@ -20,16 +21,26 @@ class DataRam extends AStorage
 
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        return substr($this->data, $offset, $limit);
+        return Strings::substr($this->data, $offset, $limit, $this->lang->cannotReadFile());
     }
 
     public function truncate(string $location, int $offset): void
     {
-        $this->data = substr($this->data, 0, $offset);
+        $this->data = Strings::substr($this->data, 0, $offset, $this->lang->cannotTruncateFile());
     }
 
     public function remove(string $location): void
     {
         $this->data = '';
+    }
+
+    /**
+     * @param string $location
+     * @return string
+     * @throws UploadException
+     */
+    public function getAll(string $location = ''): string
+    {
+        return $this->getPart($location, 0, null);
     }
 }

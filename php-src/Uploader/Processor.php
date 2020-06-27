@@ -17,6 +17,8 @@ class Processor
     protected $driver = null;
     /** @var DataStorage\AStorage */
     protected $storage = null;
+    /** @var Hashed */
+    protected $hashed = null;
     /** @var Translations */
     protected $lang = null;
 
@@ -24,12 +26,14 @@ class Processor
      * @param Translations $lang
      * @param DriveFile $driver
      * @param DataStorage\AStorage $storage
+     * @param Hashed $hashed
      */
-    public function __construct(Translations $lang, DriveFile $driver, DataStorage\AStorage $storage = null)
+    public function __construct(Translations $lang, DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed)
     {
         $this->lang = $lang;
         $this->driver = $driver;
         $this->storage = $storage;
+        $this->hashed = $hashed;
     }
 
     /**
@@ -111,7 +115,7 @@ class Processor
     {
         $data = $this->driver->read($sharedKey);
         $this->checkSegment($data, $segment);
-        return md5($this->storage->getPart($data->tempLocation, $data->bytesPerPart * $segment, $data->bytesPerPart));
+        return $this->hashed->calcHash($this->storage->getPart($data->tempLocation, $data->bytesPerPart * $segment, $data->bytesPerPart));
     }
 
     /**

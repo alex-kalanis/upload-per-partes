@@ -12,7 +12,7 @@ class KeysTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testInit()
+    public function testInit(): void
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);
@@ -25,7 +25,7 @@ class KeysTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage KEY VARIANT NOT SET
      */
-    public function testInitFail()
+    public function testInitFail(): void
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);
@@ -36,7 +36,7 @@ class KeysTest extends CommonTestClass
      * @expectedException \UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SHARED KEY IS EMPTY
      */
-    public function testSharedFail()
+    public function testSharedFail(): void
     {
         $lang = Translations::init();
         $lib = new Keys\Random($lang, new TargetSearch($lang));
@@ -46,7 +46,7 @@ class KeysTest extends CommonTestClass
     /**
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
-    public function testRandom()
+    public function testRandom(): void
     {
         $this->assertEquals('aaaaaaa', Keys\Random::generateRandomText(7, ['a','a','a','a']));
 

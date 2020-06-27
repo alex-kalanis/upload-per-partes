@@ -11,7 +11,7 @@ use UploadPerPartes\Uploader\Translations;
 
 class ADriveFile extends CommonTestClass
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         $driveFile = $this->getDriveFile();
         if ($driveFile->exists($this->mockKey())) {

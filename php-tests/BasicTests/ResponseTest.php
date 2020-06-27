@@ -8,7 +8,7 @@ use UploadPerPartes\Exceptions;
 
 class ResponseTest extends CommonTestClass
 {
-    public function testInitBegin()
+    public function testInitBegin(): void
     {
         $lib = Response\InitResponse::initOk($this->mockSharedKey(), $this->mockData());
 
@@ -20,7 +20,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(7, $lib->jsonSerialize()['lastKnownPart']);
     }
 
-    public function testInitError()
+    public function testInitError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\InitResponse::initError($this->mockData(), $ex);
@@ -30,7 +30,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testCheckOk()
+    public function testCheckOk(): void
     {
         $lib = Response\CheckResponse::initOk($this->mockSharedKey(), '123abc456def789');
 
@@ -39,7 +39,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\CheckResponse::STATUS_OK, $lib->jsonSerialize()['status']);
     }
 
-    public function testCheckError()
+    public function testCheckError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\CheckResponse::initError($this->mockSharedKey(), $ex);
@@ -50,7 +50,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testTruncateOk()
+    public function testTruncateOk(): void
     {
         $lib = Response\TruncateResponse::initOk($this->mockSharedKey(), $this->mockData());
 
@@ -59,7 +59,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\TruncateResponse::STATUS_OK, $lib->jsonSerialize()['status']);
     }
 
-    public function testTruncateError()
+    public function testTruncateError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\TruncateResponse::initError($this->mockSharedKey(), $this->mockData(), $ex);
@@ -69,7 +69,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testUploadOk()
+    public function testUploadOk(): void
     {
         $lib = Response\UploadResponse::initOK($this->mockSharedKey(), $this->mockData());
 
@@ -78,7 +78,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testUploadFail()
+    public function testUploadFail(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\UploadResponse::initError($this->mockSharedKey(), $this->mockData(), $ex);
@@ -88,7 +88,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testDoneComplete()
+    public function testDoneComplete(): void
     {
         $data = $this->mockData();
         $lib = Response\DoneResponse::initDone($this->mockSharedKey(), $data);
@@ -100,7 +100,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testDoneFail()
+    public function testDoneFail(): void
     {
         $data = $this->mockData();
         $ex = new Exceptions\UploadException('Testing one');
@@ -111,7 +111,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
-    public function testCancelOk()
+    public function testCancelOk(): void
     {
         $lib = Response\CancelResponse::initCancel($this->mockSharedKey());
 
@@ -119,7 +119,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $lib->jsonSerialize()['status']);
     }
 
-    public function testCancelError()
+    public function testCancelError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\CancelResponse::initError($this->mockSharedKey(), $ex);
