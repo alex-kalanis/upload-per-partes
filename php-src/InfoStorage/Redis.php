@@ -10,6 +10,7 @@ use UploadPerPartes\Exceptions\UploadException;
  * Class Redis
  * @package UploadPerPartes\InfoStorage
  * Processing info file in Redis
+ * @codeCoverageIgnore
  */
 class Redis extends AStorage
 {
@@ -26,17 +27,33 @@ class Redis extends AStorage
         $this->timeout = $timeout;
     }
 
+    /**
+     * @param string $key
+     * @return bool
+     * @codeCoverageIgnore
+     */
     public function exists(string $key): bool
     {
         // cannot call exists() - get on non-existing key returns false
         return (false !== $this->redis->get($key));
     }
 
+    /**
+     * @param string $key
+     * @return string
+     * @codeCoverageIgnore
+     */
     public function load(string $key): string
     {
         return (string)$this->redis->get($key);
     }
 
+    /**
+     * @param string $key
+     * @param string $data
+     * @throws UploadException
+     * @codeCoverageIgnore
+     */
     public function save(string $key, string $data): void
     {
         if (false === $this->redis->set($key, $data, $this->timeout)) {
@@ -44,6 +61,11 @@ class Redis extends AStorage
         }
     }
 
+    /**
+     * @param string $key
+     * @throws UploadException
+     * @codeCoverageIgnore
+     */
     public function remove(string $key): void
     {
         if (!$this->redis->del($key)) {

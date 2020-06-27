@@ -71,6 +71,108 @@ class UploadTest extends CommonTestClass
         // check content
         $this->assertEmpty($lib->getStorage()->getAll());
     }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testInitFail(): void
+    {
+        $lib = new UploaderMock();
+        // init data - but there is failure
+        $result1 = $lib->init('', '', 123456);
+        $this->assertEquals(Response\InitResponse::STATUS_FAIL, $result1->jsonSerialize()['status']);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testCheckFail(): void
+    {
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+
+        // step 2 - check data - non existing segment
+        $result2 = $lib->check($sharedKey, 35);
+        $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
+
+        // step 3 - cancel upload
+        /** @var Response\CancelResponse $result3 */
+        $result3 = $lib->cancel($sharedKey);
+        $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testTruncateFail(): void
+    {
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+
+        // step 2 - truncate data - non existing segment
+        $result2 = $lib->truncateFrom($sharedKey, 35);
+        $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
+
+        // step 3 - cancel upload
+        /** @var Response\CancelResponse $result3 */
+        $result3 = $lib->cancel($sharedKey);
+        $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testUploadFail(): void
+    {
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+
+        // step 2 - upload data - not continuous
+        $result2 = $lib->upload($sharedKey, Support\Strings::substr($content, 23, 47564), 66);
+        $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
+
+        // step 3 - cancel upload
+        /** @var Response\CancelResponse $result3 */
+        $result3 = $lib->cancel($sharedKey);
+        $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testCancelFail(): void
+    {
+        $lib = new UploaderMock();
+        // cancel data - but there is nothing
+        $result2 = $lib->cancel('qwertzuiop');
+        $this->assertEquals(Response\CancelResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
+    }
+
+    /**
+     * @throws \UploadPerPartes\Exceptions\UploadException
+     */
+    public function testDoneFail(): void
+    {
+        $lib = new UploaderMock();
+        // done data - but there is nothing
+        $result2 = $lib->done('qwertzuiop');
+        $this->assertEquals(Response\DoneResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
+    }
 }
 
 class UploaderMock extends Uploader
