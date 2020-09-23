@@ -3,9 +3,9 @@ import os
 import bottle
 
 from kw_upload.exceptions import UploadException
-from kw_upload.upload import Upload
 from kw_upload.responses import *
-from kw_upload.drive_file import UploadData
+from kw_upload.info_format import DataPack
+from kw_upload.upload import Uploader
 
 app = bottle.Bottle()
 
@@ -20,15 +20,15 @@ def instant():
 @app.post('/uploader/begin')
 def begin():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH)  # here set temp path and init everytime with it
-        return lib.partes_init(
+        lib = Uploader()  # here set temp path and init everytime with it
+        return lib.init(
+            ENCODING_UPLOAD_PATH,
             str(bottle.request.forms.get('fileName')),
             int(bottle.request.forms.get('fileSize'))
         ).get_result()
     except UploadException as ex:
         return InitResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
-            UploadData(),
+            DataPack(),
             ex
         ).get_result()
 
@@ -36,13 +36,14 @@ def begin():
 @app.post('/uploader/check')
 def check():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
-        return lib.partes_check(
+        lib = Uploader()
+        return lib.check(
+            str(bottle.request.forms.get('sharedKey')),
             int(bottle.request.forms.get('segment'))
         ).get_result()
     except UploadException as ex:
         return CheckResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
+            str(bottle.request.forms.get('sharedKey')),
             ex
         ).get_result()
 
@@ -50,14 +51,15 @@ def check():
 @app.post('/uploader/part')
 def part():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
-        return lib.partes_upload(
-            bytearray(base64.b64decode(bottle.request.forms.get('content')))
+        lib = Uploader()
+        return lib.upload(
+            str(bottle.request.forms.get('sharedKey')),
+            bytes(base64.b64decode(bottle.request.forms.get('content')))
         ).get_result()
     except UploadException as ex:
         return UploadResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
-            UploadData(),
+            str(bottle.request.forms.get('sharedKey')),
+            DataPack(),
             ex
         ).get_result()
 
@@ -65,14 +67,15 @@ def part():
 @app.post('/uploader/truncate')
 def truncate():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
-        return lib.partes_truncate_from(
+        lib = Uploader()
+        return lib.truncate_from(
+            str(bottle.request.forms.get('sharedKey')),
             int(bottle.request.forms.get('segment'))
         ).get_result()
     except UploadException as ex:
         return TruncateResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
-            UploadData(),
+            str(bottle.request.forms.get('sharedKey')),
+            DataPack(),
             ex
         ).get_result()
 
@@ -80,11 +83,13 @@ def truncate():
 @app.post('/uploader/cancel')
 def cancel():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
-        return lib.partes_cancel().get_result()
+        lib = Uploader()
+        return lib.cancel(
+            str(bottle.request.forms.get('sharedKey'))
+        ).get_result()
     except UploadException as ex:
         return CancelResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
+            str(bottle.request.forms.get('sharedKey')),
             ex
         ).get_result()
 
@@ -92,16 +97,18 @@ def cancel():
 @app.post('/uploader/done')
 def done():
     try:
-        lib = Upload(ENCODING_UPLOAD_PATH, bottle.request.forms.get('sharedKey'))
-        result = lib.partes_done()
+        lib = Uploader()
+        result = lib.done(
+            str(bottle.request.forms.get('sharedKey'))
+        )
         # check uploaded content and move it on drive
-        print([result.get_target_file(), result.get_file_name()])
+        print([result.get_temporary_location(), result.get_file_name()])
         # answer to client
         return result.get_result()
     except UploadException as ex:
         return DoneResponse.init_error(
-            bottle.request.forms.get('sharedKey'),
-            UploadData(),
+            str(bottle.request.forms.get('sharedKey')),
+            DataPack(),
             ex
         ).get_result()
 

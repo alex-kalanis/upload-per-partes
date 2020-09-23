@@ -2,6 +2,8 @@
 
 namespace UploadPerPartes\Keys;
 
+use UploadPerPartes\Exceptions\UploadException;
+
 /**
  * Class Volume
  * @package UploadPerPartes\Keys
@@ -11,7 +13,11 @@ class SimpleVolume extends AKey
 {
     public function fromSharedKey(string $key): string
     {
-        return base64_decode($key);
+        $result = base64_decode($key, true);
+        if (false === $result) {
+            throw new UploadException($this->lang->sharedKeyIsInvalid());
+        }
+        return $result;
     }
 
     public function generateKeys(): parent

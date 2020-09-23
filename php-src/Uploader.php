@@ -7,7 +7,7 @@ use UploadPerPartes\Uploader\Hashed;
 use UploadPerPartes\Uploader\Translations;
 
 /**
- * Class Helper
+ * Class Uploader
  * @package UploadPerPartes
  * Main server library for drive upload per-partes
  */
@@ -19,7 +19,7 @@ class Uploader
     protected $infoStorage = null;
     /** @var DataStorage\AStorage */
     protected $dataStorage = null;
-    /** @var DataStorage\TargetSearch */
+    /** @var Uploader\TargetSearch */
     protected $targetSearch = null;
     /** @var Calculates */
     protected $calculations = null;
@@ -65,9 +65,9 @@ class Uploader
         return new DataStorage\VolumeBasic($lang);
     }
 
-    protected function getTarget(Translations $lang): DataStorage\TargetSearch
+    protected function getTarget(Translations $lang): Uploader\TargetSearch
     {
-        return new DataStorage\TargetSearch($lang);
+        return new Uploader\TargetSearch($lang);
     }
 
     protected function getCalc(): Calculates

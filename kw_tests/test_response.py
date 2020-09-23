@@ -1,4 +1,4 @@
-from .common_class import CommonTestClass
+from kw_tests.common_class import CommonTestClass
 from kw_upload.exceptions import UploadException
 from kw_upload.responses import InitResponse, CheckResponse, TruncateResponse
 from kw_upload.responses import UploadResponse, DoneResponse, CancelResponse
@@ -18,9 +18,9 @@ class ResponseTest(CommonTestClass):
 
     def test_init_error(self):
         ex = UploadException('Testing one')
-        lib = InitResponse.init_error(self._mock_shared_key(), self._mock_data(), ex)
+        lib = InitResponse.init_error(self._mock_data(), ex)
 
-        assert self._mock_shared_key() == lib.get_result()['sharedKey']
+        assert '' == lib.get_result()['sharedKey']
         assert 'abcdef' == lib.get_result()['name']
         assert InitResponse.STATUS_FAIL == lib.get_result()['status']
         assert 'Testing one' == lib.get_result()['errorMessage']
@@ -75,7 +75,7 @@ class ResponseTest(CommonTestClass):
         data = self._mock_data()
         lib = DoneResponse.init_done(self._mock_shared_key(), data)
 
-        assert self._get_test_dir() + data.file_name == lib.get_target_file()
+        assert self._get_test_dir() + data.file_name == lib.get_temporary_location()
         assert 'abcdef' == lib.get_file_name()
         assert self._mock_shared_key() == lib.get_result()['sharedKey']
         assert UploadResponse.STATUS_OK == lib.get_result()['status']

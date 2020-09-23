@@ -31,6 +31,11 @@ class Translations
         return 'SHARED KEY IS EMPTY';
     }
 
+    public function sharedKeyIsInvalid(): string
+    {
+        return 'SHARED KEY IS INVALID';
+    }
+
     public function keyVariantNotSet(): string
     {
         return 'KEY VARIANT NOT SET';

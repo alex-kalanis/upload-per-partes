@@ -2,17 +2,11 @@
 
 namespace Support;
 
-use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Keys\AKey;
-use UploadPerPartes\Uploader\Translations;
+use UploadPerPartes\Uploader\TargetSearch;
 
 class Key extends AKey
 {
-    public function __construct(Translations $lang, TargetSearch $target)
-    {
-        parent::__construct($lang, $target);
-    }
-
     public function fromSharedKey(string $key): string
     {
         return 'php://memory';

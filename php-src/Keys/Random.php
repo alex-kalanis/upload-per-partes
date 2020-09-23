@@ -2,7 +2,7 @@
 
 namespace UploadPerPartes\Keys;
 
-use UploadPerPartes\DataStorage\TargetSearch;
+use UploadPerPartes\Uploader\TargetSearch;
 
 /**
  * Class Random

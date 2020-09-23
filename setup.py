@@ -19,6 +19,10 @@ setup(
         'base64',
         'hashlib',
     ],
+    extras_require={
+        'redis': ['redis'],  # https://discuss.python.org/t/adding-a-default-extra-require-environment/4898
+        'memcache': ['pymemcache'],
+    },
     packages=find_packages(),
     classifiers=[
         'Environment :: Web Environment',

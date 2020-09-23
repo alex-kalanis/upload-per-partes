@@ -13,6 +13,7 @@ class Strings
 {
     /**
      * Original one returns shitty results, so need re-implement parts
+     * It's necessary to have nullable limit, not only set as undefined
      * @param string $what
      * @param int $offset
      * @param int|null $limit
@@ -29,7 +30,7 @@ class Strings
         if (empty($limit)) {
             $result = (!empty($offset)) ? substr($what, $offset) : $what ;
         } else {
-            $result = (!empty($offset)) ? substr($what, $offset, $limit) : $what[0] . substr($what, 1, $limit - 1); // THIS ugly hack
+            $result = (!empty($offset)) ? substr($what, $offset, $limit) : substr($what, 0, $limit);
         }
         if (false === $result) {
             throw new UploadException($errorMessage); // failed substr

@@ -37,7 +37,7 @@ class Processor
     }
 
     /**
-     * Upload file by parts, final status
+     * Upload file by parts, final status - cancel that
      * @param string $sharedKey
      * @return void
      * @throws Exceptions\UploadException
@@ -129,7 +129,7 @@ class Processor
     {
         try {
             $this->driver->write($sharedKey, $dataPack, true);
-        } catch (Exceptions\ContinuityUploadException $e) { // navazani na predchozi - datapack uz mame, tak ho nacpeme na front
+        } catch (Exceptions\ContinuityUploadException $e) { // continuity from previous try - we got datapack, so we return it
             $dataPack = $this->driver->read($sharedKey);
         }
         return $dataPack;

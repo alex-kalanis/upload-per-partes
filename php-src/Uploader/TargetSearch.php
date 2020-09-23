@@ -1,13 +1,12 @@
 <?php
 
-namespace UploadPerPartes\DataStorage;
+namespace UploadPerPartes\Uploader;
 
 use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Uploader\Translations;
 
 /**
  * Class TargetSearch
- * @package UploadPerPartes\DataStorage
+ * @package UploadPerPartes\Uploader
  * Search possible target path
  */
 class TargetSearch

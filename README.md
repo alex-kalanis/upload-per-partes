@@ -13,6 +13,12 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 {
     "require": {
         "alex-kalanis/upload-per-partes": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "http",
+            "url":  "https://github.com/alex-kalanis/upload-per-partes.git"
+        }
     }
 }
 ```

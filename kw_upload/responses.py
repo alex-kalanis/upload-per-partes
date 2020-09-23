@@ -1,5 +1,4 @@
-
-from .drive_file import UploadData
+from .info_format import DataPack
 from .exceptions import PortException
 
 
@@ -91,16 +90,16 @@ class DoneResponse(AResponse):
         self._data = None
 
     @staticmethod
-    def init_done(shared_key: str, data: UploadData):
+    def init_done(shared_key: str, data: DataPack):
         return DoneResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
-    def init_error(shared_key: str, data: UploadData, ex: PortException):
+    def init_error(shared_key: str, data: DataPack, ex: PortException):
         return DoneResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
 
     def set_data(self,
                  shared_key: str,
-                 data: UploadData,
+                 data: DataPack,
                  status: str,
                  error_message: str = AResponse.STATUS_OK
                  ):
@@ -110,8 +109,8 @@ class DoneResponse(AResponse):
         self._error_message = error_message
         return self
 
-    def get_target_file(self) -> str:
-        return self._data.temp_path
+    def get_temporary_location(self) -> str:
+        return self._data.temp_location
 
     def get_file_name(self) -> str:
         return self._data.file_name
@@ -135,14 +134,14 @@ class InitResponse(AResponse):
         self._data = None
 
     @staticmethod
-    def init_ok(shared_key: str, data: UploadData):
+    def init_ok(shared_key: str, data: DataPack):
         return InitResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
-    def init_error(shared_key: str, data: UploadData, ex: PortException):
-        return InitResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
+    def init_error(data: DataPack, ex: PortException):
+        return InitResponse().set_data('', data, AResponse.STATUS_FAIL, ex.get_message())
 
-    def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
+    def set_data(self, shared_key: str, data: DataPack, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
         self._data = data
         self._status = status
@@ -171,14 +170,14 @@ class TruncateResponse(AResponse):
         self._data = None
 
     @staticmethod
-    def init_ok(shared_key: str, data: UploadData):
+    def init_ok(shared_key: str, data: DataPack):
         return TruncateResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
-    def init_error(shared_key: str, data: UploadData, ex: PortException):
+    def init_error(shared_key: str, data: DataPack, ex: PortException):
         return TruncateResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
 
-    def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
+    def set_data(self, shared_key: str, data: DataPack, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
         self._data = data
         self._status = status
@@ -201,14 +200,14 @@ class UploadResponse(AResponse):
         self._data = None
 
     @staticmethod
-    def init_ok(shared_key: str, data: UploadData):
+    def init_ok(shared_key: str, data: DataPack):
         return UploadResponse().set_data(shared_key, data, AResponse.STATUS_OK)
 
     @staticmethod
-    def init_error(shared_key: str, data: UploadData, ex: PortException):
+    def init_error(shared_key: str, data: DataPack, ex: PortException):
         return UploadResponse().set_data(shared_key, data, AResponse.STATUS_FAIL, ex.get_message())
 
-    def set_data(self, shared_key: str, data: UploadData, status: str, error_message: str = AResponse.STATUS_OK):
+    def set_data(self, shared_key: str, data: DataPack, status: str, error_message: str = AResponse.STATUS_OK):
         self._shared_key = shared_key
         self._data = data
         self._status = status

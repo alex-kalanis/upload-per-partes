@@ -10,7 +10,7 @@ class BasicTest extends CommonTestClass
 {
     /**
      * beware, i need to test this, because it's necessary for run - it happens for me to got failed testing
-     * PHP 7.2.26 has problems, it cost me 3hrs
+     * PHP has problems with badly defined params, it cost me 3hrs
      * @throws \UploadPerPartes\Exceptions\UploadException
      */
     public function testStrings(): void

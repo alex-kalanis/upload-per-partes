@@ -2,8 +2,8 @@
 
 namespace UploadPerPartes\Keys;
 
-use UploadPerPartes\DataStorage\TargetSearch;
 use UploadPerPartes\Exceptions\UploadException;
+use UploadPerPartes\Uploader\TargetSearch;
 use UploadPerPartes\Uploader\Translations;
 
 /**

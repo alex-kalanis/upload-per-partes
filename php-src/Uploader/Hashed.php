@@ -3,7 +3,7 @@
 namespace UploadPerPartes\Uploader;
 
 /**
- * Class Hashes
+ * Class Hashed
  * @package UploadPerPartes
  * Calculations hashes, need for checking content
  * Basic one is MD5

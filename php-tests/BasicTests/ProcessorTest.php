@@ -200,13 +200,13 @@ class ProcessorTest extends CommonTestClass
 
     protected function mockKey(): string
     {
-        return 'fghjkl' . DataStorage\TargetSearch::FILE_DRIVER_SUFF;
+        return 'fghjkl' . Uploader\TargetSearch::FILE_DRIVER_SUFF;
     }
 
     protected function initProcessor(): void
     {
         $lang = Uploader\Translations::init();
-        $target = new DataStorage\TargetSearch($lang);
+        $target = new Uploader\TargetSearch($lang);
         $key = new Support\Key($lang, $target);
         $format = new InfoFormat\Json();
         $hashed = Uploader\Hashed::init();

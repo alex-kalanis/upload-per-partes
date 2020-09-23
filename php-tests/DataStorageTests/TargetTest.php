@@ -4,7 +4,7 @@ namespace DataStorageTests;
 
 use CommonTestClass;
 use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\DataStorage\TargetSearch;
+use UploadPerPartes\Uploader\TargetSearch;
 use UploadPerPartes\Uploader\Translations;
 
 class TargetTest extends CommonTestClass

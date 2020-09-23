@@ -1,6 +1,6 @@
 import os
 import unittest
-from kw_upload.drive_file import UploadData
+from kw_upload.info_format import DataPack
 
 
 class CommonTestClass(unittest.TestCase):
@@ -17,8 +17,8 @@ class CommonTestClass(unittest.TestCase):
     def _get_test_file(self) -> str:
         return os.path.realpath(os.path.dirname(__file__) + '/../php-tests/testing-ipsum.txt')
 
-    def _mock_data(self) -> UploadData:
-        return UploadData().set_data(
+    def _mock_data(self) -> DataPack:
+        return DataPack().set_data(
             'abcdef',
             self._get_test_dir() + 'abcdef',
             123456,
