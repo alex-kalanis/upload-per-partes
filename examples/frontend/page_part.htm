@@ -1,0 +1,39 @@
+<script type="text/javascript" href="md5.js"></script>
+<script type="text/javascript" href="uploader.js"></script>
+<script type="text/javascript">
+	// configs
+	if (jQuery && window.File && window.FileReader && window.FileList && window.Blob) {
+		var langs = new UploadTranslations();
+		var targetConfig = new UploadTargetConfig();
+		targetConfig.targetInitPath = '//upload-file/init/';
+		targetConfig.targetFilePath = '//upload-file/file/';
+		targetConfig.targetDonePath = '//upload-file/done/';
+		var uploadedProcessor = new UploaderProcessor(new UploaderQuery(jQuery), langs, targetConfig, new CheckSumMD5());
+	}
+
+	// runner
+	if (jQuery && UploaderReader.canRead(window) && uploadedProcessor) {
+		// Great success! All the File APIs are supported.
+		var dropZone = document.getElementById("uparea");
+		dropZone.style.backgroundColor = '#a6ff80';
+		// Setup the dnd listeners.
+		// dropZone.addEventListener('dragover', uploadedProcessor.getHandler().handleDragOver, false);
+		dropZone.addEventListener('drop', uploadedProcessor.getHandler().handleFileSelect, false);
+		jQuery("#upfile").on('change', {}, uploadedProcessor.getHandler().handleFileInput);
+	}
+</script>
+
+<div><div id="uparea"><noscript><hr><p>{SCRIPTING_DISABLED_CANNOT_USE}</p><hr></noscript> &nbsp; &nbsp; &nbsp; </div></div>
+<p style="text-align: left;"><input type="file" id="upfile" multiple>
+<button onclick="uploadedProcessor.getHandler().startRead();">Start read</button>
+<button onclick="uploadedProcessor.getHandler().abortRead();">Abort read</button>
+<button onclick="uploadedProcessor.getHandler().clearList();">Clear list</button><br>
+</p><div id="list"></div>
+<div class="progress" id="base_progress">
+<div>File: <span class="filename"></span></div>
+<div class="progressbar"><div class="single">&nbsp;</div></div>
+<div class="errorlog">&nbsp;</div>
+<button onclick="uploadedProcessor.getHandler().resumeRead(this.getAttribute('data-key'));" disabled>Resume read</button>
+<button onclick="uploadedProcessor.getHandler().retryRead(this.getAttribute('data-key'));" disabled>Retry from beginning</button>
+<button onclick="uploadedProcessor.getHandler().stopRead(this.getAttribute('data-key'));">Stop read</button><br>
+</div>
