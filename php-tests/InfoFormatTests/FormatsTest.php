@@ -2,23 +2,25 @@
 
 namespace InfoFormatTests;
 
-use UploadPerPartes\InfoFormat;
-use UploadPerPartes\Uploader\Translations;
+
+use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 class FormatsTest extends AFormats
 {
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testInit(): void
     {
         $lang = Translations::init();
-        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Text', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_TEXT));
-        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Json', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_JSON));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Text', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_TEXT));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Json', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_JSON));
     }
 
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage DRIVEFILE VARIANT NOT SET
      */
     public function testInitFail(): void

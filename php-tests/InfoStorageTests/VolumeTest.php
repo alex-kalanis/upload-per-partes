@@ -2,7 +2,9 @@
 
 namespace InfoStorageTests;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 class VolumeTest extends AStorage
 {
@@ -21,7 +23,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT READ DRIVEFILE
      */
     public function testUnreadable(): void
@@ -35,7 +37,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT WRITE DRIVEFILE
      */
     public function testUnwriteable(): void
@@ -48,7 +50,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage DRIVEFILE CANNOT BE REMOVED
      */
     public function testDeleted(): void

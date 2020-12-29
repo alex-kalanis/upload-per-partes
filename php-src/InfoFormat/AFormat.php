@@ -1,13 +1,15 @@
 <?php
 
-namespace UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\InfoFormat;
 
-use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Uploader\Translations;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 /**
  * Class AFormat
- * @package UploadPerPartes\DriveFile
+ * @package kalanis\UploadPerPartes\DriveFile
  * Drive file format - abstract for each variant
  */
 abstract class AFormat

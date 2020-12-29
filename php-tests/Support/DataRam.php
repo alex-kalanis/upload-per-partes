@@ -2,8 +2,10 @@
 
 namespace Support;
 
-use UploadPerPartes\DataStorage\AStorage;
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\DataStorage\AStorage;
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class DataRam

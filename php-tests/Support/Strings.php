@@ -2,11 +2,13 @@
 
 namespace Support;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class Strings
- * @package UploadPerPartes\DriveFile
+ * @package Support
  * Processing Strings - reimplementation of necessary methods (contains fuckups)
  */
 class Strings

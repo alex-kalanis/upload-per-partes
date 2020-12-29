@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\Response;
+namespace kalanis\UploadPerPartes\Response;
+
 
 use Exception;
 
+
 /**
  * Class CheckResponse
- * @package UploadPerPartes\Response
+ * @package kalanis\UploadPerPartes\Response
  * Responses sent from content check
  */
 class CheckResponse extends AResponse

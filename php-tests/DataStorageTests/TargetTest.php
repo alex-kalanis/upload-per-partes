@@ -2,15 +2,17 @@
 
 namespace DataStorageTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Uploader\TargetSearch;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 class TargetTest extends CommonTestClass
 {
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SENT FILE NAME IS EMPTY
      */
     public function testFailNoRemote(): void
@@ -20,7 +22,7 @@ class TargetTest extends CommonTestClass
     }
 
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage TARGET DIR IS NOT SET
      */
     public function testFailNoTarget(): void
@@ -31,7 +33,7 @@ class TargetTest extends CommonTestClass
     }
 
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage UPLOAD FILE NAME IS EMPTY
      */
     public function testFailNoBase(): void

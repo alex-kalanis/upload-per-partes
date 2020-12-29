@@ -2,12 +2,14 @@
 
 namespace Support;
 
-use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\InfoStorage\AStorage;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\InfoStorage\AStorage;
+
 
 /**
  * Class InfoRam
- * @package UploadPerPartes\DriveFile
+ * @package Support
  * Processing info file on ram volume
  */
 class InfoRam extends AStorage

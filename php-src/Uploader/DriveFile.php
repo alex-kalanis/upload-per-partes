@@ -1,15 +1,17 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
 
-use UploadPerPartes\InfoFormat;
-use UploadPerPartes\Exceptions;
-use UploadPerPartes\Keys;
-use UploadPerPartes\InfoStorage;
+
+use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\Keys;
+use kalanis\UploadPerPartes\InfoStorage;
+
 
 /**
  * Class DriveFile
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Processing drive file
  */
 class DriveFile
@@ -97,6 +99,7 @@ class DriveFile
      * Has driver data? Mainly for testing
      * @param string $sharedKey
      * @return bool
+     * @throws Exceptions\UploadException
      */
     public function exists(string $sharedKey): bool
     {

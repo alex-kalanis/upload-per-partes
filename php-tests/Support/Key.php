@@ -2,8 +2,10 @@
 
 namespace Support;
 
-use UploadPerPartes\Keys\AKey;
-use UploadPerPartes\Uploader\TargetSearch;
+
+use kalanis\UploadPerPartes\Keys\AKey;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+
 
 class Key extends AKey
 {

@@ -2,15 +2,17 @@
 
 namespace KeysTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\Keys;
-use UploadPerPartes\Uploader\TargetSearch;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Keys;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 class RedisTest extends CommonTestClass
 {
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testThru(): void
     {

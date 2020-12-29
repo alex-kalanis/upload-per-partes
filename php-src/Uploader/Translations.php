@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
+
 
 /**
  * Class Translations
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Return translated quotes from backend
  * - necessary due many translation systems through web
  * For work extends this class and pass extension into your project
@@ -94,7 +95,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\VolumeBasic::getPart
+     * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::getPart
      */
     public function cannotReadFile(): string
     {
@@ -104,7 +105,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore   no ideas how to fail seek
-     * @see \UploadPerPartes\DataStorage\VolumeBasic::addPart
+     * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
     public function cannotSeekFile(): string
     {
@@ -114,7 +115,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\VolumeBasic::addPart
+     * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
     public function cannotWriteFile(): string
     {
@@ -124,7 +125,7 @@ class Translations
     /**
      * @return string
      * @codeCoverageIgnore
-     * @see \UploadPerPartes\DataStorage\VolumeBasic::truncate
+     * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::truncate
      */
     public function cannotTruncateFile(): string
     {

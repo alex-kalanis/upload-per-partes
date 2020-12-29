@@ -2,10 +2,15 @@
 
 namespace InfoFormatTests;
 
-use UploadPerPartes\InfoFormat;
+
+use kalanis\UploadPerPartes\InfoFormat;
+
 
 class JsonTest extends AFormats
 {
+    /**
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     */
     public function testThru(): void
     {
         $lib = new InfoFormat\Json();

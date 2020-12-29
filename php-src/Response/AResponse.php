@@ -1,13 +1,17 @@
 <?php
 
-namespace UploadPerPartes\Response;
+namespace kalanis\UploadPerPartes\Response;
+
+
+use JsonSerializable;
+
 
 /**
  * Class AResponse
- * @package UploadPerPartes\Response
+ * @package kalanis\UploadPerPartes\Response
  * Responses for client
  */
-abstract class AResponse implements \JsonSerializable
+abstract class AResponse implements JsonSerializable
 {
     const STATUS_OK = 'OK';
     const STATUS_FAIL = 'FAIL';

@@ -2,15 +2,17 @@
 
 namespace KeysTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\Keys;
-use UploadPerPartes\Uploader\TargetSearch;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Keys;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 class VolumeTest extends CommonTestClass
 {
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SHARED KEY IS INVALID
      */
     public function testThru(): void

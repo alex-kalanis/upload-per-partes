@@ -1,13 +1,15 @@
 <?php
 
-namespace UploadPerPartes\InfoStorage;
+namespace kalanis\UploadPerPartes\InfoStorage;
 
-use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Uploader\Translations;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 /**
  * Class AStorage
- * @package UploadPerPartes\InfoStorage
+ * @package kalanis\UploadPerPartes\InfoStorage
  * Target storage for data stream
  */
 abstract class AStorage

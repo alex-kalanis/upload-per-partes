@@ -2,7 +2,9 @@
 
 namespace DataStorageTests;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 class VolumeTest extends AStorage
 {
@@ -22,7 +24,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      */
     public function testUnreadable(): void
@@ -34,7 +36,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      */
     public function testUnreadableSeek(): void
@@ -46,7 +48,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      * @-expectedExceptionMessage CANNOT WRITE FILE
      */
@@ -60,7 +62,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT OPEN FILE
      * @-expectedExceptionMessage CANNOT WRITE FILE
      */
@@ -74,7 +76,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage CANNOT REMOVE DATA
      */
     public function testDeleted(): void

@@ -2,9 +2,11 @@
 
 namespace InfoFormatTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\InfoStorage;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\InfoStorage;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 abstract class AFormats extends CommonTestClass
 {

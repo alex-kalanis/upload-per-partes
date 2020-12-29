@@ -1,14 +1,16 @@
 <?php
 
-namespace UploadPerPartes\InfoStorage;
+namespace kalanis\UploadPerPartes\InfoStorage;
+
 
 use Predis;
-use UploadPerPartes\Uploader\Translations;
-use UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class Redis
- * @package UploadPerPartes\InfoStorage
+ * @package kalanis\UploadPerPartes\InfoStorage
  * Processing info file in Redis
  * @codeCoverageIgnore
  */

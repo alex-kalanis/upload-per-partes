@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\Keys;
+namespace kalanis\UploadPerPartes\Keys;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class Volume
- * @package UploadPerPartes\Keys
+ * @package kalanis\UploadPerPartes\Keys
  * Connect shared key and local path in format which can be used in local volume
  */
 class SimpleVolume extends AKey

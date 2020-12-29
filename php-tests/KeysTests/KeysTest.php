@@ -2,27 +2,29 @@
 
 namespace KeysTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\Keys;
-use UploadPerPartes\Uploader\TargetSearch;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Keys;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 class KeysTest extends CommonTestClass
 {
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testInit(): void
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);
-        $this->assertInstanceOf('\UploadPerPartes\Keys\SimpleVolume', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_VOLUME));
-        $this->assertInstanceOf('\UploadPerPartes\Keys\Random', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_RANDOM));
-        $this->assertInstanceOf('\UploadPerPartes\Keys\Redis', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_REDIS));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\SimpleVolume', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_VOLUME));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Random', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_RANDOM));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Redis', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_REDIS));
     }
 
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage KEY VARIANT NOT SET
      */
     public function testInitFail(): void
@@ -33,7 +35,7 @@ class KeysTest extends CommonTestClass
     }
 
     /**
-     * @expectedException \UploadPerPartes\Exceptions\UploadException
+     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SHARED KEY IS EMPTY
      */
     public function testSharedFail(): void
@@ -44,7 +46,7 @@ class KeysTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testRandom(): void
     {

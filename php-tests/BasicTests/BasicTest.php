@@ -2,16 +2,18 @@
 
 namespace BasicTests;
 
+
 use CommonTestClass;
 use Support;
-use UploadPerPartes\Uploader\Calculates;
+use kalanis\UploadPerPartes\Uploader\Calculates;
+
 
 class BasicTest extends CommonTestClass
 {
     /**
      * beware, i need to test this, because it's necessary for run - it happens for me to got failed testing
      * PHP has problems with badly defined params, it cost me 3hrs
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testStrings(): void
     {
@@ -30,7 +32,7 @@ class BasicTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testCalculate(): void
     {

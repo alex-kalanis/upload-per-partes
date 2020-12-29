@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\Keys;
+namespace kalanis\UploadPerPartes\Keys;
+
 
 /**
  * Class Redis
- * @package UploadPerPartes\Keys
+ * @package kalanis\UploadPerPartes\Keys
  * Connect shared key and local in format available for Redis
  */
 class Redis extends AKey

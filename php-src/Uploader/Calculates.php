@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
+
 
 /**
  * Class Calculates
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Calculations over sizes
  */
 class Calculates

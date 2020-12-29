@@ -1,14 +1,16 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
 
-use UploadPerPartes\InfoFormat;
-use UploadPerPartes\DataStorage;
-use UploadPerPartes\Exceptions;
+
+use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\Exceptions;
+
 
 /**
  * Class Processor
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Processing upload per-partes
  */
 class Processor

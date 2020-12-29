@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
+
 
 /**
  * Class Hashed
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Calculations hashes, need for checking content
  * Basic one is MD5
  */

@@ -1,6 +1,7 @@
 <?php
 
-namespace UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\InfoFormat;
+
 
 /**
  * Class Data

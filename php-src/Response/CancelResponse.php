@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\Response;
+namespace kalanis\UploadPerPartes\Response;
+
 
 use Exception;
 
+
 /**
  * Class CancelResponse
- * @package UploadPerPartes\Response
+ * @package kalanis\UploadPerPartes\Response
  * Responses sent during upload cancelling
  */
 class CancelResponse extends AResponse

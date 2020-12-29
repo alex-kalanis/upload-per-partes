@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\DataStorage;
+namespace kalanis\UploadPerPartes\DataStorage;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class VolumeBasic
- * @package UploadPerPartes\DataStorage
+ * @package kalanis\UploadPerPartes\DataStorage
  * Processing info file on disk volume
  * Filesystem behaves oddly - beware of fucked up caching!
  * When someone got idea how to test it without ignoring failed states, please tell me.

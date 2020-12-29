@@ -1,14 +1,16 @@
 <?php
 
-namespace UploadPerPartes;
+namespace kalanis\UploadPerPartes;
 
-use UploadPerPartes\Uploader\Calculates;
-use UploadPerPartes\Uploader\Hashed;
-use UploadPerPartes\Uploader\Translations;
+
+use kalanis\UploadPerPartes\Uploader\Calculates;
+use kalanis\UploadPerPartes\Uploader\Hashed;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 /**
  * Class Uploader
- * @package UploadPerPartes
+ * @package kalanis\UploadPerPartes
  * Main server library for drive upload per-partes
  */
 class Uploader

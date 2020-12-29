@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\Uploader;
+namespace kalanis\UploadPerPartes\Uploader;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class TargetSearch
- * @package UploadPerPartes\Uploader
+ * @package kalanis\UploadPerPartes\Uploader
  * Search possible target path
  */
 class TargetSearch

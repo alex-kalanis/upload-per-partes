@@ -1,12 +1,14 @@
 <?php
 
-namespace UploadPerPartes\InfoStorage;
+namespace kalanis\UploadPerPartes\InfoStorage;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+
 
 /**
  * Class Volume
- * @package UploadPerPartes\InfoStorage
+ * @package kalanis\UploadPerPartes\InfoStorage
  * Processing info file on disk volume
  */
 class Volume extends AStorage

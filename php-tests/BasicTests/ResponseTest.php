@@ -2,9 +2,11 @@
 
 namespace BasicTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\Response;
-use UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\Response;
+use kalanis\UploadPerPartes\Exceptions;
+
 
 class ResponseTest extends CommonTestClass
 {

@@ -1,7 +1,11 @@
 {
     "name": "alex-kalanis/upload-per-partes",
     "description": "HTTP Uploading Client for PHP",
-    "keywords": [],
+    "keywords": [
+        "upload",
+        "uploading",
+        "step-by-step"
+    ],
     "license": "BSD 3-Clause",
     "type": "project",
     "require": {
@@ -17,11 +21,18 @@
     },
     "autoload": {
         "psr-4": {
-            "UploadPerPartes\\": "php-src/"
+            "kalanis\\UploadPerPartes\\": "php-src/"
         }
     },
     "scripts": {
     },
+    "authors": [
+        {
+            "name": "Petr Plsek",
+            "homepage": "http://www.kalanys.com",
+            "role": "Developer"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }

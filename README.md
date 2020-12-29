@@ -13,12 +13,6 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 {
     "require": {
         "alex-kalanis/upload-per-partes": "dev-master"
-    },
-    "repositories": [
-        {
-            "type": "http",
-            "url":  "https://github.com/alex-kalanis/upload-per-partes.git"
-        }
     }
 }
 ```
@@ -31,7 +25,7 @@ familiar with composer)
 
 1.) Use your autoloader (if not already done via Composer autoloader)
 
-2.) Connect the "UploadPerPartes\Upload" into your app. When it came necessary
+2.) Connect the "kalanis\UploadPerPartes\Upload" into your app. When it came necessary
 you can extends every library to comply your use-case; mainly your storage and
 processing.
 

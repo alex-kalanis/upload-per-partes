@@ -2,9 +2,11 @@
 
 namespace DataStorageTests;
 
+
 use CommonTestClass;
-use UploadPerPartes\DataStorage;
-use UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 abstract class AStorage extends CommonTestClass
 {

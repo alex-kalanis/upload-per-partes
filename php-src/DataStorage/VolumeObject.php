@@ -1,12 +1,15 @@
 <?php
 
-namespace UploadPerPartes\DataStorage;
+namespace kalanis\UploadPerPartes\DataStorage;
 
-use UploadPerPartes\Exceptions\UploadException;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use SplFileObject;
+
 
 /**
  * Class VolumeBasic
- * @package UploadPerPartes\DataStorage
+ * @package kalanis\UploadPerPartes\DataStorage
  * Processing info file on disk volume
  * Filesystem behaves oddly - beware of fucked up caching!
  * When someone got idea how to test it without ignoring failed states, please tell me.
@@ -23,7 +26,7 @@ class VolumeObject extends VolumeBasic
      */
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
-        $file = new \SplFileObject($location, 'r+');
+        $file = new SplFileObject($location, 'r+');
         if (!$file) {
             throw new UploadException($this->lang->cannotOpenFile());
         }
@@ -49,7 +52,7 @@ class VolumeObject extends VolumeBasic
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        $file = new \SplFileObject($location, 'r+');
+        $file = new SplFileObject($location, 'r+');
         if (!$file) {
             throw new UploadException($this->lang->cannotOpenFile());
         }
@@ -80,7 +83,7 @@ class VolumeObject extends VolumeBasic
      */
     public function truncate(string $location, int $offset): void
     {
-        $file = new \SplFileObject($location, 'r+');
+        $file = new SplFileObject($location, 'r+');
         $file->rewind();
         if (!$file->ftruncate($offset)) {
             unset($file);

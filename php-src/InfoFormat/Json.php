@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\InfoFormat;
+
 
 /**
  * Class Json
- * @package UploadPerPartes\DataFormat
+ * @package kalanis\UploadPerPartes\DataFormat
  * Driver file - format JSON
  */
 class Json extends AFormat

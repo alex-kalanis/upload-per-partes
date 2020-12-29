@@ -1,10 +1,11 @@
 <?php
 
-namespace UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\InfoFormat;
+
 
 /**
  * Class Text
- * @package UploadPerPartes\DriveFile
+ * @package kalanis\UploadPerPartes\DriveFile
  * Driver file - format plaintext
  */
 class Text extends AFormat

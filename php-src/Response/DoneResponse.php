@@ -1,13 +1,15 @@
 <?php
 
-namespace UploadPerPartes\Response;
+namespace kalanis\UploadPerPartes\Response;
+
 
 use Exception;
-use UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\InfoFormat;
+
 
 /**
  * Class DoneResponse
- * @package UploadPerPartes\Response
+ * @package kalanis\UploadPerPartes\Response
  * Responses sent during upload closure
  */
 class DoneResponse extends AResponse

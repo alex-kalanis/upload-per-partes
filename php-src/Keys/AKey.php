@@ -1,14 +1,16 @@
 <?php
 
-namespace UploadPerPartes\Keys;
+namespace kalanis\UploadPerPartes\Keys;
 
-use UploadPerPartes\Exceptions\UploadException;
-use UploadPerPartes\Uploader\TargetSearch;
-use UploadPerPartes\Uploader\Translations;
+
+use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use kalanis\UploadPerPartes\Uploader\Translations;
+
 
 /**
  * Class AKey
- * @package UploadPerPartes\Keys
+ * @package kalanis\UploadPerPartes\Keys
  * Connect shared key and local details
  */
 abstract class AKey
@@ -33,6 +35,7 @@ abstract class AKey
     /**
      * @param string $key
      * @return string
+     * @throws UploadException
      */
     abstract public function fromSharedKey(string $key): string;
 

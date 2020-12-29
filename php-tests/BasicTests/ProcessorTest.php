@@ -2,12 +2,14 @@
 
 namespace BasicTests;
 
+
 use CommonTestClass;
 use Support;
-use UploadPerPartes\DataStorage;
-use UploadPerPartes\InfoFormat;
-use UploadPerPartes\InfoStorage;
-use UploadPerPartes\Uploader;
+use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\InfoStorage;
+use kalanis\UploadPerPartes\Uploader;
+
 
 class ProcessorTest extends CommonTestClass
 {
@@ -30,7 +32,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testInit(): void
     {
@@ -40,7 +42,7 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 5;
         $data = $this->processor->init($pack, $this->mockSharedKey());
 
-        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Data', $data);
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data);
         $this->assertEquals('abcdef', $data->fileName);
         $this->assertEquals($this->getTestDir() . 'abcdef', $data->tempLocation);
         $this->assertEquals(123456, $data->fileSize);
@@ -49,7 +51,7 @@ class ProcessorTest extends CommonTestClass
         $this->assertEquals(5, $data->lastKnownPart);
 
         $data2 = $this->processor->done($this->mockKey());
-        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Data', $data2);
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data2);
         $this->assertEquals('abcdef', $data2->fileName);
         $this->assertEquals($this->getTestDir() . 'abcdef', $data2->tempLocation);
         $this->assertEquals(123456, $data2->fileSize);
@@ -59,7 +61,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testInitFail(): void
     {
@@ -69,7 +71,7 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 4;
         $data = $this->processor->init($pack, $this->mockSharedKey());
 
-        $this->assertInstanceOf('\UploadPerPartes\InfoFormat\Data', $data);
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data);
         $this->assertEquals(4, $data->lastKnownPart);
 
         $pack->lastKnownPart = 8;
@@ -79,7 +81,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage READ TOO EARLY
      */
     public function testUploadEarly(): void
@@ -97,7 +99,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
      */
     public function testCheckSegmentSubZero(): void
@@ -113,7 +115,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
      */
     public function testCheckSegmentAvailableParts(): void
@@ -129,7 +131,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @expectedException  \UploadPerPartes\Exceptions\UploadException
+     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
      * @expectedExceptionMessage SEGMENT NOT UPLOADED YET
      */
     public function testCheckSegmentNotUploaded(): void
@@ -145,7 +147,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testSimpleThru(): void
     {
@@ -180,7 +182,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \UploadPerPartes\Exceptions\UploadException
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
      */
     public function testSimpleAll(): void
     {

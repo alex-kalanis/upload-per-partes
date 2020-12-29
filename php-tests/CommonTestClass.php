@@ -1,6 +1,7 @@
 <?php
 
-use UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\InfoFormat;
+
 
 class CommonTestClass extends \PHPUnit\Framework\TestCase
 {

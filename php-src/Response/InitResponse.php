@@ -1,9 +1,11 @@
 <?php
 
-namespace UploadPerPartes\Response;
+namespace kalanis\UploadPerPartes\Response;
+
 
 use Exception;
-use UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\InfoFormat;
+
 
 /**
  * Class InitResponse
