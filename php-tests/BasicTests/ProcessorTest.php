@@ -6,6 +6,7 @@ namespace BasicTests;
 use CommonTestClass;
 use Support;
 use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\InfoStorage;
 use kalanis\UploadPerPartes\Uploader;
@@ -32,7 +33,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testInit(): void
     {
@@ -61,7 +62,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testInitFail(): void
     {
@@ -81,8 +82,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage READ TOO EARLY
+     * @throws Exceptions\UploadException
      */
     public function testUploadEarly(): void
     {
@@ -95,12 +95,13 @@ class ProcessorTest extends CommonTestClass
         $this->processor->init($pack, $this->mockSharedKey());
         $datacont = 'asdfghjklyxcvbnmqwertzuiop1234567890';
         $this->processor->upload($this->mockSharedKey(), $datacont, 5); // pass, last is 4, wanted 5
+        $this->expectException(Exceptions\UploadException::class);
         $this->processor->upload($this->mockSharedKey(), $datacont, 7); // fail, last is 5, wanted 6
+        $this->expectExceptionMessageMatches('READ TOO EARLY');
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
+     * @throws Exceptions\UploadException
      */
     public function testCheckSegmentSubZero(): void
     {
@@ -111,12 +112,13 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
         $this->processor->init($pack, $this->mockSharedKey());
+        $this->expectException(Exceptions\UploadException::class);
         $this->processor->check($this->mockSharedKey(), -5); // fail, sub zero
+        $this->expectExceptionMessageMatches('SEGMENT OUT OF BOUNDS');
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage SEGMENT OUT OF BOUNDS
+     * @throws Exceptions\UploadException
      */
     public function testCheckSegmentAvailableParts(): void
     {
@@ -127,12 +129,13 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
         $this->processor->init($pack, $this->mockSharedKey());
+        $this->expectException(Exceptions\UploadException::class);
         $this->processor->check($this->mockSharedKey(), 10); // fail, out of size
+        $this->expectExceptionMessageMatches('SEGMENT OUT OF BOUNDS');
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage SEGMENT NOT UPLOADED YET
+     * @throws Exceptions\UploadException
      */
     public function testCheckSegmentNotUploaded(): void
     {
@@ -143,11 +146,13 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
         $this->processor->init($pack, $this->mockSharedKey());
+        $this->expectException(Exceptions\UploadException::class);
         $this->processor->check($this->mockSharedKey(), 6); // fail, outside upload
+        $this->expectExceptionMessageMatches('SEGMENT NOT UPLOADED YET');
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testSimpleThru(): void
     {
@@ -182,7 +187,7 @@ class ProcessorTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testSimpleAll(): void
     {

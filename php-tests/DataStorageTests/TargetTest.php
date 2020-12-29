@@ -12,34 +12,37 @@ use kalanis\UploadPerPartes\Uploader\Translations;
 class TargetTest extends CommonTestClass
 {
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage SENT FILE NAME IS EMPTY
+     * @throws UploadException
      */
     public function testFailNoRemote(): void
     {
         $lib = new TargetSearch(Translations::init());
+        $this->expectException(UploadException::class);
         $lib->process();
+        $this->expectExceptionMessageMatches('SENT FILE NAME IS EMPTY');
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage TARGET DIR IS NOT SET
+     * @throws UploadException
      */
     public function testFailNoTarget(): void
     {
         $lib = new TargetSearch(Translations::init());
         $lib->setRemoteFileName('abcdefg');
+        $this->expectException(UploadException::class);
         $lib->process();
+        $this->expectExceptionMessageMatches('TARGET DIR IS NOT SET');
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage UPLOAD FILE NAME IS EMPTY
+     * @throws UploadException
      */
     public function testFailNoBase(): void
     {
         $lib = new TargetSearch(Translations::init());
+        $this->expectException(UploadException::class);
         $lib->getFinalTargetName();
+        $this->expectExceptionMessageMatches('UPLOAD FILE NAME IS EMPTY');
     }
 
     /**

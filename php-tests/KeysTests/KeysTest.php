@@ -4,6 +4,7 @@ namespace KeysTests;
 
 
 use CommonTestClass;
+use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Keys;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use kalanis\UploadPerPartes\Uploader\Translations;
@@ -12,7 +13,7 @@ use kalanis\UploadPerPartes\Uploader\Translations;
 class KeysTest extends CommonTestClass
 {
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws UploadException
      */
     public function testInit(): void
     {
@@ -24,29 +25,31 @@ class KeysTest extends CommonTestClass
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage KEY VARIANT NOT SET
+     * @throws UploadException
      */
     public function testInitFail(): void
     {
         $lang = Translations::init();
         $target = new TargetSearch($lang);
+        $this->expectException(UploadException::class);
         Keys\AKey::getVariant($lang, $target, 0);
+        $this->expectExceptionMessageMatches('KEY VARIANT NOT SET');
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage SHARED KEY IS EMPTY
+     * @throws UploadException
      */
     public function testSharedFail(): void
     {
         $lang = Translations::init();
         $lib = new Keys\Random($lang, new TargetSearch($lang));
+        $this->expectException(UploadException::class);
         $lib->getSharedKey(); // no key set!
+        $this->expectExceptionMessageMatches('SHARED KEY IS EMPTY');
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws UploadException
      */
     public function testRandom(): void
     {

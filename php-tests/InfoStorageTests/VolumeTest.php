@@ -23,8 +23,7 @@ class VolumeTest extends AStorage
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage CANNOT READ DRIVEFILE
+     * @throws UploadException
      */
     public function testUnreadable(): void
     {
@@ -33,12 +32,13 @@ class VolumeTest extends AStorage
         $storage->save($file, 'abcdefghijklmnopqrstuvwxyz');
         $storage->load($file);
         chmod($file, 0333);
+        $this->expectException(UploadException::class);
         $storage->load($file);
+        $this->expectExceptionMessageMatches('CANNOT READ DRIVEFILE');
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage CANNOT WRITE DRIVEFILE
+     * @throws UploadException
      */
     public function testUnwriteable(): void
     {
@@ -46,12 +46,13 @@ class VolumeTest extends AStorage
         $storage = $this->mockStorage();
         $storage->save($file, 'abcdefghijklmnopqrstuvwxyz');
         chmod($file, 0444);
+        $this->expectException(UploadException::class);
         $storage->save($file, 'abcdefghijklmnopqrstuvwxyz');
+        $this->expectExceptionMessageMatches('CANNOT WRITE DRIVEFILE');
     }
 
     /**
-     * @expectedException  \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage DRIVEFILE CANNOT BE REMOVED
+     * @throws UploadException
      */
     public function testDeleted(): void
     {
@@ -59,6 +60,8 @@ class VolumeTest extends AStorage
         $storage = $this->mockStorage();
         $storage->save($file, 'abcdefghijklmnopqrstuvwxyz');
         $storage->remove($file);
+        $this->expectException(UploadException::class);
         $storage->remove($file); // dies here
+        $this->expectExceptionMessageMatches('DRIVEFILE CANNOT BE REMOVED');
     }
 }

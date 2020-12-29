@@ -3,6 +3,7 @@
 namespace InfoFormatTests;
 
 
+use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
@@ -10,7 +11,7 @@ use kalanis\UploadPerPartes\Uploader\Translations;
 class FormatsTest extends AFormats
 {
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws UploadException
      */
     public function testInit(): void
     {
@@ -20,11 +21,12 @@ class FormatsTest extends AFormats
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage DRIVEFILE VARIANT NOT SET
+     * @throws UploadException
      */
     public function testInitFail(): void
     {
+        $this->expectException(UploadException::class);
         InfoFormat\AFormat::getFormat(Translations::init(), 0);
+        $this->expectExceptionMessageMatches('DRIVEFILE VARIANT NOT SET');
     }
 }

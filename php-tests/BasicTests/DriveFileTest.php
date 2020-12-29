@@ -5,6 +5,7 @@ namespace BasicTests;
 
 use CommonTestClass;
 use Support;
+use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Uploader;
 
@@ -21,7 +22,7 @@ class DriveFileTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testThru(): void
     {
@@ -39,9 +40,7 @@ class DriveFileTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\ContinuityUploadException
-     * @expectedExceptionMessage DRIVEFILE ALREADY EXISTS
+     * @throws Exceptions\UploadException
      */
     public function testWriteFail(): void
     {
@@ -49,11 +48,13 @@ class DriveFileTest extends CommonTestClass
         $data = $this->mockData();
         $this->assertTrue($driveFile->write($this->mockKey(), $data));
         $this->assertTrue($driveFile->exists($this->mockKey()));
+        $this->expectException(Exceptions\ContinuityUploadException::class);
         $driveFile->write($this->mockKey(), $data, true); // fail
+        $this->expectExceptionMessageMatches('DRIVEFILE ALREADY EXISTS');
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testUpdate(): void
     {
@@ -65,15 +66,16 @@ class DriveFileTest extends CommonTestClass
     }
 
     /**
-     * @expectedException \kalanis\UploadPerPartes\Exceptions\UploadException
-     * @expectedExceptionMessage DRIVEFILE IS NOT CONTINUOUS
+     * @throws Exceptions\UploadException
      */
     public function testUpdateFail(): void
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
         $this->assertTrue($driveFile->write($this->mockKey(), $data));
+        $this->expectException(Exceptions\UploadException::class);
         $driveFile->updateLastPart($this->mockKey(), $data, $data->lastKnownPart + 5); // fail
+        $this->expectExceptionMessageMatches('DRIVEFILE IS NOT CONTINUOUS');
     }
 
     protected function mockKey(): string
