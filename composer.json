@@ -2,12 +2,14 @@
     "name": "alex-kalanis/upload-per-partes",
     "description": "HTTP Uploading Client for PHP",
     "keywords": [
+        "http",
         "upload",
         "uploading",
+        "sequential",
         "step-by-step"
     ],
     "license": "BSD 3-Clause",
-    "type": "project",
+    "type": "library",
     "require": {
         "php": ">=7.2.0",
         "ext-json": "*",
