@@ -21,9 +21,18 @@
         timeoutForLargeTests="60"
         defaultTestSuite="ALL"
         verbose="true">
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <ini name="intl.default_locale" value="en" />
+        <ini name="intl.error_level" value="0" />
+        <ini name="memory_limit" value="-1" />
+    </php>
+
     <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false" />
+        <log type="coverage-clover" target="php-tests/data/clover.xml" />
     </logging>
+
     <filter>
         <whitelist>
             <directory suffix=".php">php-src/</directory>

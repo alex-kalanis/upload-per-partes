@@ -1,8 +1,10 @@
 <?php
 
-namespace UploadPerPartes\examples\controller;
+namespace kalanis\UploadPerPartes\examples\controller;
 
-use UploadPerPartes;
+
+use kalanis\UploadPerPartes;
+
 
 /**
  * Class Uploader

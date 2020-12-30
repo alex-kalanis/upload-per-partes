@@ -3,7 +3,7 @@
 phpunit.phar
 phpunit
 phpunit-*
-.phpunit
+.phpunit*
 
 # Compiled modules
 *.pyc

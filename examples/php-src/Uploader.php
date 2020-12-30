@@ -1,16 +1,18 @@
 <?php
 
-namespace UploadPerPartes\examples;
+namespace kalanis\UploadPerPartes\examples;
 
-use UploadPerPartes;
-use UploadPerPartes\Uploader\Calculates;
+
+use kalanis\UploadPerPartes;
+use kalanis\UploadPerPartes\Uploader\Calculates;
+
 
 /**
  * Class Upload
- * @package UploadPerPartes\examples
+ * @package kalanis\UploadPerPartes\examples
  * Library for uploading files per partes - port into our project
  */
-class Uploader extends \UploadPerPartes\Uploader
+class Uploader extends UploadPerPartes\Uploader
 {
     protected function getCalc(): Calculates
     {

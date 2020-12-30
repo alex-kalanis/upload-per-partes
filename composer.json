@@ -8,7 +8,7 @@
         "sequential",
         "step-by-step"
     ],
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "type": "library",
     "require": {
         "php": ">=7.2.0",
