@@ -16,7 +16,8 @@
         "ext-mbstring": "*"
     },
     "suggest": {
-        "predis/predis": "Redis client"
+        "predis/predis": "Redis client",
+        "kalanis/kw_storage": "Universal storage library for store data as key-value pairs"
     },
     "require-dev": {
         "phpunit/phpunit": ">7.2"

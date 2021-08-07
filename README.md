@@ -12,7 +12,7 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 ```
 {
     "require": {
-        "alex-kalanis/upload-per-partes": "dev-master"
+        "alex-kalanis/upload-per-partes": "1.0"
     }
 }
 ```

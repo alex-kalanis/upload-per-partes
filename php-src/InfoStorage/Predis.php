@@ -3,25 +3,25 @@
 namespace kalanis\UploadPerPartes\InfoStorage;
 
 
-use Redis as lib;
+use Predis as lib;
 use kalanis\UploadPerPartes\Uploader\Translations;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 
 
 /**
- * Class Redis
+ * Class Predis
  * @package kalanis\UploadPerPartes\InfoStorage
  * Processing info file in Redis
  * @codeCoverageIgnore
  */
-class Redis extends AStorage
+class Predis extends AStorage
 {
-    /** @var null|lib */
+    /** @var null|lib\Client */
     protected $redis = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(Translations $lang, lib $redis, int $timeout = 3600)
+    public function __construct(Translations $lang, lib\Client $redis, int $timeout = 3600)
     {
         // path is not a route but redis key
         parent::__construct($lang);
@@ -36,8 +36,7 @@ class Redis extends AStorage
      */
     public function exists(string $key): bool
     {
-        // cannot call exists() - get on non-existing key returns false
-        return (false !== $this->redis->get($key));
+        return (0 < $this->redis->exists($key));
     }
 
     /**
@@ -53,13 +52,14 @@ class Redis extends AStorage
     /**
      * @param string $key
      * @param string $data
-     * @throws UploadException
      * @codeCoverageIgnore
      */
     public function save(string $key, string $data): void
     {
-        if (false === $this->redis->set($key, $data, $this->timeout)) {
-            throw new UploadException($this->lang->driveFileCannotWrite());
+        if (is_null($this->timeout)) {
+            $this->redis->set($key, $data);
+        } else {
+            $this->redis->set($key, $data, 'EX', $this->timeout);
         }
     }
 

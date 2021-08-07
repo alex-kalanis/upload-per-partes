@@ -3,74 +3,78 @@
 namespace kalanis\UploadPerPartes\InfoStorage;
 
 
-use Redis as lib;
+use kalanis\kw_storage\Storage as lib;
+use kalanis\kw_storage\StorageException;
 use kalanis\UploadPerPartes\Uploader\Translations;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 
 
 /**
- * Class Redis
+ * Class Storage
  * @package kalanis\UploadPerPartes\InfoStorage
- * Processing info file in Redis
+ * Processing info file in kw_storage
  * @codeCoverageIgnore
  */
-class Redis extends AStorage
+class Storage extends AStorage
 {
     /** @var null|lib */
-    protected $redis = null;
+    protected $storage = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(Translations $lang, lib $redis, int $timeout = 3600)
+    public function __construct(Translations $lang, lib $storage, int $timeout = 3600)
     {
         // path is not a route but redis key
         parent::__construct($lang);
-        $this->redis = $redis;
+        $this->storage = $storage;
         $this->timeout = $timeout;
     }
 
     /**
      * @param string $key
      * @return bool
+     * @throws StorageException
      * @codeCoverageIgnore
      */
     public function exists(string $key): bool
     {
-        // cannot call exists() - get on non-existing key returns false
-        return (false !== $this->redis->get($key));
+        return $this->storage->exists($key);
     }
 
     /**
      * @param string $key
      * @return string
+     * @throws StorageException
      * @codeCoverageIgnore
      */
     public function load(string $key): string
     {
-        return (string)$this->redis->get($key);
+        return (string)$this->storage->get($key);
     }
 
     /**
      * @param string $key
      * @param string $data
+     * @throws StorageException
      * @throws UploadException
      * @codeCoverageIgnore
      */
     public function save(string $key, string $data): void
     {
-        if (false === $this->redis->set($key, $data, $this->timeout)) {
+        if (false === $this->storage->set($key, $data, $this->timeout)) {
             throw new UploadException($this->lang->driveFileCannotWrite());
         }
     }
 
     /**
      * @param string $key
+     * @throws StorageException
      * @throws UploadException
      * @codeCoverageIgnore
      */
     public function remove(string $key): void
     {
-        if (!$this->redis->del($key)) {
+        if (!$this->storage->delete($key)) {
             throw new UploadException($this->lang->driveFileCannotRemove());
         }
     }
