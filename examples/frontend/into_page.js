@@ -6,11 +6,13 @@ document.addEventListener('DOMContentLoaded', function () {
         targetConfig.targetInitPath = '//upload-file/init/';
         targetConfig.targetFilePath = '//upload-file/file/';
         targetConfig.targetDonePath = '//upload-file/done/';
-        var uploadedProcessor = new UploaderProcessor(new UploaderQuery(jQuery), langs, targetConfig);
+        var uploaderQuery = new UploaderQuery();
+        var uploadedProcessor = new UploaderProcessor();
+        uploadedProcessor.init(uploaderQuery.init(jQuery), langs, targetConfig);
     }
-
+    
     // runner
-    if (jQuery && UploaderReader.canRead(window) && uploadedProcessor) {
+    if (jQuery && UploaderReader.canRead(window)) {
         // Great success! All the File APIs are supported.
         var dropZone = document.getElementById("uparea");
         dropZone.style.backgroundColor = '#a6ff80';

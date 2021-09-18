@@ -3,12 +3,13 @@
 <script type="text/javascript">
 	// configs
 	if (jQuery && window.File && window.FileReader && window.FileList && window.Blob) {
-		var langs = new UploadTranslations();
 		var targetConfig = new UploadTargetConfig();
 		targetConfig.targetInitPath = '//upload-file/init/';
 		targetConfig.targetFilePath = '//upload-file/file/';
 		targetConfig.targetDonePath = '//upload-file/done/';
-		var uploadedProcessor = new UploaderProcessor(new UploaderQuery(jQuery), langs, targetConfig, new CheckSumMD5());
+		var uploaderQuery = new UploaderQuery();
+		var uploadedProcessor = new UploaderProcessor();
+		uploadedProcessor.init(uploaderQuery.init($), uploadTranslations, targetConfig, checkSumMD5);
 	}
 
 	// runner
@@ -19,7 +20,7 @@
 		// Setup the dnd listeners.
 		// dropZone.addEventListener('dragover', uploadedProcessor.getHandler().handleDragOver, false);
 		dropZone.addEventListener('drop', uploadedProcessor.getHandler().handleFileSelect, false);
-		jQuery("#upfile").on('change', {}, uploadedProcessor.getHandler().handleFileInput);
+		$("#upfile").on('change', {}, uploadedProcessor.getHandler().handleFileInput);
 	}
 </script>
 
