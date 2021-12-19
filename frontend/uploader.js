@@ -26,7 +26,7 @@ var UploadTranslations = function () {
  * Identify any target in selection box
  * Overwrite with values in your own selection box
  */
-var UploadIdentificators = function () {
+var UploadIdentification = function () {
     this.baseProgress = 'base_progress';
     this.knownBulk = 'list';
     this.elapsedTime = 'elapsed_time'; // time passed
@@ -81,6 +81,8 @@ var UploadedFile = function () {
     this.partSize = 0;
     /** @var {string} when it dies... */
     this.errorMessage = "";
+    /** @var {number} when the upload starts */
+    this.startTime = 0;
 
     // setters
     /**
@@ -203,7 +205,7 @@ var UploaderProcessor = function () {
             checksum = null;
         }
         var remoteQuery = uploaderRemoteQuery.init(upQuery, targetConfig);
-        var upRenderer = uploaderRenderer.init(upQuery, uploadIdentificators);
+        var upRenderer = uploaderRenderer.init(upQuery, uploadIdentification);
         var upReader = uploaderReader.init(translations);
         uploaderProcessor.upInit = uploadInit.init(uploaderProcessor, upRenderer, remoteQuery, translations);
         uploaderProcessor.upCheck = uploaderChecker.init(uploaderProcessor, uploaderChecksum.init(checksum), upReader, upRenderer, remoteQuery, translations);
@@ -309,6 +311,7 @@ var UploadInit = function () {
      * @param {UploadedFile} uploadedFile
      */
     this.process = function(uploadedFile) {
+        uploadedFile.startTime = uploadInit.upRenderer.getCurrentTime();
         uploadInit.upRenderer.updateBar(uploadedFile);
         uploadInit.upQuery.begin(
             {
@@ -324,13 +327,13 @@ var UploadInit = function () {
                     } else {
                         // uploadedFile.RESULT_FAIL
                         // File is dead, sent user info
-                        uploadedFile.setError(uploadInit.upLang.initReturnsFollowingError + responseData.errorMessage);
                         uploadInit.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(uploadInit.upLang.initReturnsFollowingError + responseData.errorMessage, responseData.status);
                     }
                 } else {
                     // Query dead, sent user info
-                    uploadedFile.setError(uploadInit.upLang.initReturnsSomethingFailed);
                     uploadInit.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(uploadInit.upLang.initReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -439,8 +442,8 @@ var UploaderChecker = function () {
                         }
                     } else {
                         // Query dead, sent user info
-                        uploadedFile.setError(uploaderChecker.upLang.initReturnsSomethingFailed);
                         uploaderChecker.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(uploaderChecker.upLang.initReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                     }
                 },
                 function(err) {
@@ -493,8 +496,8 @@ var UploaderChecker = function () {
                     }
                 } else {
                     // Query dead, sent user info
-                    uploadedFile.setError(uploaderChecker.upLang.checkerReturnsSomethingFailed);
                     uploaderChecker.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(uploaderChecker.upLang.checkerReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -568,7 +571,7 @@ var UploaderRunner = function () {
      * @param {UploadedFile} uploadedFile
      */
     this.uploadPart = function(uploadedFile) {
-        uploaderRunner.upRenderer.updateBar(uploadedFile.nextFilePart());
+        uploaderRunner.upRenderer.updateBar(uploadedFile);
         uploaderRunner.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
             uploaderRunner.upQuery.upload(
                 {
@@ -580,6 +583,7 @@ var UploaderRunner = function () {
                     if (typeof responseData == "object") {
                         if (uploadedFile.RESULT_OK === responseData.status) {
                             // everything ok
+                            uploadedFile.nextFilePart();
                             uploaderRunner.upRenderer.updateBar(uploadedFile.nextCheckedPart());
                             uploaderRunner.continueRunning(uploadedFile);
                         } else {
@@ -587,8 +591,8 @@ var UploaderRunner = function () {
                             uploaderRunner.upProcessor.failProcess(uploadedFile);
                         }
                     } else {
-                        uploadedFile.setError(uploaderRunner.upLang.dataUploadReturnsSomethingFailed);
                         uploaderRunner.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(uploaderRunner.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                     }
                 },
                 function(err) {
@@ -621,8 +625,8 @@ var UploaderRunner = function () {
                     }
                 } else {
                     // dead query, user info
-                    uploadedFile.setError(uploaderRunner.upLang.doneReturnsSomethingFailed);
                     uploaderRunner.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(uploaderRunner.upLang.doneReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -713,8 +717,8 @@ var UploaderFailure = function () {
                     }
                 } else {
                     // dead query, user info
-                    uploadedFile.setError(uploaderFailure.upLang.doneReturnsSomethingFailed);
                     uploaderFailure.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(uploaderFailure.upLang.doneReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -777,7 +781,7 @@ var UploaderReader = function () {
             (segment + 1 === uploadedFile.totalParts) ? uploadedFile.fileSize : uploadedFile.partSize * (segment + 1)
         );
         if (null == blob) {
-            uploadedFile.setError(uploaderReader.upLang.readFileCannotSlice);
+            uploadedFile.setError(uploaderReader.upLang.readFileCannotSlice, uploadedFile.RESULT_FAIL);
         } else {
             reader.readAsBinaryString(blob);
         }
@@ -915,7 +919,7 @@ var UploaderQuery = function () {
      * @param {function} onError
      */
     this.post = function(target, params, onSuccess, onError) {
-        uploaderQuery.queryEngine.post(target, params, onSuccess, onError);
+        uploaderQuery.queryEngine.post(target, params).done(onSuccess).fail(onError);
     };
 
     /**
@@ -1194,16 +1198,14 @@ var UploaderHandler = function () {
  * Usually main candidate to customization
  */
 var UploaderRenderer  = function () {
-    /** @var {numeric} */
-    this.startTime = 0;
-    /** @var {UploadIdentificators} */
+    /** @var {UploadIdentification} */
     this.upIdent = null;
     /** @var {UploaderQuery} */
     this.upQuery = null;
 
     /**
      * @param {UploaderQuery} upQuery
-     * @param {UploadIdentificators} upIdent
+     * @param {UploadIdentification} upIdent
      */
     this.init = function(upQuery, upIdent) {
         uploaderRenderer.upQuery = upQuery;
@@ -1249,11 +1251,11 @@ var UploaderRenderer  = function () {
      * @param {UploadedFile} uploadedFile
      */
     this.renderFinished = function(uploadedFile) {
-        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.elapsedTime, uploaderRenderer.formatTime(uploaderRenderer.getElapsedTime()));
+        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.elapsedTime, uploaderRenderer.formatTime(uploaderRenderer.getElapsedTime(uploadedFile)));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.estimatedTimeLeft, uploaderRenderer.calculateEstimatedTimeLeft(uploadedFile,100));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.currentPosition, uploaderRenderer.calculateSize(uploadedFile.fileSize));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.totalSize, uploaderRenderer.calculateSize(uploadedFile.fileSize));
-        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.estimatedSpeed, uploaderRenderer.calculateSize(uploadedFile.fileSize));
+        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.estimatedSpeed, uploaderRenderer.calculateSize(0));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.percentsComplete, "100%"); // percents
 
         var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
@@ -1274,7 +1276,6 @@ var UploaderRenderer  = function () {
      * @param {UploadedFile} uploadedFile
      */
     this.startRead = function(uploadedFile) {
-        uploaderRenderer.startTime = uploaderRenderer.getCurrentTime();
         var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
         var button = node.find("button").eq(2);
         button.removeAttr("disabled");
@@ -1303,9 +1304,9 @@ var UploaderRenderer  = function () {
      */
     this.updateBar = function(uploadedFile) {
         var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
-        var percent = UploaderRenderer.calculatePercent(uploadedFile);
+        var percent = uploaderRenderer.calculatePercent(uploadedFile);
 
-        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.elapsedTime, uploaderRenderer.formatTime(uploaderRenderer.getElapsedTime()));
+        uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.elapsedTime, uploaderRenderer.formatTime(uploaderRenderer.getElapsedTime(uploadedFile)));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.estimatedTimeLeft, uploaderRenderer.calculateEstimatedTimeLeft(uploadedFile, percent));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.currentPosition, uploaderRenderer.calculateSize(uploadedFile.lastKnownPart * uploadedFile.partSize));
         uploaderRenderer.upQuery.setObjectContent(uploaderRenderer.upIdent.totalSize, uploaderRenderer.calculateSize(uploadedFile.fileSize));
@@ -1334,7 +1335,7 @@ var UploaderRenderer  = function () {
      * @return {string}
      */
     this.calculateEstimatedTimeLeft = function(uploadedFile, percentDone) {
-        var spend = uploaderRenderer.getElapsedTime();
+        var spend = uploaderRenderer.getElapsedTime(uploadedFile);
         if (percentDone > 0) {
             var fullTime = 100 * (spend / percentDone);
             return uploaderRenderer.formatTime(Math.abs(fullTime - spend));
@@ -1379,26 +1380,26 @@ var UploaderRenderer  = function () {
     };
 
     /**
-     * calculate processing speed
-     * @param {numeric} bytesProcessed int
-     * @return {numeric}
+     * calculate processing speed - bytes/second
+     * @param {UploadedFile} uploadedFile
+     * @return {number}
      */
-    this.calculateSpeed = function(bytesProcessed) {
-        var elapsedTime = uploaderRenderer.getElapsedTime();
+    this.calculateSpeed = function(uploadedFile) {
+        var elapsedTime = uploaderRenderer.getElapsedTime(uploadedFile);
 
         if (elapsedTime < 1) {
             return 0;
         }
-        if (bytesProcessed == 0) {
+        if (0 == uploadedFile.lastKnownPart) {
             return 0;
         }
-        return bytesProcessed / elapsedTime;
+        return (uploadedFile.totalParts * elapsedTime * 100) / uploadedFile.lastKnownPart;
     };
 
     /**
      * calculate sizes
-     * @param bytesProcessed int
-     * @return string
+     * @param {number} bytesProcessed
+     * @return {string}
      */
     this.calculateSize = function(bytesProcessed) {
         var sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -1413,23 +1414,24 @@ var UploaderRenderer  = function () {
 
     /**
      * amount of passed seconds
-     * @return int
+     * @param {UploadedFile} uploadedFile
+     * @return {number}
      */
-    this.getElapsedTime = function() {
-        return uploaderRenderer.getCurrentTime() - uploaderRenderer.startTime;
+    this.getElapsedTime = function(uploadedFile) {
+        return uploaderRenderer.getCurrentTime() - uploadedFile.startTime;
     };
 
     /**
      * current time for init and calculations
-     * @return int
+     * @return {number}
      */
     this.getCurrentTime = function() {
-        return new Date().getTime() / 1000;
+        return Math.round(new Date().getTime() / 1000);
     }
 };
 
 var uploadTranslations = new UploadTranslations();
-var uploadIdentificators = new UploadIdentificators();
+var uploadIdentification = new UploadIdentification();
 var uploadedFile = new UploadedFile();
 var uploaderProcessor = new UploaderProcessor();
 var uploadInit = new UploadInit();

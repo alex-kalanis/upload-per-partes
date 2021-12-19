@@ -7,20 +7,18 @@
 		targetConfig.targetInitPath = '//upload-file/init/';
 		targetConfig.targetFilePath = '//upload-file/file/';
 		targetConfig.targetDonePath = '//upload-file/done/';
-		var uploaderQuery = new UploaderQuery();
-		var uploadedProcessor = new UploaderProcessor();
-		uploadedProcessor.init(uploaderQuery.init($), uploadTranslations, targetConfig, checkSumMD5);
+		uploaderProcessor.init(uploaderQuery.init($), uploadTranslations, targetConfig, checkSumMD5);
 	}
 
 	// runner
-	if (jQuery && UploaderReader.canRead(window) && uploadedProcessor) {
+	if (jQuery && uploaderReader.canRead(window) && uploaderProcessor) {
 		// Great success! All the File APIs are supported.
 		var dropZone = document.getElementById("uparea");
 		dropZone.style.backgroundColor = '#a6ff80';
 		// Setup the dnd listeners.
 		// dropZone.addEventListener('dragover', uploadedProcessor.getHandler().handleDragOver, false);
-		dropZone.addEventListener('drop', uploadedProcessor.getHandler().handleFileSelect, false);
-		$("#upfile").on('change', {}, uploadedProcessor.getHandler().handleFileInput);
+		dropZone.addEventListener('drop', uploaderProcessor.getHandler().handleFileSelect, false);
+		$("#upfile").on('change', {}, uploaderProcessor.getHandler().handleFileInput);
 	}
 </script>
 

@@ -77,6 +77,7 @@ class ResponseTest(CommonTestClass):
 
         assert self._get_test_dir() + data.file_name == lib.get_temporary_location()
         assert 'abcdef' == lib.get_file_name()
+        assert 123456 == lib.get_size()
         assert self._mock_shared_key() == lib.get_result()['sharedKey']
         assert UploadResponse.STATUS_OK == lib.get_result()['status']
         assert UploadResponse.STATUS_OK == lib.get_result()['errorMessage']

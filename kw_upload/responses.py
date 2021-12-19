@@ -112,6 +112,9 @@ class DoneResponse(AResponse):
     def get_temporary_location(self) -> str:
         return self._data.temp_location
 
+    def get_size(self) -> int:
+        return self._data.file_size
+
     def get_file_name(self) -> str:
         return self._data.file_name
 

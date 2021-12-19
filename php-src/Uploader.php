@@ -35,7 +35,7 @@ class Uploader
      */
     public function __construct()
     {
-        $lang = new Uploader\Translations();
+        $lang = $this->getTranslations();
         $this->infoStorage = $this->getInfoStorage($lang);
         $this->dataStorage = $this->getDataStorage($lang);
         $format = InfoFormat\AFormat::getFormat($lang, $this->getFormat());
@@ -55,6 +55,11 @@ class Uploader
     protected function getKeyVariant(): int
     {
         return Keys\AKey::VARIANT_VOLUME;
+    }
+
+    protected function getTranslations(): Translations
+    {
+        return new Uploader\Translations();
     }
 
     protected function getInfoStorage(Translations $lang): InfoStorage\AStorage

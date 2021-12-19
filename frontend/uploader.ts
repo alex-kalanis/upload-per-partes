@@ -26,7 +26,7 @@ class UploadTranslations {
  * Identify any target in selection box
  * Overwrite with values in your own selection box
  */
-class UploadIdentificators {
+class UploadIdentification {
     baseProgress = 'base_progress';
     knownBulk = 'list';
     elapsedTime = 'elapsed_time'; // time passed
@@ -81,6 +81,8 @@ class UploadedFile {
     partSize = 0;
     /** @var {string} when it dies... */
     errorMessage = "";
+    /** @var {number} when the upload starts */
+    startTime = 0;
 
     // setters
     /**
@@ -197,7 +199,7 @@ class UploaderProcessor {
      */
     constructor(upQuery, translations, targetConfig, checksum = null) {
         let remoteQuery = new UploaderRemoteQuery(upQuery, targetConfig);
-        let upRenderer = new UploaderRenderer(upQuery, new UploadIdentificators());
+        let upRenderer = new UploaderRenderer(upQuery, new UploadIdentification());
         let upReader = new UploaderReader(translations);
         this.upInit = new UploadInit(this, upRenderer, remoteQuery, translations);
         this.upCheck = new UploaderChecker(this, new UploaderChecksum(checksum), upReader, upRenderer, remoteQuery, translations);
@@ -296,6 +298,7 @@ class UploadInit {
      */
     process(uploadedFile) {
         let self = this;
+        uploadedFile.startTime = this.upRenderer.getCurrentTime();
         this.upRenderer.updateBar(uploadedFile);
         this.upQuery.init(
             {
@@ -311,13 +314,13 @@ class UploadInit {
                     } else {
                         // uploadedFile.RESULT_FAIL
                         // File is dead, sent user info
-                        uploadedFile.setError(self.upLang.initReturnsFollowingError + responseData.errorMessage);
                         self.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(self.upLang.initReturnsFollowingError + responseData.errorMessage, responseData.status);
                     }
                 } else {
                     // Query dead, sent user info
-                    uploadedFile.setError(self.upLang.initReturnsSomethingFailed);
                     self.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(self.upLang.initReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -426,8 +429,8 @@ class UploaderChecker {
                         }
                     } else {
                         // Query dead, sent user info
-                        uploadedFile.setError(self.upLang.initReturnsSomethingFailed);
                         self.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(self.upLang.initReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                     }
                 },
                 function(err) {
@@ -481,8 +484,8 @@ class UploaderChecker {
                     }
                 } else {
                     // Query dead, sent user info
-                    uploadedFile.setError(self.upLang.checkerReturnsSomethingFailed);
                     self.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(self.upLang.checkerReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -575,8 +578,8 @@ class UploaderRunner {
                             self.upProcessor.failProcess(uploadedFile);
                         }
                     } else {
-                        uploadedFile.setError(self.upLang.dataUploadReturnsSomethingFailed);
                         self.upRenderer.consoleError(uploadedFile, responseData);
+                        uploadedFile.setError(self.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                     }
                 },
                 function(err) {
@@ -610,8 +613,8 @@ class UploaderRunner {
                     }
                 } else {
                     // dead query, user info
-                    uploadedFile.setError(self.upLang.doneReturnsSomethingFailed);
                     self.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(self.upLang.doneReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -699,8 +702,8 @@ class UploaderFailure {
                     }
                 } else {
                     // dead query, user info
-                    uploadedFile.setError(self.upLang.doneReturnsSomethingFailed);
                     self.upRenderer.consoleError(uploadedFile, responseData);
+                    uploadedFile.setError(self.upLang.doneReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                 }
             },
             function(err) {
@@ -759,7 +762,7 @@ class UploaderReader {
             (segment + 1 === uploadedFile.totalParts) ? uploadedFile.fileSize : uploadedFile.partSize * (segment + 1)
         );
         if (null == blob) {
-            uploadedFile.setError(this.upLang.readFileCannotSlice);
+            uploadedFile.setError(this.upLang.readFileCannotSlice, uploadedFile.RESULT_FAIL);
         } else {
             reader.readAsBinaryString(blob);
         }
@@ -892,7 +895,7 @@ class UploaderQuery {
      * @param {function} onError
      */
     post(target, params, onSuccess, onError) {
-        this.queryEngine.post(target, params, onSuccess, onError);
+        this.queryEngine.post(target, params).done(onSuccess).fail(onError);
     }
 
     /**
@@ -1170,16 +1173,14 @@ class UploaderHandler {
  */
 class UploaderRenderer {
 
-    /** @var {numeric} */
-    startTime = 0;
-    /** @var {UploadIdentificators} */
+    /** @var {UploadIdentification} */
     upIdent = null;
     /** @var {UploaderQuery} */
     upQuery = null;
 
     /**
      * @param {UploaderQuery} upQuery
-     * @param {UploadIdentificators} upIdent
+     * @param {UploadIdentification} upIdent
      */
     constructor(upQuery, upIdent) {
         this.upQuery = upQuery;
@@ -1224,11 +1225,11 @@ class UploaderRenderer {
      * @param {UploadedFile} uploadedFile
      */
     renderFinished(uploadedFile) {
-        this.upQuery.setObjectContent(this.upIdent.elapsedTime, UploaderRenderer.formatTime(this.getElapsedTime()));
-        this.upQuery.setObjectContent(this.upIdent.estimatedTimeLeft, this.calculateEstimatedTimeLeft(uploadedFile,100));
+        this.upQuery.setObjectContent(this.upIdent.elapsedTime, UploaderRenderer.formatTime(UploaderRenderer.getElapsedTime(uploadedFile)));
+        this.upQuery.setObjectContent(this.upIdent.estimatedTimeLeft, UploaderRenderer.calculateEstimatedTimeLeft(uploadedFile, 100));
         this.upQuery.setObjectContent(this.upIdent.currentPosition, UploaderRenderer.calculateSize(uploadedFile.fileSize));
         this.upQuery.setObjectContent(this.upIdent.totalSize, UploaderRenderer.calculateSize(uploadedFile.fileSize));
-        this.upQuery.setObjectContent(this.upIdent.estimatedSpeed, UploaderRenderer.calculateSize(uploadedFile.fileSize));
+        this.upQuery.setObjectContent(this.upIdent.estimatedSpeed, UploaderRenderer.calculateSize(0));
         this.upQuery.setObjectContent(this.upIdent.percentsComplete, "100%"); // percents
 
         let node: any = this.upQuery.getObjectById(uploadedFile.localId);
@@ -1249,7 +1250,6 @@ class UploaderRenderer {
      * @param {UploadedFile} uploadedFile
      */
     startRead(uploadedFile) {
-        this.startTime = UploaderRenderer.getCurrentTime();
         let node: any = this.upQuery.getObjectById(uploadedFile.localId);
         let button: any = node.find("button").eq(2);
         button.removeAttr("disabled");
@@ -1280,11 +1280,11 @@ class UploaderRenderer {
         let node: any = this.upQuery.getObjectById(uploadedFile.localId);
         let percent = UploaderRenderer.calculatePercent(uploadedFile);
 
-        this.upQuery.setObjectContent(this.upIdent.elapsedTime, UploaderRenderer.formatTime(this.getElapsedTime()));
-        this.upQuery.setObjectContent(this.upIdent.estimatedTimeLeft, this.calculateEstimatedTimeLeft(uploadedFile, percent));
+        this.upQuery.setObjectContent(this.upIdent.elapsedTime, UploaderRenderer.formatTime(UploaderRenderer.getElapsedTime(uploadedFile)));
+        this.upQuery.setObjectContent(this.upIdent.estimatedTimeLeft, UploaderRenderer.calculateEstimatedTimeLeft(uploadedFile, percent));
         this.upQuery.setObjectContent(this.upIdent.currentPosition, UploaderRenderer.calculateSize(uploadedFile.lastKnownPart * uploadedFile.partSize));
         this.upQuery.setObjectContent(this.upIdent.totalSize, UploaderRenderer.calculateSize(uploadedFile.fileSize));
-        this.upQuery.setObjectContent(this.upIdent.estimatedSpeed, UploaderRenderer.calculateSize(this.calculateSpeed(uploadedFile)));
+        this.upQuery.setObjectContent(this.upIdent.estimatedSpeed, UploaderRenderer.calculateSize(UploaderRenderer.calculateSpeed(uploadedFile)));
         this.upQuery.setObjectContent(this.upIdent.percentsComplete, percent.toString() + "%");
 
         let button: any = node.find("." + this.upIdent.progressCounter).eq(1);
@@ -1308,8 +1308,8 @@ class UploaderRenderer {
      * @param {numeric} percentDone
      * @return {string}
      */
-    calculateEstimatedTimeLeft (uploadedFile, percentDone) {
-        let spend = this.getElapsedTime();
+    static calculateEstimatedTimeLeft (uploadedFile, percentDone) {
+        let spend = UploaderRenderer.getElapsedTime(uploadedFile);
         if (percentDone > 0) {
             let fullTime = 100 * (spend / percentDone);
             return UploaderRenderer.formatTime(Math.abs(fullTime - spend));
@@ -1354,26 +1354,26 @@ class UploaderRenderer {
     }
 
     /**
-     * calculate processing speed
-     * @param {numeric} bytesProcessed int
+     * calculate processing speed - bytes/second
+     * @param {UploadedFile} uploadedFile
      * @return {numeric}
      */
-    calculateSpeed (bytesProcessed) {
-        let elapsedTime = this.getElapsedTime();
+    static calculateSpeed (uploadedFile) {
+        let elapsedTime = UploaderRenderer.getElapsedTime(uploadedFile);
 
         if (elapsedTime < 1) {
             return 0;
         }
-        if (bytesProcessed == 0) {
+        if (0 == uploadedFile.lastKnownPart) {
             return 0;
         }
-        return bytesProcessed / elapsedTime;
+        return (uploadedFile.totalParts * elapsedTime * 100) / uploadedFile.lastKnownPart;
     }
 
     /**
      * calculate sizes
-     * @param bytesProcessed int
-     * @return string
+     * @param {number} bytesProcessed
+     * @return {string}
      */
     static calculateSize (bytesProcessed) {
         let sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -1388,17 +1388,18 @@ class UploaderRenderer {
 
     /**
      * amount of passed seconds
-     * @return int
+     * @param {UploadedFile} uploadedFile
+     * @return {number}
      */
-    getElapsedTime () {
-        return UploaderRenderer.getCurrentTime() - this.startTime;
+    static getElapsedTime (uploadedFile) {
+        return UploaderRenderer.getCurrentTime() - uploadedFile.startTime;
     }
 
     /**
      * current time for init and calculations
-     * @return int
+     * @return {number}
      */
     static getCurrentTime () {
-        return new Date().getTime() / 1000;
+        return Math.round(new Date().getTime() / 1000);
     }
 }

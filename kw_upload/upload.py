@@ -198,7 +198,7 @@ class Uploader:
     """
 
     def __init__(self):
-        _lang = Translations()
+        _lang = self._get_translations()
         self._info_storage = self._get_info_storage(_lang)
         self._data_storage = self._get_data_storage(_lang)
         _format = AFormat.get_format(_lang, self._get_format())
@@ -214,6 +214,9 @@ class Uploader:
 
     def _get_key_variant(self) -> int:
         return AKey.VARIANT_VOLUME
+
+    def _get_translations(self) -> Translations:
+        return Translations()
 
     def _get_info_storage(self, lang: Translations) -> InfoStorage:
         from .info_storage import Volume

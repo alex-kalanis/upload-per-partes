@@ -97,6 +97,7 @@ class ResponseTest extends CommonTestClass
 
         $this->assertEquals($this->getTestDir() . $data->fileName, $lib->getTemporaryLocation());
         $this->assertEquals('abcdef', $lib->getFileName());
+        $this->assertEquals(123456, $lib->getSize());
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);

@@ -43,6 +43,11 @@ class DoneResponse extends AResponse
         return $this->data->tempLocation;
     }
 
+    public function getSize(): int
+    {
+        return $this->data->fileSize;
+    }
+
     public function getFileName(): string
     {
         return $this->data->fileName;
