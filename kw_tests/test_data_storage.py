@@ -1,5 +1,5 @@
 from kw_tests.common_class import CommonTestClass
-from kw_tests.support import Files, Dirs
+from kw_tests.support import Files, Dirs, DataRam, InfoRam
 from kw_upload.data_storage import VolumeBasic
 from kw_upload.data_storage import AStorage as DataStorage
 from kw_upload.uploader.essentials import Calculates, Hashed, TargetSearch
@@ -41,6 +41,8 @@ class VolumeTest(ADataStorageTest):
             assert False, 'Accessing unreadable!'
         except UploadException as ex:
             assert 'CANNOT OPEN FILE' == ex.get_message()
+        finally:
+            Dirs.rmdir(file)
 
     def test_unreadable_seek(self):
         file = self._mock_test_file()
@@ -51,6 +53,8 @@ class VolumeTest(ADataStorageTest):
             assert False, 'Accessing unreadable!'
         except UploadException as ex:
             assert 'CANNOT OPEN FILE' == ex.get_message()
+        finally:
+            Dirs.rmdir(file)
 
     def test_unwriteable(self):
         file = self._mock_test_file()
@@ -62,6 +66,9 @@ class VolumeTest(ADataStorageTest):
             assert False, 'Writing to locked file!'
         except UploadException as ex:
             assert 'CANNOT WRITE FILE' == ex.get_message()
+        finally:
+            Files.chmod(file, 0o666)
+            storage.remove(self._mock_test_file())
 
     def test_unwriteable_seek(self):
         file = self._mock_test_file()
@@ -73,11 +80,16 @@ class VolumeTest(ADataStorageTest):
             assert False, 'Writing to non-available seek in file!'
         except UploadException as ex:
             assert 'CANNOT WRITE FILE' == ex.get_message()
+        finally:
+            Files.chmod(file, 0o666)
+            storage.remove(self._mock_test_file())
 
     def test_deleted(self):
         file = self._mock_test_file()
         storage = self._mock_storage()
+        assert not storage.exists(file)
         storage.add_part(file, b'abcdefghijklmnopqrstuvwxyz', 0)
+        assert storage.exists(file)
         try:
             storage.remove(file)
             storage.remove(file)  # fail
@@ -89,7 +101,8 @@ class VolumeTest(ADataStorageTest):
 class TargetTest(CommonTestClass):
 
     def test_fail_no_remote(self):
-        lib = TargetSearch(Translations())
+        lang = Translations()
+        lib = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         try:
             lib.process()
             assert False, 'No remote and passed'
@@ -97,7 +110,8 @@ class TargetTest(CommonTestClass):
             assert 'SENT FILE NAME IS EMPTY' == ex.get_message()
 
     def test_fail_no_target(self):
-        lib = TargetSearch(Translations())
+        lang = Translations()
+        lib = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         lib.set_remote_file_name('abcdefg')
         try:
             lib.process()
@@ -106,7 +120,8 @@ class TargetTest(CommonTestClass):
             assert 'TARGET DIR IS NOT SET' == ex.get_message()
 
     def test_fail_no_base(self):
-        lib = TargetSearch(Translations())
+        lang = Translations()
+        lib = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         try:
             lib.get_final_target_name()
             assert False, 'No final target name and passed'
@@ -114,28 +129,28 @@ class TargetTest(CommonTestClass):
             assert 'UPLOAD FILE NAME IS EMPTY' == ex.get_message()
 
     def test_process_clear(self):
-        lib = TargetSearch(Translations())
+        lang = Translations()
+        lib = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         lib.set_target_dir(self._get_test_dir()).set_remote_file_name('what can be found$.here').process()
         assert 'what_can_be_found.here' == lib.get_final_target_name()
         assert self._get_test_dir() + 'what_can_be_found' + TargetSearch.FILE_DRIVER_SUFF == lib.get_driver_location()
         assert self._get_test_dir() + 'what_can_be_found.here' + TargetSearch.FILE_UPLOAD_SUFF == lib.get_temporary_target_location()
 
     def test_process_no_clear(self):
-        lib = TargetSearch(Translations(), False, False)
+        lang = Translations()
+        lib = TargetSearch(lang, InfoRam(lang), DataRam(lang), False, False)
         lib.set_target_dir(self._get_test_dir()).set_remote_file_name('what el$e can be found').process()
         assert 'what el$e can be found' == lib.get_final_target_name()
         assert self._get_test_dir() + 'what el$e can be found' + TargetSearch.FILE_DRIVER_SUFF == lib.get_driver_location()
         assert self._get_test_dir() + 'what el$e can be found' + TargetSearch.FILE_UPLOAD_SUFF == lib.get_temporary_target_location()
 
     def test_process_name_lookup(self):
-        Files.file_put_contents(self._get_test_dir() + 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        Files.file_put_contents(self._get_test_dir() + 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        Files.file_put_contents(self._get_test_dir() + 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        Files.file_put_contents(self._get_test_dir() + 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        lib = TargetSearch(Translations(), False, False)
+        lang = Translations()
+        data_ram = DataRam(lang)
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm')
+        lib = TargetSearch(lang, InfoRam(lang), data_ram, False, False)
         lib.set_target_dir(self._get_test_dir()).set_remote_file_name('dummyFile.tst').process()
         assert self._get_test_dir() + 'dummyFile.3.tst' + TargetSearch.FILE_UPLOAD_SUFF == lib.get_temporary_target_location()
-        Files.unlink(self._get_test_dir() + 'dummyFile.tst')
-        Files.unlink(self._get_test_dir() + 'dummyFile.0.tst')
-        Files.unlink(self._get_test_dir() + 'dummyFile.1.tst')
-        Files.unlink(self._get_test_dir() + 'dummyFile.2.tst')

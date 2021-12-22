@@ -1,8 +1,10 @@
 from .data_storage import AStorage as DataStorage
 from .exceptions import UploadException, ContinuityUploadException
 from .info_format import AFormat, DataPack
+from .info_format import Factory as InfoFactory
 from .info_storage import AStorage as InfoStorage
 from .keys import AKey
+from .keys import Factory as KeyFactory
 from .responses import DoneResponse, CancelResponse, UploadResponse, TruncateResponse, CheckResponse, InitResponse
 from .uploader.essentials import Calculates, Hashed, TargetSearch
 from .uploader.translations import Translations
@@ -201,19 +203,19 @@ class Uploader:
         _lang = self._get_translations()
         self._info_storage = self._get_info_storage(_lang)
         self._data_storage = self._get_data_storage(_lang)
-        _format = AFormat.get_format(_lang, self._get_format())
-        self._target_search = self._get_target(_lang)
+        _format = InfoFactory.get_format(_lang, self._get_format())
+        self._target_search = self._get_target(_lang, self._info_storage, self._data_storage)
         self._calculations = self._get_calc()
         self._hashed = self._get_hashed()
-        self._key = AKey.get_variant(_lang, self._target_search, self._get_key_variant())
-        _driver = DriveFile(_lang, self._info_storage, _format, self._key)
-        self._processor = self._get_processor(_lang, _driver, self._data_storage, self._hashed)
+        self._key = KeyFactory.get_variant(_lang, self._target_search, self._get_key_variant())
+        self._driver = DriveFile(_lang, self._info_storage, _format, self._key)
+        self._processor = self._get_processor(_lang, self._driver, self._data_storage, self._hashed)
 
     def _get_format(self) -> int:
-        return AFormat.FORMAT_JSON
+        return InfoFactory.FORMAT_JSON
 
     def _get_key_variant(self) -> int:
-        return AKey.VARIANT_VOLUME
+        return KeyFactory.VARIANT_VOLUME
 
     def _get_translations(self) -> Translations:
         return Translations()
@@ -226,8 +228,8 @@ class Uploader:
         from .data_storage import VolumeBasic
         return VolumeBasic(lang)
 
-    def _get_target(self, lang: Translations) -> TargetSearch:
-        return TargetSearch(lang)
+    def _get_target(self, lang: Translations, info_storage: InfoStorage, data_storage: DataStorage) -> TargetSearch:
+        return TargetSearch(lang, info_storage, data_storage)
 
     def _get_calc(self) -> Calculates:
         return Calculates(262144)

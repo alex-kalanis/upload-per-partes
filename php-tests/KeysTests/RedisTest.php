@@ -7,6 +7,7 @@ use CommonTestClass;
 use kalanis\UploadPerPartes\Keys;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use kalanis\UploadPerPartes\Uploader\Translations;
+use Support;
 
 
 class RedisTest extends CommonTestClass
@@ -17,7 +18,7 @@ class RedisTest extends CommonTestClass
     public function testThru(): void
     {
         $lang = Translations::init();
-        $target = new TargetSearch($lang);
+        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $target->setRemoteFileName('poiuztrewq')->setTargetDir($this->getTestDir())->process();
         $lib = new Keys\Redis($lang, $target);
         $lib->generateKeys();

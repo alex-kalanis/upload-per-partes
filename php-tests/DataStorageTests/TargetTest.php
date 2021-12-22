@@ -7,6 +7,7 @@ use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use kalanis\UploadPerPartes\Uploader\Translations;
+use Support;
 
 
 class TargetTest extends CommonTestClass
@@ -16,7 +17,8 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoRemote(): void
     {
-        $lib = new TargetSearch(Translations::init());
+        $lang = Translations::init();
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
         $lib->process();
         $this->expectExceptionMessageMatches('SENT FILE NAME IS EMPTY');
@@ -27,7 +29,8 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoTarget(): void
     {
-        $lib = new TargetSearch(Translations::init());
+        $lang = Translations::init();
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $lib->setRemoteFileName('abcdefg');
         $this->expectException(UploadException::class);
         $lib->process();
@@ -39,7 +42,8 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoBase(): void
     {
-        $lib = new TargetSearch(Translations::init());
+        $lang = Translations::init();
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
         $lib->getFinalTargetName();
         $this->expectExceptionMessageMatches('UPLOAD FILE NAME IS EMPTY');
@@ -50,7 +54,8 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessClear(): void
     {
-        $lib = new TargetSearch(Translations::init());
+        $lang = Translations::init();
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what can be found$.here')->process();
         $this->assertEquals('what_can_be_found.here', $lib->getFinalTargetName());
         $this->assertEquals($this->getTestDir() . 'what_can_be_found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
@@ -62,7 +67,8 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessNoClear(): void
     {
-        $lib = new TargetSearch(Translations::init(), false, false);
+        $lang = Translations::init();
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang), false, false);
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what el$e can be found')->process();
         $this->assertEquals('what el$e can be found', $lib->getFinalTargetName());
         $this->assertEquals($this->getTestDir() . 'what el$e can be found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
@@ -74,16 +80,14 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessNameLookup(): void
     {
-        file_put_contents($this->getTestDir() . 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents($this->getTestDir() . 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents($this->getTestDir() . 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        file_put_contents($this->getTestDir() . 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm');
-        $lib = new TargetSearch(Translations::init(), false, false);
+        $lang = Translations::init();
+        $dataRam = new Support\DataRam($lang);
+        $dataRam->addPart($this->getTestDir() . 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        $dataRam->addPart($this->getTestDir() . 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        $dataRam->addPart($this->getTestDir() . 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        $dataRam->addPart($this->getTestDir() . 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm');
+        $lib = new TargetSearch($lang, new Support\InfoRam($lang), $dataRam, false, false);
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('dummyFile.tst')->process();
         $this->assertEquals($this->getTestDir() . 'dummyFile.3.tst' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
-        unlink($this->getTestDir() . 'dummyFile.tst');
-        unlink($this->getTestDir() . 'dummyFile.0.tst');
-        unlink($this->getTestDir() . 'dummyFile.1.tst');
-        unlink($this->getTestDir() . 'dummyFile.2.tst');
     }
 }

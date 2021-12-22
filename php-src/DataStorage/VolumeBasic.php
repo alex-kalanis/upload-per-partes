@@ -15,6 +15,11 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
  */
 class VolumeBasic extends AStorage
 {
+    public function exists(string $location): bool
+    {
+        return is_file($location);
+    }
+
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
         if (is_null($seek)) {  // append to end

@@ -7,7 +7,7 @@ with things like real truth-telling progress bar or available upload resume.
 
 This is the mixed package - contains sever-side implementation in Python and PHP.
 
-# PHP Installation
+## PHP Installation
 
 ```
 {
@@ -21,7 +21,7 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 familiar with composer)
 
 
-# PHP Usage
+## PHP Usage
 
 1.) Use your autoloader (if not already done via Composer autoloader)
 
@@ -33,7 +33,7 @@ processing.
 something like Grunt to translate TypeScript into JavaScript. You can also extends
 included classes to comply your use-case; mainly for styling.
 
-# Python Installation
+## Python Installation
 
 into your "setup.py":
 
@@ -43,7 +43,7 @@ into your "setup.py":
     ]
 ```
 
-# Python Usage
+## Python Usage
 
 1.) Connect the "kw_upload\upload" into your app. When it came necessary
 you can extends every library to comply your use-case; mainly your storage and

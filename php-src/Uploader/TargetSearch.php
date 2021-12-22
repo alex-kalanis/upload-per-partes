@@ -3,7 +3,9 @@
 namespace kalanis\UploadPerPartes\Uploader;
 
 
+use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\InfoStorage;
 
 
 /**
@@ -21,6 +23,10 @@ class TargetSearch
 
     /** @var Translations|null */
     protected $lang = null;
+    /** @var InfoStorage\AStorage */
+    protected $infoStorage = null;
+    /** @var DataStorage\AStorage */
+    protected $dataStorage = null;
     /** @var bool */
     protected $sanitizeAlnum = true;
     /** @var bool */
@@ -39,12 +45,16 @@ class TargetSearch
 
     /**
      * @param Translations $lang
+     * @param InfoStorage\AStorage $infoStorage
+     * @param DataStorage\AStorage $dataStorage
      * @param bool $sanitizeWhitespace
      * @param bool $sanitizeAlnum
      */
-    public function __construct(Translations $lang, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
+    public function __construct(Translations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
     {
         $this->lang = $lang;
+        $this->infoStorage = $infoStorage;
+        $this->dataStorage = $dataStorage;
         $this->sanitizeAlnum = $sanitizeAlnum;
         $this->sanitizeWhitespace = $sanitizeWhitespace;
     }
@@ -78,7 +88,9 @@ class TargetSearch
         $this->checkRemoteName();
         $this->checkTargetDir();
         $this->canonize();
-        $this->findFreeName();
+        if (!$this->infoStorage->exists($this->getDriverLocation())) {
+            $this->findFreeName();
+        }
         return $this;
     }
 
@@ -143,7 +155,6 @@ class TargetSearch
         }
     }
 
-
     /**
      * Find non-existing name
      * @throws UploadException
@@ -151,14 +162,12 @@ class TargetSearch
     protected function findFreeName(): void
     {
         $ext = $this->addExt();
-        if (    is_file($this->targetDir . $this->fileBase . $ext)
-            && !is_file($this->getDriverLocation())
-        ) {
+        if ($this->dataStorage->exists($this->targetDir . $this->fileBase . $ext)) {
             $i = 0;
             do {
                 $location = $this->fileBase . static::FILE_VER_SEP . $i;
                 $i++;
-            } while ( is_file($this->targetDir . $location . $ext) );
+            } while ( $this->dataStorage->exists($this->targetDir . $location . $ext) );
             $this->fileBase = $location;
         }
     }

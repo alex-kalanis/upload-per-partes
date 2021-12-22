@@ -14,26 +14,47 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
  */
 class DataRam extends AStorage
 {
-    protected $data = '';
+    /** @var string[] */
+    protected $data = [];
 
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
-        $this->data = ( is_null($seek) ? $this->data : substr($this->data, 0, $seek) ) . $content;
+        if (!$this->exists($location)) {
+            $this->data[$location] = $content;
+        } elseif (is_null($seek)) {
+            $this->data[$location] .= $content;
+        } elseif ($seek >= strlen($this->data[$location])) {
+            $this->data[$location] .= $content;
+        } else {
+            $this->data[$location] = substr($this->data[$location], 0, $seek) . $content;
+        }
     }
 
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        return Strings::substr($this->data, $offset, $limit, $this->lang->cannotReadFile());
+        if (!$this->exists($location)) {
+            return '';
+        }
+        return Strings::substr($this->data[$location], $offset, $limit, $this->lang->cannotReadFile());
     }
 
     public function truncate(string $location, int $offset): void
     {
-        $this->data = Strings::substr($this->data, 0, $offset, $this->lang->cannotTruncateFile());
+        if ($this->exists($location) && (strlen($this->data[$location]) > $offset)) {
+            $this->data[$location] = Strings::substr($this->data[$location], 0, $offset, $this->lang->cannotTruncateFile());
+        }
     }
 
     public function remove(string $location): void
     {
-        $this->data = '';
+        if ($this->exists($location)) {
+            unset($this->data[$location]);
+        }
+    }
+
+    public function exists(string $location): bool
+    {
+        return isset($this->data[$location]);
     }
 
     /**

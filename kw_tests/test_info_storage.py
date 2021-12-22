@@ -37,6 +37,9 @@ class AInfoStorage(CommonTestClass):
             assert False, 'Accessing unreadable!'
         except UploadException as ex:
             assert 'CANNOT READ DRIVEFILE' == ex.get_message()
+        finally:
+            Files.chmod(file, 0o666)
+            storage.remove(self._mock_test_file())
 
     def test_unwriteable(self):
         file = self._mock_test_file()
@@ -48,6 +51,9 @@ class AInfoStorage(CommonTestClass):
             assert False, 'Accessing unreadable!'
         except UploadException as ex:
             assert 'CANNOT WRITE DRIVEFILE' == ex.get_message()
+        finally:
+            Files.chmod(file, 0o666)
+            storage.remove(self._mock_test_file())
 
     def test_deleted(self):
         file = self._mock_test_file()

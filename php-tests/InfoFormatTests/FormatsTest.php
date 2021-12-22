@@ -16,8 +16,8 @@ class FormatsTest extends AFormats
     public function testInit(): void
     {
         $lang = Translations::init();
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Text', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_TEXT));
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Json', InfoFormat\AFormat::getFormat($lang, InfoFormat\AFormat::FORMAT_JSON));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Text', InfoFormat\Factory::getFormat($lang, InfoFormat\Factory::FORMAT_TEXT));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Json', InfoFormat\Factory::getFormat($lang, InfoFormat\Factory::FORMAT_JSON));
     }
 
     /**
@@ -26,7 +26,7 @@ class FormatsTest extends AFormats
     public function testInitFail(): void
     {
         $this->expectException(UploadException::class);
-        InfoFormat\AFormat::getFormat(Translations::init(), 0);
+        InfoFormat\Factory::getFormat(Translations::init(), 0);
         $this->expectExceptionMessageMatches('DRIVEFILE VARIANT NOT SET');
     }
 }

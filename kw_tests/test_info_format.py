@@ -1,6 +1,6 @@
 from kw_tests.common_class import CommonTestClass
 from kw_tests.support import Files
-from kw_upload.info_format import AFormat, Json, Text
+from kw_upload.info_format import Factory, AFormat, Json, Text
 from kw_upload.info_storage import Volume
 from kw_upload.exceptions import UploadException
 from kw_upload.uploader.translations import Translations
@@ -16,12 +16,12 @@ class InfoFormatTest(CommonTestClass):
 
     def test_init(self):
         lang = Translations()
-        assert isinstance(AFormat.get_format(lang, AFormat.FORMAT_TEXT), Text)
-        assert isinstance(AFormat.get_format(lang, AFormat.FORMAT_JSON), Json)
+        assert isinstance(Factory.get_format(lang, Factory.FORMAT_TEXT), Text)
+        assert isinstance(Factory.get_format(lang, Factory.FORMAT_JSON), Json)
 
     def test_init_fail(self):
         try:
-            AFormat.get_format(Translations(), 0)  # fail
+            Factory.get_format(Translations(), 0)  # fail
             assert False, 'Accessing unreadable!'
         except UploadException as ex:
             assert 'DRIVEFILE VARIANT NOT SET' == ex.get_message()

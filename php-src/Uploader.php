@@ -27,6 +27,8 @@ class Uploader
     protected $calculations = null;
     /** @var Hashed */
     protected $hashed = null;
+    /** @var Uploader\DriveFile */
+    protected $driver = null;
     /** @var Uploader\Processor */
     protected $processor = null;
 
@@ -38,23 +40,23 @@ class Uploader
         $lang = $this->getTranslations();
         $this->infoStorage = $this->getInfoStorage($lang);
         $this->dataStorage = $this->getDataStorage($lang);
-        $format = InfoFormat\AFormat::getFormat($lang, $this->getFormat());
-        $this->targetSearch = $this->getTarget($lang);
+        $format = InfoFormat\Factory::getFormat($lang, $this->getFormat());
+        $this->targetSearch = $this->getTarget($lang, $this->infoStorage, $this->dataStorage);
         $this->calculations = $this->getCalc();
         $this->hashed = $this->getHashed();
-        $this->key = Keys\AKey::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
-        $driver = new Uploader\DriveFile($lang, $this->infoStorage, $format, $this->key);
-        $this->processor = $this->getProcessor($lang, $driver, $this->dataStorage, $this->hashed);
+        $this->key = Keys\Factory::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
+        $this->driver = new Uploader\DriveFile($lang, $this->infoStorage, $format, $this->key);
+        $this->processor = $this->getProcessor($lang, $this->driver, $this->dataStorage, $this->hashed);
     }
 
     protected function getFormat(): int
     {
-        return InfoFormat\AFormat::FORMAT_JSON;
+        return InfoFormat\Factory::FORMAT_JSON;
     }
 
     protected function getKeyVariant(): int
     {
-        return Keys\AKey::VARIANT_VOLUME;
+        return Keys\Factory::VARIANT_VOLUME;
     }
 
     protected function getTranslations(): Translations
@@ -72,9 +74,9 @@ class Uploader
         return new DataStorage\VolumeBasic($lang);
     }
 
-    protected function getTarget(Translations $lang): Uploader\TargetSearch
+    protected function getTarget(Translations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage): Uploader\TargetSearch
     {
-        return new Uploader\TargetSearch($lang);
+        return new Uploader\TargetSearch($lang, $infoStorage, $dataStorage);
     }
 
     protected function getCalc(): Calculates

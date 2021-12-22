@@ -95,7 +95,9 @@ class DriveFileTest(CommonTestClass):
 
     def _get_drive_file(self) -> DriveFile:
         lang = Translations()
-        return DriveFile(lang, InfoRam(lang), Json(), Key(lang, TargetSearch(lang)))
+        storage = InfoRam(lang)
+        target = TargetSearch(lang, storage, DataRam(lang))
+        return DriveFile(lang, storage, Json(), Key(lang, target))
 
 
 class ProcessorTest(CommonTestClass):
@@ -105,7 +107,8 @@ class ProcessorTest(CommonTestClass):
         _lang = Translations()
         self._info_storage = InfoRam(_lang)
         self._data_storage = DataRam(_lang)
-        self._drive_file = DriveFile(_lang, self._info_storage, Json(), Key(_lang, TargetSearch(_lang)))
+        target = TargetSearch(_lang, self._info_storage, self._data_storage)
+        self._drive_file = DriveFile(_lang, self._info_storage, Json(), Key(_lang, target))
         self._processor = Processor(_lang, self._drive_file, self._data_storage, Hashed())
 
     def tearDown(self):
@@ -288,11 +291,90 @@ class UploadTest(CommonTestClass):
             i = i + 1
 
         # step 3 - close upload
+        target = lib.get_lib_driver().read(shared_key).temp_location
         result3 = lib.done(shared_key)
         assert DoneResponse.STATUS_OK == result3.get_result()['status']
 
         # check content
-        uploaded = lib.get_storage().get_all()
+        uploaded = lib.get_storage().get_all(target)
+        assert 0 < len(uploaded)
+        assert content == uploaded.decode()
+
+    def test_stopped_upload(self):
+        from kw_upload.responses import InitResponse, UploadResponse, DoneResponse
+        import hashlib
+        import math
+        # from pprint import pprint
+
+        lib = UploaderMock()  # must stay same, because it's only in the ram
+        content = Files.file_get_contents(self._get_test_file(), 900000)  # read test content into ram
+        max_size = len(content)
+
+        # step 1 - init driver
+        result1 = lib.init(self._get_test_dir(), 'lorem-ipsum.txt', max_size)
+        assert InitResponse.STATUS_OK == result1.get_result()['status']
+        bytes_per_part = result1.get_result()['partSize']
+        shared_key = result1.get_result()['sharedKey']  # for this test it's zero care
+        assert 1024 == bytes_per_part
+        assert 629 == result1.get_result()['totalParts']
+
+        # step 2 - send first part of data
+        i = 0
+        limited = math.floor(max_size / 2)
+        while True:
+            if i * bytes_per_part > limited:
+                break
+            part = Strings.substr(content, i * bytes_per_part, bytes_per_part)
+            result2 = lib.upload(shared_key, bytes(part, encoding='utf-8'))
+            assert UploadResponse.STATUS_OK == result2.get_result()['status']
+            i = i + 1
+
+        # step 3 - again from the beginning
+        result3 = lib.init(self._get_test_dir(), 'lorem-ipsum.txt', max_size)
+        assert InitResponse.STATUS_OK == result3.get_result()['status']
+        bytes_per_part = result3.get_result()['partSize']
+        last_known_part = result3.get_result()['lastKnownPart']
+        shared_key = result3.get_result()['sharedKey']  # for this test it's zero care
+        assert 315 == last_known_part  # NOT ZERO
+        assert 1024 == bytes_per_part
+
+        # step 4 - check first part
+        i = 0
+        while True:
+            if i > last_known_part:
+                break
+            part = Strings.substr(content, i * bytes_per_part, bytes_per_part)
+            result4 = lib.check(shared_key, i)
+            assert UploadResponse.STATUS_OK == result4.get_result()['status']
+            if hashlib.md5(part.encode('utf-8')) != result4.get_result()['checksum']:
+                # step 5 - truncate of failed part
+                result5 = lib.truncate_from(shared_key, i - 2)
+                assert UploadResponse.STATUS_OK == result5.get_result()['status']
+                break
+            else :
+                assert hashlib.md5(part.encode('utf-8')) == result4.get_result()['checksum']
+            i = i + 1
+
+        last_known_part = result5.get_result()['lastKnownPart']
+        assert 313 == last_known_part
+
+        # step 6 - send second part
+        i = last_known_part
+        while True:
+            if i * bytes_per_part > max_size:
+                break
+            part = Strings.substr(content, i * bytes_per_part, bytes_per_part)
+            result6 = lib.upload(shared_key, bytes(part, encoding='utf-8'))
+            assert UploadResponse.STATUS_OK == result6.get_result()['status']
+            i = i + 1
+
+        # step 7 - close upload
+        target = lib.get_lib_driver().read(shared_key).temp_location
+        result7 = lib.done(shared_key)
+        assert DoneResponse.STATUS_OK == result7.get_result()['status']
+
+        # check content
+        uploaded = lib.get_storage().get_all(target)
         assert 0 < len(uploaded)
         assert content == uploaded.decode()
 
@@ -312,11 +394,12 @@ class UploadTest(CommonTestClass):
         assert UploadResponse.STATUS_OK == result2.get_result()['status']
 
         # step 3 - cancel upload
+        target = lib.get_lib_driver().read(shared_key).temp_location
         result3 = lib.cancel(shared_key)
         assert CancelResponse.STATUS_OK == result3.get_result()['status']
 
         # check content
-        assert not lib.get_storage().get_all()
+        assert not lib.get_storage().get_all(target)
 
     def test_init_fail(self):
         from kw_upload.responses import InitResponse
@@ -413,3 +496,6 @@ class UploaderMock(Uploader):
 
     def get_storage(self) -> DataStorage:
         return self._data_storage
+
+    def get_lib_driver(self) -> DriveFile:
+        return self._driver

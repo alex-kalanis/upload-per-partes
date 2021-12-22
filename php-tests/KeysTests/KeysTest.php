@@ -8,6 +8,7 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Keys;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use kalanis\UploadPerPartes\Uploader\Translations;
+use Support;
 
 
 class KeysTest extends CommonTestClass
@@ -18,10 +19,10 @@ class KeysTest extends CommonTestClass
     public function testInit(): void
     {
         $lang = Translations::init();
-        $target = new TargetSearch($lang);
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\SimpleVolume', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_VOLUME));
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Random', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_RANDOM));
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Redis', Keys\AKey::getVariant($lang, $target, Keys\AKey::VARIANT_REDIS));
+        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\SimpleVolume', Keys\Factory::getVariant($lang, $target, Keys\Factory::VARIANT_VOLUME));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Random', Keys\Factory::getVariant($lang, $target, Keys\Factory::VARIANT_RANDOM));
+        $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Redis', Keys\Factory::getVariant($lang, $target, Keys\Factory::VARIANT_REDIS));
     }
 
     /**
@@ -30,9 +31,9 @@ class KeysTest extends CommonTestClass
     public function testInitFail(): void
     {
         $lang = Translations::init();
-        $target = new TargetSearch($lang);
+        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
-        Keys\AKey::getVariant($lang, $target, 0);
+        Keys\Factory::getVariant($lang, $target, 0);
         $this->expectExceptionMessageMatches('KEY VARIANT NOT SET');
     }
 
@@ -42,7 +43,7 @@ class KeysTest extends CommonTestClass
     public function testSharedFail(): void
     {
         $lang = Translations::init();
-        $lib = new Keys\Random($lang, new TargetSearch($lang));
+        $lib = new Keys\Random($lang, new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang)));
         $this->expectException(UploadException::class);
         $lib->getSharedKey(); // no key set!
         $this->expectExceptionMessageMatches('SHARED KEY IS EMPTY');
@@ -56,7 +57,7 @@ class KeysTest extends CommonTestClass
         $this->assertEquals('aaaaaaa', Keys\Random::generateRandomText(7, ['a','a','a','a']));
 
         $lang = Translations::init();
-        $lib = new Keys\Random($lang, new TargetSearch($lang));
+        $lib = new Keys\Random($lang, new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang)));
         $this->assertEquals('abcdefghi' . TargetSearch::FILE_DRIVER_SUFF, $lib->fromSharedKey('abcdefghi'));
     }
 }

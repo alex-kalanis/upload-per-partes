@@ -97,19 +97,33 @@ class DataRam(DataStorage):
 
     def __init__(self, lang: Translations):
         super().__init__(lang)
-        self._data = b''
+        self._data = {}
 
     def add_part(self, location: str, content: bytes, seek: int = None):
-        self._data = (self._data if seek is None else self._data[0:seek]) + content
+        if not self.exists(location):
+            self._data[location] = content
+        elif seek is None:
+            self._data[location] = self._data[location] + content
+        elif len(self._data[location]) <= seek:
+            self._data[location] = self._data[location] + content
+        else:
+            self._data[location] = self._data[location][0:seek] + content
 
     def get_part(self, location: str, offset: int, limit: int = None) -> bytes:
-        return self._data[offset:] if limit is None else self._data[offset:offset+limit]
+        if not self.exists(location):
+            return b''
+        return self._data[location][offset:] if limit is None else self._data[location][offset:offset+limit]
 
     def truncate(self, location: str, offset: int):
-        self._data = self._data[0:offset]
+        if self.exists(location) and (len(self._data[location]) > offset):
+            self._data[location] = self._data[location][0:offset]
 
     def remove(self, location: str):
-        self._data = ''
+        if self.exists(location):
+            del self._data[location]
+
+    def exists(self, location: str) -> bool:
+        return location in self._data
 
     def get_all(self, location: str = '') -> bytes:
         return self.get_part(location, 0, None)
@@ -122,22 +136,23 @@ class InfoRam(InfoStorage):
 
     def __init__(self, lang: Translations):
         super().__init__(lang)
-        self._data = ''
+        self._data = {}
 
     def exists(self, key: str) -> bool:
-        return bool(len(self._data))
+        return key in self._data
 
     def load(self, key: str) -> str:
-        content = self._data
+        content = self._data[key]
         if not bool(len(content)):
             raise UploadException(self._lang.drive_file_cannot_read())
         return content
 
     def save(self, key: str, data: str):
-        self._data = data
+        self._data[key] = data
 
     def remove(self, key: str):
-        self._data = ''
+        if self.exists(key):
+            del self._data[key]
 
 
 class Key(AKey):

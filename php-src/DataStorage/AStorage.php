@@ -23,6 +23,14 @@ abstract class AStorage
     }
 
     /**
+     * If that file exists
+     * @param string $location
+     * @return bool
+     * @throws UploadException
+     */
+    abstract public function exists(string $location): bool;
+
+    /**
      * Add part to file
      * @param string $location
      * @param string $content binary content

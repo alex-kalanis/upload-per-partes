@@ -47,6 +47,9 @@
             <directory>php-tests/InfoStorageTests</directory>
             <directory>php-tests/KeysTests</directory>
         </testsuite>
+        <testsuite name="Basics">
+            <directory>php-tests/BasicTests</directory>
+        </testsuite>
         <testsuite name="Data">
             <directory>php-tests/DataStorageTests</directory>
         </testsuite>

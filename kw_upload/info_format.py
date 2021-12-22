@@ -48,9 +48,6 @@ class AFormat:
      * Drive file format - abstract for each variant
     """
 
-    FORMAT_TEXT = 1
-    FORMAT_JSON = 2
-
     def from_format(self, content: str) -> DataPack:
         """
         :param content:
@@ -66,21 +63,6 @@ class AFormat:
         :raise UploadException:
         """
         raise NotImplementedError('TBI')
-
-    @staticmethod
-    def get_format(lang: Translations, variant: int):
-        """
-        :param lang: Translations
-        :param variant: int
-        :return: AFormat
-        :raise: UploadException
-        """
-        if AFormat.FORMAT_TEXT == variant:
-            return Text()
-        elif AFormat.FORMAT_JSON == variant:
-            return Json()
-        else:
-            raise UploadException(lang.drive_file_variant_not_set())
 
 
 class Text(AFormat):
@@ -120,3 +102,28 @@ class Json(AFormat):
     def to_format(self, data: DataPack) -> str:
         import json
         return json.dumps(vars(data))
+
+
+class Factory:
+    """
+     * Class Factory
+     * Drive file format - Factory to get formats
+    """
+
+    FORMAT_TEXT = 1
+    FORMAT_JSON = 2
+
+    @staticmethod
+    def get_format(lang: Translations, variant: int):
+        """
+        :param lang: Translations
+        :param variant: int
+        :return: AFormat
+        :raise: UploadException
+        """
+        if Factory.FORMAT_TEXT == variant:
+            return Text()
+        elif Factory.FORMAT_JSON == variant:
+            return Json()
+        else:
+            raise UploadException(lang.drive_file_variant_not_set())

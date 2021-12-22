@@ -1,6 +1,5 @@
 from .uploader.translations import Translations
 from .exceptions import UploadException
-import os
 
 
 class AStorage:
@@ -11,6 +10,15 @@ class AStorage:
 
     def __init__(self, lang: Translations):
         self._lang = lang
+
+    def exists(self, location: str) -> bool:
+        """
+         * If that file exists
+        :param location: string
+        :return bool:
+        :raise UploadException:
+        """
+        raise NotImplementedError('TBA')
 
     def add_part(self, location: str, content: bytes, seek: int = None):
         """
@@ -31,8 +39,8 @@ class AStorage:
         :param limit:
         :return void:
         :raise UploadException:
-        raise NotImplementedError('TBA')
         """
+        raise NotImplementedError('TBA')
 
     def truncate(self, location: str, offset: int):
         """
@@ -42,6 +50,7 @@ class AStorage:
         :return void:
         :raise UploadException:
         """
+        raise NotImplementedError('TBA')
 
     def remove(self, location: str):
         """
@@ -50,6 +59,7 @@ class AStorage:
         :return void:
         :raise UploadException:
         """
+        raise NotImplementedError('TBA')
 
 
 class VolumeBasic(AStorage):
@@ -59,82 +69,90 @@ class VolumeBasic(AStorage):
      * Filesystem behaves oddly - beware of fucked up caching!
     """
 
+    def exists(self, location: str) -> bool:
+        import os.path
+        return os.path.exists(location)
+
     def add_part(self, location: str, content: bytes, seek: int = None):
         if not seek:  # append to end
             try:
                 fp = open(location, 'ab')
-            except IsADirectoryError:
-                raise UploadException(self._lang.cannot_open_file())
-            except PermissionError:
-                raise UploadException(self._lang.cannot_write_file())
-            if not fp:
-                raise UploadException(self._lang.cannot_open_file())
-            if not fp.write(content):
-                fp.close()
-                raise UploadException(self._lang.cannot_write_file())
-            fp.close()
+                if 'fp' not in locals():
+                    raise UploadException(self._lang.cannot_open_file())
+                if not fp.write(content):
+                    raise UploadException(self._lang.cannot_write_file())
+            except IsADirectoryError as err:
+                raise UploadException(self._lang.cannot_open_file()) from err
+            except PermissionError as err:
+                raise UploadException(self._lang.cannot_write_file()) from err
+            finally:
+                if 'fp' in locals():
+                    fp.close()
         else:  # append from position
             try:
                 fp = open(location, 'rb+')
-            except IsADirectoryError:
-                raise UploadException(self._lang.cannot_open_file())
-            except PermissionError:
-                raise UploadException(self._lang.cannot_write_file())
-            if not fp:
-                raise UploadException(self._lang.cannot_open_file())
-            if not fp.seek(seek):
-                fp.close()
-                raise UploadException(self._lang.cannot_seek_file())
-            if not fp.write(content):
-                fp.close()
-                raise UploadException(self._lang.cannot_write_file())
-            fp.close()
+                if 'fp' not in locals():
+                    raise UploadException(self._lang.cannot_open_file())
+                if not fp.seek(seek):
+                    raise UploadException(self._lang.cannot_seek_file())
+                if not fp.write(content):
+                    raise UploadException(self._lang.cannot_write_file())
+            except IsADirectoryError as err:
+                raise UploadException(self._lang.cannot_open_file()) from err
+            except PermissionError as err:
+                raise UploadException(self._lang.cannot_write_file()) from err
+            finally:
+                if 'fp' in locals():
+                    fp.close()
 
     def get_part(self, location: str, offset: int, limit: int = None) -> bytes:
         try:
             fp = open(location, 'rb')
-        except IsADirectoryError:
-            raise UploadException(self._lang.cannot_open_file())
-        except PermissionError:
-            raise UploadException(self._lang.cannot_read_file())
+            if 'fp' not in locals():
+                raise UploadException(self._lang.cannot_open_file())
 
-        if not fp:
-            raise UploadException(self._lang.cannot_open_file())
+            if not limit:
+                fp.seek(0, 2)
+                limit = fp.tell()
 
-        if not limit:
-            fp.seek(0, 2)
-            limit = fp.tell()
+            position = fp.seek(offset, 0)
+            if position < 0:
+                raise UploadException(self._lang.cannot_seek_file())
 
-        position = fp.seek(offset, 0)
-        if position < 0:
-            fp.close()
-            raise UploadException(self._lang.cannot_seek_file())
+            data = fp.read(limit if limit else -1)
+            if not data:
+                raise UploadException(self._lang.cannot_read_file())
 
-        data = fp.read(limit if limit else -1)
-        if not data:
-            fp.close()
-            raise UploadException(self._lang.cannot_read_file())
+            return bytes(data)
 
-        fp.close()
-        return bytes(data)
+        except IsADirectoryError as err:
+            raise UploadException(self._lang.cannot_open_file()) from err
+        except PermissionError as err:
+            raise UploadException(self._lang.cannot_read_file()) from err
+        finally:
+            if 'fp' in locals():
+                fp.close()
 
     def truncate(self, location: str, offset: int):
         try:
             fp = open(location, 'rb+')
-        except IsADirectoryError:
-            raise UploadException(self._lang.cannot_open_file())
-        except PermissionError:
-            raise UploadException(self._lang.cannot_truncate_file())
-
-        fp.seek(0)
-        if not fp.truncate(offset):
-            fp.close()
-            raise UploadException(self._lang.cannot_truncate_file())
-        fp.seek(0)
-        fp.close()
+            if 'fp' not in locals():
+                raise UploadException(self._lang.cannot_open_file())
+            fp.seek(0)
+            if not fp.truncate(offset):
+                raise UploadException(self._lang.cannot_truncate_file())
+            fp.seek(0)
+        except IsADirectoryError as err:
+            raise UploadException(self._lang.cannot_open_file()) from err
+        except PermissionError as err:
+            raise UploadException(self._lang.cannot_truncate_file()) from err
+        finally:
+            if 'fp' in locals():
+                fp.close()
 
     def remove(self, location: str):
+        import os
         try:
             os.unlink(location)
-        except OSError:
-            raise UploadException(self._lang.cannot_remove_data())
+        except OSError as err:
+            raise UploadException(self._lang.cannot_remove_data()) from err

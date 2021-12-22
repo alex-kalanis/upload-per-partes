@@ -4,11 +4,12 @@ namespace BasicTests;
 
 
 use CommonTestClass;
-use Support;
 use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Response;
 use kalanis\UploadPerPartes\InfoStorage;
 use kalanis\UploadPerPartes\Uploader;
+use Support;
 
 
 class UploadTest extends CommonTestClass
@@ -34,15 +35,86 @@ class UploadTest extends CommonTestClass
             $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
             $result2 = $lib->upload($sharedKey, $part);
             $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
-        };
+        }
 
         // step 3 - close upload
         /** @var Response\DoneResponse $result3 */
+        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
         $result3 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()->getAll();
+        $uploaded = $lib->getStorage()->getAll($target);
+        $this->assertGreaterThan(0, strlen($uploaded));
+        $this->assertTrue($content == $uploaded);
+    }
+
+    /**
+     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     */
+    public function testStoppedUpload(): void
+    {
+        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $bytesPerPart = $result1->jsonSerialize()['partSize'];
+        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $this->assertEquals(1024, $bytesPerPart);
+        $this->assertEquals(631, $result1->jsonSerialize()['totalParts']);
+
+        // step 2 - send first part of data
+        $limited = floor($maxSize / 2);
+        for ($i = 0; $i * $bytesPerPart < $limited; $i++) {
+            $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
+            $result2 = $lib->upload($sharedKey, $part);
+            $this->assertEquals(Response\UploadResponse::STATUS_OK, $result2->jsonSerialize()['status']);
+        }
+
+        // step 3 - again from the beginning
+        $result3 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result3->jsonSerialize()['status']);
+        $bytesPerPart = $result3->jsonSerialize()['partSize'];
+        $lastKnownPart = $result3->jsonSerialize()['lastKnownPart'];
+        $sharedKey = $result3->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $this->assertEquals(316, $lastKnownPart); // NOT ZERO
+        $this->assertEquals(1024, $bytesPerPart);
+
+        // step 4 - check first part
+        for ($i = 0; $i <= $lastKnownPart; $i++) {
+            $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
+            $result4 = $lib->check($sharedKey, $i);
+            $this->assertEquals(Response\UploadResponse::STATUS_OK, $result4->jsonSerialize()['status']);
+            if (md5($part) != $result4->jsonSerialize()['checksum']) {
+                // step 5 - truncate of failed part
+                $result5 = $lib->truncateFrom($sharedKey, $i - 2);
+                $this->assertEquals(Response\UploadResponse::STATUS_OK, $result5->jsonSerialize()['status']);
+                break;
+            } else {
+                $this->assertEquals(md5($part), $result4->jsonSerialize()['checksum']);
+            }
+        }
+        $lastKnownPart = $result5->jsonSerialize()['lastKnownPart'];
+        $this->assertEquals(314, $lastKnownPart);
+
+        // step 6 - send second part
+        for ($i = $lastKnownPart; $i * $bytesPerPart <= $maxSize; $i++) {
+            $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
+            $result6 = $lib->upload($sharedKey, $part);
+            $this->assertEquals(Response\UploadResponse::STATUS_OK, $result6->jsonSerialize()['status']);
+        }
+
+        // step 7 - close upload
+        /** @var Response\DoneResponse $result3 */
+        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
+        $result7 = $lib->done($sharedKey);
+        $this->assertEquals(Response\DoneResponse::STATUS_OK, $result7->jsonSerialize()['status']);
+
+        // check content
+        $uploaded = $lib->getStorage()->getAll($target);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
@@ -67,11 +139,12 @@ class UploadTest extends CommonTestClass
 
         // step 3 - cancel upload
         /** @var Response\CancelResponse $result3 */
+        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
         $result3 = $lib->cancel($sharedKey);
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $this->assertEmpty($lib->getStorage()->getAll());
+        $this->assertEmpty($lib->getStorage()->getAll($target));
     }
 
     /**
@@ -204,5 +277,10 @@ class UploaderMock extends Uploader
     public function getStorage(): DataStorage\AStorage
     {
         return $this->dataStorage;
+    }
+
+    public function getLibDriver(): Uploader\DriveFile
+    {
+        return $this->driver;
     }
 }

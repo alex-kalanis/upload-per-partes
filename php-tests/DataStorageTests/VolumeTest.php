@@ -98,7 +98,9 @@ class VolumeTest extends AStorage
     {
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
+        $this->assertFalse($storage->exists($file));
         $storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz');
+        $this->assertTrue($storage->exists($file));
         $storage->remove($file);
         $this->expectException(UploadException::class);
         $storage->remove($file); // dies here

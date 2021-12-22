@@ -4,10 +4,10 @@ namespace BasicTests;
 
 
 use CommonTestClass;
-use Support;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Uploader;
+use Support;
 
 
 class DriveFileTest extends CommonTestClass
@@ -87,7 +87,7 @@ class DriveFileTest extends CommonTestClass
     {
         $lang = Uploader\Translations::init();
         $storage = new Support\InfoRam($lang);
-        $target = new Uploader\TargetSearch($lang);
+        $target = new Uploader\TargetSearch($lang, $storage, new Support\DataRam($lang));
         $key = new Support\Key($lang, $target);
         $format = new InfoFormat\Json();
         return new Uploader\DriveFile($lang, $storage, $format, $key);

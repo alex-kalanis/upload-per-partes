@@ -37,36 +37,40 @@ class Volume(AStorage):
     def load(self, key: str) -> str:
         try:
             fp = open(key, 'r+')
-        except IsADirectoryError:
-            raise UploadException(self._lang.drive_file_cannot_read())
-        except PermissionError:
-            raise UploadException(self._lang.drive_file_cannot_read())
+            content = fp.read(10000)
+            if not content:
+                raise UploadException(self._lang.drive_file_cannot_read())
+            return str(content)
 
-        content = fp.read(10000)
-        if not content:
-            raise UploadException(self._lang.drive_file_cannot_read())
-        fp.close()
-        return str(content)
+        except IsADirectoryError as err:
+            raise UploadException(self._lang.drive_file_cannot_read()) from err
+        except PermissionError as err:
+            raise UploadException(self._lang.drive_file_cannot_read()) from err
+        finally:
+            if 'fp' in locals():
+                fp.close()
 
     def save(self, key: str, data: str):
         try:
             fp = open(key, 'w')
-        except IsADirectoryError:
-            raise UploadException(self._lang.drive_file_cannot_write())
-        except PermissionError:
-            raise UploadException(self._lang.drive_file_cannot_write())
-        if not fp:
-            raise UploadException(self._lang.drive_file_cannot_write())
-        if not fp.write(data):
-            fp.close()
-            raise UploadException(self._lang.drive_file_cannot_write())
-        fp.close()
+            if 'fp' not in locals():
+                raise UploadException(self._lang.drive_file_cannot_write())
+            if not fp.write(data):
+                raise UploadException(self._lang.drive_file_cannot_write())
+
+        except IsADirectoryError as err:
+            raise UploadException(self._lang.drive_file_cannot_write()) from err
+        except PermissionError as err:
+            raise UploadException(self._lang.drive_file_cannot_write()) from err
+        finally:
+            if 'fp' in locals():
+                fp.close()
 
     def remove(self, key: str):
         try:
             os.unlink(key)
-        except OSError:
-            raise UploadException(self._lang.drive_file_cannot_remove())
+        except OSError as err:
+            raise UploadException(self._lang.drive_file_cannot_remove()) from err
 
 
 class Redis(AStorage):

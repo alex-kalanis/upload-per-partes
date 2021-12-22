@@ -4,10 +4,10 @@ from .exceptions import UploadException
 
 
 class AKey:
-
-    VARIANT_VOLUME = 1
-    VARIANT_RANDOM = 2
-    VARIANT_REDIS = 3
+    """
+     * Class AKey
+     * Connect shared key and local details
+    """
 
     def __init__(self, lang: Translations, target: TargetSearch):
         self._lang = lang
@@ -27,17 +27,6 @@ class AKey:
     def _check_shared_key(self):
         if not self._shared_key or 0 == len(self._shared_key):
             raise UploadException(self._lang.shared_key_is_empty())
-
-    @staticmethod
-    def get_variant(lang: Translations, target: TargetSearch, variant: int):
-        if AKey.VARIANT_VOLUME == variant:
-            return SimpleVolume(lang, target)
-        elif AKey.VARIANT_RANDOM == variant:
-            return Random(lang, target)
-        elif AKey.VARIANT_REDIS == variant:
-            return Redis(lang, target)
-        else:
-            raise UploadException(lang.key_variant_not_set())
 
 
 class SimpleVolume(AKey):
@@ -109,3 +98,25 @@ class Redis(AKey):
 
     def _get_prefix(self) -> str:
         return self.PREFIX
+
+
+class Factory:
+    """
+     * Class Factory
+     * Select correct type of shared key
+    """
+
+    VARIANT_VOLUME = 1
+    VARIANT_RANDOM = 2
+    VARIANT_REDIS = 3
+
+    @staticmethod
+    def get_variant(lang: Translations, target: TargetSearch, variant: int):
+        if Factory.VARIANT_VOLUME == variant:
+            return SimpleVolume(lang, target)
+        elif Factory.VARIANT_RANDOM == variant:
+            return Random(lang, target)
+        elif Factory.VARIANT_REDIS == variant:
+            return Redis(lang, target)
+        else:
+            raise UploadException(lang.key_variant_not_set())

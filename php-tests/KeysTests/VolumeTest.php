@@ -8,6 +8,7 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Keys;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use kalanis\UploadPerPartes\Uploader\Translations;
+use Support;
 
 
 class VolumeTest extends CommonTestClass
@@ -18,7 +19,7 @@ class VolumeTest extends CommonTestClass
     public function testThru(): void
     {
         $lang = Translations::init();
-        $target = new TargetSearch($lang);
+        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $target->setRemoteFileName('poiuztrewq')->setTargetDir('/tmp/')->process();
         $lib = new Keys\SimpleVolume($lang, $target);
         $lib->generateKeys();

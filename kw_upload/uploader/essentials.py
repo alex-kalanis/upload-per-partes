@@ -1,8 +1,9 @@
 import hashlib
-import os
 import re
 from .translations import Translations
 from kw_upload.exceptions import UploadException
+from kw_upload.data_storage import AStorage as DataStorage
+from kw_upload.info_storage import AStorage as InfoStorage
 
 
 class Calculates:
@@ -50,8 +51,10 @@ class TargetSearch:
     FILE_VER_SEP = '.'
     WIN_NAME_LEN_LIMIT = 110  # minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    def __init__(self, lang: Translations, sanitize_whitespace: bool = True, sanitize_alnum: bool = True):
+    def __init__(self, lang: Translations, info_storage: InfoStorage, data_storage: DataStorage, sanitize_whitespace: bool = True, sanitize_alnum: bool = True):
         self._lang = lang
+        self._info_storage = info_storage
+        self._data_storage = data_storage
         self._sanitize_whitespace = sanitize_whitespace
         self._sanitize_alnum = sanitize_alnum
 
@@ -73,7 +76,8 @@ class TargetSearch:
         self._check_remote_name()
         self._check_target_dir()
         self._canonize()
-        self._find_free_name()
+        if not self._info_storage.exists(self.get_driver_location()):
+            self._find_free_name()
         return self
 
     def get_driver_location(self) -> str:
@@ -105,12 +109,12 @@ class TargetSearch:
          * Find non-existing name
         """
         ext = self._add_ext()
-        if os.path.isfile(self._target_dir + self._file_base + ext) and not os.path.isfile(self.get_driver_location()):
+        if self._data_storage.exists(self._target_dir + self._file_base + ext):
             i = 0
             while True:
                 location = self._file_base + self.FILE_VER_SEP + str(i)
                 i = i+1
-                if not os.path.isfile(self._target_dir + location + ext):
+                if not self._data_storage.exists(self._target_dir + location + ext):
                     break
             self._file_base = location
 

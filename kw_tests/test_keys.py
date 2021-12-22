@@ -1,7 +1,8 @@
 from kw_tests.common_class import CommonTestClass
+from kw_tests.support import DataRam, InfoRam
 from kw_upload.uploader.essentials import TargetSearch
 from kw_upload.exceptions import UploadException
-from kw_upload.keys import AKey, SimpleVolume, Random, Redis
+from kw_upload.keys import Factory, AKey, SimpleVolume, Random, Redis
 from kw_upload.uploader.translations import Translations
 
 
@@ -9,23 +10,23 @@ class KeysTest(CommonTestClass):
 
     def test_init(self):
         lang = Translations()
-        target = TargetSearch(lang)
-        assert isinstance(AKey.get_variant(lang, target, AKey.VARIANT_VOLUME), SimpleVolume)
-        assert isinstance(AKey.get_variant(lang, target, AKey.VARIANT_RANDOM), Random)
-        assert isinstance(AKey.get_variant(lang, target, AKey.VARIANT_REDIS), Redis)
+        target = TargetSearch(lang, InfoRam(lang), DataRam(lang))
+        assert isinstance(Factory.get_variant(lang, target, Factory.VARIANT_VOLUME), SimpleVolume)
+        assert isinstance(Factory.get_variant(lang, target, Factory.VARIANT_RANDOM), Random)
+        assert isinstance(Factory.get_variant(lang, target, Factory.VARIANT_REDIS), Redis)
 
     def test_init_fail(self):
         lang = Translations()
-        target = TargetSearch(lang)
+        target = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         try:
-            AKey.get_variant(lang, target, 0)
+            Factory.get_variant(lang, target, 0)
             assert False, 'Use unknown variant'
         except UploadException as ex:
             assert 'KEY VARIANT NOT SET' == ex.get_message()
 
     def test_shared_fail(self):
         lang = Translations()
-        lib = Random(lang, TargetSearch(lang))
+        lib = Random(lang, TargetSearch(lang, InfoRam(lang), DataRam(lang)))
         try:
             lib.get_shared_key()  # no key set!
             assert False, 'Got empty shared key'
@@ -36,13 +37,13 @@ class KeysTest(CommonTestClass):
         assert 'aaaaaaa' == Random.generate_random_text(7, ['a','a','a','a'])
 
         lang = Translations()
-        lib = Random(lang, TargetSearch(lang))
+        lib = Random(lang, TargetSearch(lang, InfoRam(lang), DataRam(lang)))
         assert 'abcdefghi' + TargetSearch.FILE_DRIVER_SUFF == lib.from_shared_key('abcdefghi')
 
     def test_redis(self):
         import hashlib
         lang = Translations()
-        target = TargetSearch(lang)
+        target = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         target.set_remote_file_name('poiuztrewq').set_target_dir(self._get_test_dir()).process()
         lib = Redis(lang, target)
         lib.generate_keys()
@@ -55,7 +56,7 @@ class KeysTest(CommonTestClass):
     def test_volume(self):
         import base64
         lang = Translations()
-        target = TargetSearch(lang)
+        target = TargetSearch(lang, InfoRam(lang), DataRam(lang))
         target.set_remote_file_name('poiuztrewq').set_target_dir('/tmp/').process()
         lib = SimpleVolume(lang, target)
         lib.generate_keys()

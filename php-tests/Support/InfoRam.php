@@ -14,16 +14,17 @@ use kalanis\UploadPerPartes\InfoStorage\AStorage;
  */
 class InfoRam extends AStorage
 {
-    protected $data = '';
+    /** @var string[] */
+    protected $data = [];
 
     public function exists(string $key): bool
     {
-        return !empty($this->data);
+        return isset($this->data[$key]);
     }
 
     public function load(string $key): string
     {
-        $content = $this->data;
+        $content = $this->exists($key) ? $this->data[$key] : '';
         if (empty($content)) {
             throw new UploadException($this->lang->driveFileCannotRead());
         }
@@ -32,11 +33,13 @@ class InfoRam extends AStorage
 
     public function save(string $key, string $data): void
     {
-        $this->data = $data;
+        $this->data[$key] = $data;
     }
 
     public function remove(string $key): void
     {
-        $this->data = '';
+        if ($this->exists($key)) {
+            unset($this->data[$key]);
+        }
     }
 }
