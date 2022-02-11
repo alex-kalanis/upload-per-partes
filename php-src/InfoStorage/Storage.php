@@ -5,8 +5,8 @@ namespace kalanis\UploadPerPartes\InfoStorage;
 
 use kalanis\kw_storage\Storage as lib;
 use kalanis\kw_storage\StorageException;
-use kalanis\UploadPerPartes\Uploader\Translations;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
 /**
@@ -22,7 +22,7 @@ class Storage extends AStorage
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(Translations $lang, lib $storage, int $timeout = 3600)
+    public function __construct(IUPPTranslations $lang, lib $storage, int $timeout = 3600)
     {
         // path is not a route but redis key
         parent::__construct($lang);
@@ -62,7 +62,7 @@ class Storage extends AStorage
     public function save(string $key, string $data): void
     {
         if (false === $this->storage->set($key, $data, $this->timeout)) {
-            throw new UploadException($this->lang->driveFileCannotWrite());
+            throw new UploadException($this->lang->uppDriveFileCannotWrite($key));
         }
     }
 
@@ -75,7 +75,7 @@ class Storage extends AStorage
     public function remove(string $key): void
     {
         if (!$this->storage->delete($key)) {
-            throw new UploadException($this->lang->driveFileCannotRemove());
+            throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
         }
     }
 }

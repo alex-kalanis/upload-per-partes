@@ -26,7 +26,7 @@ class InfoRam extends AStorage
     {
         $content = $this->exists($key) ? $this->data[$key] : '';
         if (empty($content)) {
-            throw new UploadException($this->lang->driveFileCannotRead());
+            throw new UploadException($this->lang->uppDriveFileCannotRead($key));
         }
         return $content;
     }

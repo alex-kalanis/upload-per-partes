@@ -4,8 +4,8 @@ namespace kalanis\UploadPerPartes\Keys;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
-use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 /**
@@ -15,14 +15,14 @@ use kalanis\UploadPerPartes\Uploader\Translations;
  */
 abstract class AKey
 {
-    /** @var Translations */
+    /** @var IUPPTranslations */
     protected $lang = null;
     /** @var TargetSearch */
     protected $target = null;
     /** @var string */
     protected $sharedKey = '';
 
-    public function __construct(Translations $lang, TargetSearch $target)
+    public function __construct(IUPPTranslations $lang, TargetSearch $target)
     {
         $this->lang = $lang;
         $this->target = $target;
@@ -57,7 +57,7 @@ abstract class AKey
     protected function checkSharedKey(): void
     {
         if (empty($this->sharedKey)) {
-            throw new UploadException($this->lang->sharedKeyIsEmpty());
+            throw new UploadException($this->lang->uppSharedKeyIsEmpty());
         }
     }
 }

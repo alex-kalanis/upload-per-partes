@@ -5,7 +5,7 @@ namespace kalanis\UploadPerPartes\InfoFormat;
 
 /**
  * Class Data
- * @package UploadPerPartes\DriveFile
+ * @package kalanis\UploadPerPartes\DriveFile
  * Driver metadata about processed file
  */
 class Data

@@ -8,7 +8,7 @@ use kalanis\UploadPerPartes;
 
 /**
  * Class Uploader
- * @package UploadPerPartes\examples\controller
+ * @package kalanis\UploadPerPartes\examples\controller
  * What can be displayed on page for content upload
  * This one uses Redis as driver storage; just for fun
  */

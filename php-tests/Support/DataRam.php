@@ -35,13 +35,13 @@ class DataRam extends AStorage
         if (!$this->exists($location)) {
             return '';
         }
-        return Strings::substr($this->data[$location], $offset, $limit, $this->lang->cannotReadFile());
+        return Strings::substr($this->data[$location], $offset, $limit, $this->lang->uppCannotReadFile($location));
     }
 
     public function truncate(string $location, int $offset): void
     {
         if ($this->exists($location) && (strlen($this->data[$location]) > $offset)) {
-            $this->data[$location] = Strings::substr($this->data[$location], 0, $offset, $this->lang->cannotTruncateFile());
+            $this->data[$location] = Strings::substr($this->data[$location], 0, $offset, $this->lang->uppCannotTruncateFile($location));
         }
     }
 

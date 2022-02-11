@@ -4,7 +4,6 @@ namespace kalanis\UploadPerPartes\examples;
 
 
 use kalanis\UploadPerPartes;
-use kalanis\UploadPerPartes\Uploader\Calculates;
 
 
 /**
@@ -14,8 +13,8 @@ use kalanis\UploadPerPartes\Uploader\Calculates;
  */
 class Uploader extends UploadPerPartes\Uploader
 {
-    protected function getCalc(): Calculates
+    protected function getCalc(): UploadPerPartes\Uploader\Calculates
     {
-        return new Calculates(10485760); // segment size: 1024*1024*10 = 10MB
+        return new UploadPerPartes\Uploader\Calculates(10485760); // segment size: 1024*1024*10 = 10MB
     }
 }

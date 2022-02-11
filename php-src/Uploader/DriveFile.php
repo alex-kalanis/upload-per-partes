@@ -5,6 +5,7 @@ namespace kalanis\UploadPerPartes\Uploader;
 
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Keys;
 use kalanis\UploadPerPartes\InfoStorage;
 
@@ -22,10 +23,10 @@ class DriveFile
     protected $format = null;
     /** @var Keys\AKey */
     protected $key = null;
-    /** @var Translations */
+    /** @var IUPPTranslations */
     protected $lang = null;
 
-    public function __construct(Translations $lang, InfoStorage\AStorage $storage, InfoFormat\AFormat $format, Keys\AKey $key)
+    public function __construct(IUPPTranslations $lang, InfoStorage\AStorage $storage, InfoFormat\AFormat $format, Keys\AKey $key)
     {
         $this->storage = $storage;
         $this->format = $format;
@@ -45,7 +46,7 @@ class DriveFile
     public function write(string $sharedKey, InfoFormat\Data $data, bool $isNew = false): bool
     {
         if ($isNew && $this->exists($sharedKey)) {
-            throw new Exceptions\ContinuityUploadException($this->lang->driveFileAlreadyExists());
+            throw new Exceptions\ContinuityUploadException($this->lang->uppDriveFileAlreadyExists($sharedKey));
         }
         $this->storage->save($this->key->fromSharedKey($sharedKey), $this->format->toFormat($data));
         return true;
@@ -75,7 +76,7 @@ class DriveFile
     {
         if ($checkContinuous) {
             if (($data->lastKnownPart + 1) != $last) {
-                throw new Exceptions\UploadException($this->lang->driveFileNotContinuous());
+                throw new Exceptions\UploadException($this->lang->uppDriveFileNotContinuous($sharedKey));
             }
         }
         $data->lastKnownPart = $last;

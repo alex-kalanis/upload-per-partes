@@ -5,7 +5,6 @@ namespace kalanis\UploadPerPartes;
 
 use kalanis\UploadPerPartes\Uploader\Calculates;
 use kalanis\UploadPerPartes\Uploader\Hashed;
-use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 /**
@@ -59,22 +58,22 @@ class Uploader
         return Keys\Factory::VARIANT_VOLUME;
     }
 
-    protected function getTranslations(): Translations
+    protected function getTranslations(): Interfaces\IUPPTranslations
     {
         return new Uploader\Translations();
     }
 
-    protected function getInfoStorage(Translations $lang): InfoStorage\AStorage
+    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): InfoStorage\AStorage
     {
         return new InfoStorage\Volume($lang);
     }
 
-    protected function getDataStorage(Translations $lang): DataStorage\AStorage
+    protected function getDataStorage(Interfaces\IUPPTranslations $lang): DataStorage\AStorage
     {
         return new DataStorage\VolumeBasic($lang);
     }
 
-    protected function getTarget(Translations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage): Uploader\TargetSearch
+    protected function getTarget(Interfaces\IUPPTranslations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage): Uploader\TargetSearch
     {
         return new Uploader\TargetSearch($lang, $infoStorage, $dataStorage);
     }
@@ -89,7 +88,7 @@ class Uploader
         return new Hashed();
     }
 
-    protected function getProcessor(Translations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed): Uploader\Processor
+    protected function getProcessor(Interfaces\IUPPTranslations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed): Uploader\Processor
     {
         return new Uploader\Processor($lang, $driver, $storage, $hashed);
     }

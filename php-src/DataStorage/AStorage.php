@@ -4,7 +4,7 @@ namespace kalanis\UploadPerPartes\DataStorage;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
 /**
@@ -14,10 +14,10 @@ use kalanis\UploadPerPartes\Uploader\Translations;
  */
 abstract class AStorage
 {
-    /** @var Translations */
+    /** @var IUPPTranslations */
     protected $lang = null;
 
-    public function __construct(Translations $lang)
+    public function __construct(IUPPTranslations $lang)
     {
         $this->lang = $lang;
     }

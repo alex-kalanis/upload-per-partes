@@ -9,7 +9,7 @@ use kalanis\UploadPerPartes\InfoFormat;
 
 /**
  * Class InitResponse
- * @package UploadPerPartes\Response
+ * @package kalanis\UploadPerPartes\Response
  * Responses sent during upload initialization
  */
 class InitResponse extends AResponse

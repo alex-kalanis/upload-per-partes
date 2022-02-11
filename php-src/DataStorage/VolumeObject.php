@@ -28,16 +28,16 @@ class VolumeObject extends VolumeBasic
     {
         $file = new SplFileObject($location, 'r+');
         if (!$file) {
-            throw new UploadException($this->lang->cannotOpenFile());
+            throw new UploadException($this->lang->uppCannotOpenFile($location));
         }
         $position = is_null($seek) ? @$file->fseek(0, SEEK_END) : @$file->fseek($seek) ;
         if ($position == -1) {
             unset($file);
-            throw new UploadException($this->lang->cannotSeekFile());
+            throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
         if (false === @$file->fwrite($content)) {
             unset($file);
-            throw new UploadException($this->lang->cannotWriteFile());
+            throw new UploadException($this->lang->uppCannotWriteFile($location));
         }
         unset($file);
     }
@@ -54,7 +54,7 @@ class VolumeObject extends VolumeBasic
     {
         $file = new SplFileObject($location, 'r+');
         if (!$file) {
-            throw new UploadException($this->lang->cannotOpenFile());
+            throw new UploadException($this->lang->uppCannotOpenFile($location));
         }
         if (empty($limit)) {
             @$file->fseek(0, SEEK_END);
@@ -63,13 +63,13 @@ class VolumeObject extends VolumeBasic
         $position = @$file->fseek($offset, SEEK_SET);
         if ($position == -1) {
             unset($file);
-            throw new UploadException($this->lang->cannotSeekFile());
+            throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
         $data = @$file->fread((int)$limit);
 
         if (false === $data) {
             unset($file);
-            throw new UploadException($this->lang->cannotReadFile());
+            throw new UploadException($this->lang->uppCannotReadFile($location));
         }
         unset($file);
         return $data;
@@ -87,7 +87,7 @@ class VolumeObject extends VolumeBasic
         $file->rewind();
         if (!$file->ftruncate($offset)) {
             unset($file);
-            throw new UploadException($this->lang->cannotTruncateFile());
+            throw new UploadException($this->lang->uppCannotTruncateFile($location));
         }
         @$file->rewind();
         unset($file);

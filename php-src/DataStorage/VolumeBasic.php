@@ -25,31 +25,31 @@ class VolumeBasic extends AStorage
         if (is_null($seek)) {  // append to end
             $pointer = @fopen($location, 'a');
             if (false == $pointer) {
-                throw new UploadException($this->lang->cannotOpenFile());
+                throw new UploadException($this->lang->uppCannotOpenFile($location));
             }
             if (false === @fwrite($pointer, $content)) {
                 // @codeCoverageIgnoreStart
                 @fclose($pointer);
-                throw new UploadException($this->lang->cannotWriteFile());
+                throw new UploadException($this->lang->uppCannotWriteFile($location));
                 // @codeCoverageIgnoreEnd
             }
             @fclose($pointer);
         } else { // append from position
             $pointer = @fopen($location, 'r+');
             if (false === $pointer) {
-                throw new UploadException($this->lang->cannotOpenFile());
+                throw new UploadException($this->lang->uppCannotOpenFile($location));
             }
             // @codeCoverageIgnoreStart
             $position = @fseek($pointer, $seek);
             if ($position == -1) {
                 @fclose($pointer);
-                throw new UploadException($this->lang->cannotSeekFile());
+                throw new UploadException($this->lang->uppCannotSeekFile($location));
             }
             // @codeCoverageIgnoreEnd
             // @codeCoverageIgnoreStart
             if (false === @fwrite($pointer, $content)) {
                 @fclose($pointer);
-                throw new UploadException($this->lang->cannotWriteFile());
+                throw new UploadException($this->lang->uppCannotWriteFile($location));
             }
             @fclose($pointer);
             // @codeCoverageIgnoreEnd
@@ -61,7 +61,7 @@ class VolumeBasic extends AStorage
         $pointer = @fopen($location, 'r');
         if (false == $pointer) {
             // @codeCoverageIgnoreStart
-            throw new UploadException($this->lang->cannotOpenFile());
+            throw new UploadException($this->lang->uppCannotOpenFile($location));
             // @codeCoverageIgnoreEnd
         }
         if (empty($limit)) {
@@ -72,14 +72,14 @@ class VolumeBasic extends AStorage
         $position = @fseek($pointer, $offset, SEEK_SET);
         if ($position == -1) {
             @fclose($pointer);
-            throw new UploadException($this->lang->cannotSeekFile());
+            throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
         // @codeCoverageIgnoreEnd
         $data = @fread($pointer, (int)$limit);
 
         if (false === $data) {
             // @codeCoverageIgnoreStart
-            throw new UploadException($this->lang->cannotReadFile());
+            throw new UploadException($this->lang->uppCannotReadFile($location));
             // @codeCoverageIgnoreEnd
         }
         return $data;
@@ -92,7 +92,7 @@ class VolumeBasic extends AStorage
         if (!ftruncate($pointer, $offset)) {
             // @codeCoverageIgnoreStart
             @fclose($pointer);
-            throw new UploadException($this->lang->cannotTruncateFile());
+            throw new UploadException($this->lang->uppCannotTruncateFile($location));
             // @codeCoverageIgnoreEnd
         }
         @rewind($pointer);
@@ -102,7 +102,7 @@ class VolumeBasic extends AStorage
     public function remove(string $location): void
     {
         if (!@unlink($location)) {
-            throw new UploadException($this->lang->cannotRemoveData());
+            throw new UploadException($this->lang->uppCannotRemoveData($location));
         }
     }
 }

@@ -4,8 +4,8 @@ namespace kalanis\UploadPerPartes\Keys;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
-use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 /**
@@ -26,16 +26,16 @@ class Factory
     ];
 
     /**
-     * @param Translations $lang
+     * @param IUPPTranslations $lang
      * @param TargetSearch $target
      * @param int $variant
      * @return AKey
      * @throws UploadException
      */
-    public static function getVariant(Translations $lang, TargetSearch $target, int $variant): AKey
+    public static function getVariant(IUPPTranslations $lang, TargetSearch $target, int $variant): AKey
     {
         if (!isset(static::$map[$variant])) {
-            throw new UploadException($lang->keyVariantNotSet());
+            throw new UploadException($lang->uppKeyVariantNotSet());
         }
         $class = static::$map[$variant];
         return new $class($lang, $target);

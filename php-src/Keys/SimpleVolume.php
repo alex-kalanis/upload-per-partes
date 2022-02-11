@@ -17,7 +17,7 @@ class SimpleVolume extends AKey
     {
         $result = base64_decode($key, true);
         if (false === $result) {
-            throw new UploadException($this->lang->sharedKeyIsInvalid());
+            throw new UploadException($this->lang->uppSharedKeyIsInvalid());
         }
         return $result;
     }

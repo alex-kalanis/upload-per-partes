@@ -6,6 +6,7 @@ namespace kalanis\UploadPerPartes\Uploader;
 use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\InfoStorage;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
 /**
@@ -21,7 +22,7 @@ class TargetSearch
     const FILE_VER_SEP = '.';
     const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    /** @var Translations|null */
+    /** @var IUPPTranslations|null */
     protected $lang = null;
     /** @var InfoStorage\AStorage */
     protected $infoStorage = null;
@@ -44,13 +45,13 @@ class TargetSearch
 
 
     /**
-     * @param Translations $lang
+     * @param IUPPTranslations $lang
      * @param InfoStorage\AStorage $infoStorage
      * @param DataStorage\AStorage $dataStorage
      * @param bool $sanitizeWhitespace
      * @param bool $sanitizeAlnum
      */
-    public function __construct(Translations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
+    public function __construct(IUPPTranslations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
     {
         $this->lang = $lang;
         $this->infoStorage = $infoStorage;
@@ -131,7 +132,7 @@ class TargetSearch
     protected function checkRemoteName(): void
     {
         if (empty($this->remoteFileName)) {
-            throw new UploadException($this->lang->sentNameIsEmpty());
+            throw new UploadException($this->lang->uppSentNameIsEmpty());
         }
     }
 
@@ -141,7 +142,7 @@ class TargetSearch
     protected function checkTargetDir(): void
     {
         if (empty($this->targetDir)) {
-            throw new UploadException($this->lang->targetDirIsEmpty());
+            throw new UploadException($this->lang->uppTargetDirIsEmpty());
         }
     }
 
@@ -151,7 +152,7 @@ class TargetSearch
     protected function checkFileBase(): void
     {
         if (empty($this->fileBase)) {
-            throw new UploadException($this->lang->uploadNameIsEmpty());
+            throw new UploadException($this->lang->uppUploadNameIsEmpty());
         }
     }
 

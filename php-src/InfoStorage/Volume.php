@@ -22,7 +22,7 @@ class Volume extends AStorage
     {
         $content = @file_get_contents($key);
         if (false === $content) {
-            throw new UploadException($this->lang->driveFileCannotRead());
+            throw new UploadException($this->lang->uppDriveFileCannotRead($key));
         }
         return $content;
     }
@@ -30,14 +30,14 @@ class Volume extends AStorage
     public function save(string $key, string $data): void
     {
         if (false === @file_put_contents($key, $data)) {
-            throw new UploadException($this->lang->driveFileCannotWrite());
+            throw new UploadException($this->lang->uppDriveFileCannotWrite($key));
         }
     }
 
     public function remove(string $key): void
     {
         if (!@unlink($key)) {
-            throw new UploadException($this->lang->driveFileCannotRemove());
+            throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
         }
     }
 }

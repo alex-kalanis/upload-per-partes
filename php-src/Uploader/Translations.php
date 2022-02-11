@@ -3,6 +3,9 @@
 namespace kalanis\UploadPerPartes\Uploader;
 
 
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+
+
 /**
  * Class Translations
  * @package kalanis\UploadPerPartes
@@ -10,134 +13,138 @@ namespace kalanis\UploadPerPartes\Uploader;
  * - necessary due many translation systems through web
  * For work extends this class and pass extension into your project
  */
-class Translations
+class Translations implements IUPPTranslations
 {
     public static function init(): Translations
     {
         return new static();
     }
 
-    public function sentNameIsEmpty(): string
+    public function uppSentNameIsEmpty(): string
     {
         return 'SENT FILE NAME IS EMPTY';
     }
 
-    public function uploadNameIsEmpty(): string
+    public function uppUploadNameIsEmpty(): string
     {
         return 'UPLOAD FILE NAME IS EMPTY';
     }
 
-    public function sharedKeyIsEmpty(): string
+    public function uppSharedKeyIsEmpty(): string
     {
         return 'SHARED KEY IS EMPTY';
     }
 
-    public function sharedKeyIsInvalid(): string
+    public function uppSharedKeyIsInvalid(): string
     {
         return 'SHARED KEY IS INVALID';
     }
 
-    public function keyVariantNotSet(): string
+    public function uppKeyVariantNotSet(): string
     {
         return 'KEY VARIANT NOT SET';
     }
 
-    public function targetDirIsEmpty(): string
+    public function uppTargetDirIsEmpty(): string
     {
         return 'TARGET DIR IS NOT SET';
     }
 
-    public function driveFileAlreadyExists(): string
+    public function uppDriveFileAlreadyExists(string $driveFile): string
     {
         return 'DRIVEFILE ALREADY EXISTS';
     }
 
-    public function driveFileNotContinuous(): string
+    public function uppDriveFileNotContinuous(string $driveFile): string
     {
         return 'DRIVEFILE IS NOT CONTINUOUS';
     }
 
-    public function driveFileCannotRemove(): string
+    public function uppDriveFileCannotRemove(string $key): string
     {
         return 'DRIVEFILE CANNOT BE REMOVED';
     }
 
-    public function driveFileVariantNotSet(): string
+    public function uppDriveFileVariantNotSet(): string
     {
         return 'DRIVEFILE VARIANT NOT SET';
     }
 
-    public function driveFileCannotRead(): string
+    public function uppDriveFileCannotRead(string $key): string
     {
         return 'CANNOT READ DRIVEFILE';
     }
 
-    public function driveFileCannotWrite(): string
+    public function uppDriveFileCannotWrite(string $key): string
     {
         return 'CANNOT WRITE DRIVEFILE';
     }
 
-    public function cannotRemoveData(): string
+    public function uppCannotRemoveData(string $location): string
     {
         return 'CANNOT REMOVE DATA';
     }
 
-    public function readTooEarly(): string
+    public function uppReadTooEarly(string $key): string
     {
         return 'READ TOO EARLY';
     }
 
-    public function cannotOpenFile(): string
+    public function uppCannotOpenFile(string $location): string
     {
         return 'CANNOT OPEN FILE';
     }
 
     /**
+     * @param string $location
      * @return string
      * @codeCoverageIgnore
      * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::getPart
      */
-    public function cannotReadFile(): string
+    public function uppCannotReadFile(string $location): string
     {
         return 'CANNOT READ FILE';
     }
 
     /**
+     * @param string $location
      * @return string
      * @codeCoverageIgnore   no ideas how to fail seek
      * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
-    public function cannotSeekFile(): string
+    public function uppCannotSeekFile(string $location): string
     {
         return 'CANNOT SEEK FILE';
     }
 
     /**
+     * @param string $location
      * @return string
      * @codeCoverageIgnore
      * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::addPart
      */
-    public function cannotWriteFile(): string
+    public function uppCannotWriteFile(string $location): string
     {
         return 'CANNOT WRITE FILE';
     }
 
     /**
+     * @param string $location
      * @return string
      * @codeCoverageIgnore
      * @see \kalanis\UploadPerPartes\DataStorage\VolumeBasic::truncate
      */
-    public function cannotTruncateFile(): string
+    public function uppCannotTruncateFile(string $location): string
     {
         return 'FILE CANNOT TRUNCATE';
     }
 
-    public function segmentOutOfBounds(): string
+    public function uppSegmentOutOfBounds(int $segment): string
     {
         return 'SEGMENT OUT OF BOUNDS';
     }
 
-    public function segmentNotUploadedYet(): string
+    public function uppSegmentNotUploadedYet(int $segment): string
     {
         return 'SEGMENT NOT UPLOADED YET';
     }
