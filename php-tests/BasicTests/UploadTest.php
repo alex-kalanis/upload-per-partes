@@ -5,7 +5,8 @@ namespace BasicTests;
 
 use CommonTestClass;
 use kalanis\UploadPerPartes\DataStorage;
-use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Response;
 use kalanis\UploadPerPartes\InfoStorage;
 use kalanis\UploadPerPartes\Uploader;
@@ -15,7 +16,7 @@ use Support;
 class UploadTest extends CommonTestClass
 {
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testSimpleUpload(): void
     {
@@ -50,7 +51,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testStoppedUpload(): void
     {
@@ -120,7 +121,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testCancel(): void
     {
@@ -148,7 +149,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testInitFail(): void
     {
@@ -159,7 +160,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testCheckFail(): void
     {
@@ -182,7 +183,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testTruncateFail(): void
     {
@@ -205,7 +206,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testUploadFail(): void
     {
@@ -228,7 +229,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testCancelFail(): void
     {
@@ -239,7 +240,7 @@ class UploadTest extends CommonTestClass
     }
 
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws Exceptions\UploadException
      */
     public function testDoneFail(): void
     {
@@ -253,13 +254,13 @@ class UploadTest extends CommonTestClass
 
 class UploaderMock extends Uploader
 {
-    protected function getInfoStorage(Uploader\Translations $lang): InfoStorage\AStorage
+    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): InfoStorage\AStorage
     {
         parent::getInfoStorage($lang);
         return new Support\InfoRam($lang);
     }
 
-    protected function getDataStorage(Uploader\Translations $lang): DataStorage\AStorage
+    protected function getDataStorage(Interfaces\IUPPTranslations $lang): DataStorage\AStorage
     {
         parent::getDataStorage($lang);
         return new Support\DataRam($lang);
