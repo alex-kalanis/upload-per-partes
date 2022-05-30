@@ -4,7 +4,6 @@
         bootstrap="php-tests/_bootstrap.php"
         backupGlobals="false"
         backupStaticAttributes="false"
-        cacheTokens="false"
         colors="true"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
@@ -21,24 +20,30 @@
         timeoutForLargeTests="60"
         defaultTestSuite="ALL"
         verbose="true">
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <ini name="intl.default_locale" value="en" />
-        <ini name="intl.error_level" value="0" />
-        <ini name="memory_limit" value="-1" />
-    </php>
 
-    <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false" />
-        <log type="coverage-clover" target="php-tests/data/clover.xml" />
-    </logging>
+    <!-- phpunit 9+ -->
+    <coverage>
+        <include>
+            <directory suffix=".php">php-src/</directory>
+        </include>
+        <report>
+            <clover outputFile="php-tests/data/clover.xml"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
 
+    <!-- phpunit 8- -->
     <filter>
         <whitelist>
             <directory suffix=".php">php-src/</directory>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false" />
+        <log type="coverage-clover" target="php-tests/data/clover.xml" />
+    </logging>
 
+    <!-- rest as usual -->
     <testsuites>
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
