@@ -39,7 +39,7 @@ class VolumeBasic extends AStorage
                 throw new UploadException($this->lang->uppCannotWriteFile($location));
                 // @codeCoverageIgnoreEnd
             }
-            @fclose($pointer);
+            /** @scrutinizer ignore-unhandled */@fclose($pointer);
         } else { // append from position
             $pointer = @fopen($location, 'rb+');
             if (false === $pointer) {
@@ -48,16 +48,16 @@ class VolumeBasic extends AStorage
             // @codeCoverageIgnoreStart
             $position = @fseek($pointer, $seek);
             if ($position == -1) {
-                @fclose($pointer);
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
                 throw new UploadException($this->lang->uppCannotSeekFile($location));
             }
             // @codeCoverageIgnoreEnd
             // @codeCoverageIgnoreStart
             if (false === @fwrite($pointer, $content)) {
-                @fclose($pointer);
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
                 throw new UploadException($this->lang->uppCannotWriteFile($location));
             }
-            @fclose($pointer);
+            /** @scrutinizer ignore-unhandled */@fclose($pointer);
             // @codeCoverageIgnoreEnd
         }
     }

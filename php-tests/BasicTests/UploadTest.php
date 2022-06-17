@@ -45,7 +45,7 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()/** @scrutinizer ignore-call */->getAll($target);
+        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
