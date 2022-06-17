@@ -85,7 +85,7 @@ class DriveFileTest extends CommonTestClass
 
     protected function getDriveFile(): Uploader\DriveFile
     {
-        $lang = Uploader\Translations::init();
+        $lang = new Uploader\Translations();
         $storage = new Support\InfoRam($lang);
         $target = new Uploader\TargetSearch($lang, $storage, new Support\DataRam($lang));
         $key = new Support\Key($lang, $target);

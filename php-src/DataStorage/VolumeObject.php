@@ -20,14 +20,14 @@ class VolumeObject extends VolumeBasic
     /**
      * @param string $location
      * @param string $content
-     * @param int|null $seek
+     * @param int<0, max>|null $seek
      * @throws UploadException
      * @codeCoverageIgnore
      */
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
-        $file = new SplFileObject($location, 'r+');
-        if (!$file) {
+        $file = new SplFileObject($location, 'rb+');
+        if (false === @$file->ftell()) {
             throw new UploadException($this->lang->uppCannotOpenFile($location));
         }
         $position = is_null($seek) ? @$file->fseek(0, SEEK_END) : @$file->fseek($seek) ;
@@ -35,7 +35,8 @@ class VolumeObject extends VolumeBasic
             unset($file);
             throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
-        if (false === @$file->fwrite($content)) {
+        $status = @$file->fwrite($content);
+        if (false === $status || is_null($status)) { /** @phpstan-ignore-line probably bug in phpstan definitions */
             unset($file);
             throw new UploadException($this->lang->uppCannotWriteFile($location));
         }
@@ -44,16 +45,16 @@ class VolumeObject extends VolumeBasic
 
     /**
      * @param string $location
-     * @param int $offset
-     * @param int|null $limit
+     * @param int<0, max> $offset
+     * @param int<0, max>|null $limit
      * @return string
      * @throws UploadException
      * @codeCoverageIgnore
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        $file = new SplFileObject($location, 'r+');
-        if (!$file) {
+        $file = new SplFileObject($location, 'rb+');
+        if (false === @$file->ftell()) {
             throw new UploadException($this->lang->uppCannotOpenFile($location));
         }
         if (empty($limit)) {
@@ -65,7 +66,7 @@ class VolumeObject extends VolumeBasic
             unset($file);
             throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
-        $data = @$file->fread((int)$limit);
+        $data = @$file->fread(intval($limit));
 
         if (false === $data) {
             unset($file);
@@ -77,13 +78,13 @@ class VolumeObject extends VolumeBasic
 
     /**
      * @param string $location
-     * @param int $offset
+     * @param int<0, max> $offset
      * @throws UploadException
      * @codeCoverageIgnore
      */
     public function truncate(string $location, int $offset): void
     {
-        $file = new SplFileObject($location, 'r+');
+        $file = new SplFileObject($location, 'rb+');
         $file->rewind();
         if (!$file->ftruncate($offset)) {
             unset($file);

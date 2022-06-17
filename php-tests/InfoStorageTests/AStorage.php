@@ -20,6 +20,6 @@ abstract class AStorage extends CommonTestClass
 
     protected function mockStorage(): InfoStorage\AStorage
     {
-        return new InfoStorage\Volume(Translations::init());
+        return new InfoStorage\Volume(new Translations());
     }
 }

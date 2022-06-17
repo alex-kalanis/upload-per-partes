@@ -13,21 +13,22 @@ use Exception;
  */
 class CheckResponse extends AResponse
 {
+    /** @var string */
     protected $checksum = '';
 
-    public static function initOk(string $sharedKey, string $checksum): CheckResponse
+    public static function initOk(string $sharedKey, string $checksum): self
     {
         $l = new static();
         return $l->setData($sharedKey, $checksum, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, Exception $ex): CheckResponse
+    public static function initError(string $sharedKey, Exception $ex): self
     {
         $l = new static();
         return $l->setData($sharedKey, '', static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, string $checksum, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, string $checksum, string $status, string $errorMessage = self::STATUS_OK): self
     {
         $this->sharedKey = $sharedKey;
         $this->checksum = $checksum;
@@ -39,10 +40,10 @@ class CheckResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            "sharedKey" => (string)$this->sharedKey,
-            "checksum" => (string)$this->checksum,
-            "status" => (string)$this->status,
-            "errorMessage" => (string)$this->errorMessage,
+            'sharedKey' => (string)$this->sharedKey,
+            'checksum' => (string)$this->checksum,
+            'status' => (string)$this->status,
+            'errorMessage' => (string)$this->errorMessage,
         ];
     }
 }

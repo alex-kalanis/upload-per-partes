@@ -34,7 +34,7 @@ abstract class AStorage
      * Add part to file
      * @param string $location
      * @param string $content binary content
-     * @param int|null $seek where it save
+     * @param int<0, max>|null $seek where it save
      * @return void
      * @throws UploadException
      */
@@ -43,8 +43,8 @@ abstract class AStorage
     /**
      * Get part of file
      * @param string $location
-     * @param int $offset
-     * @param int $limit
+     * @param int<0, max> $offset
+     * @param int<0, max>|null $limit
      * @return string
      * @throws UploadException
      */
@@ -53,7 +53,7 @@ abstract class AStorage
     /**
      * Truncate data file
      * @param string $location
-     * @param int $offset
+     * @param int<0, max> $offset
      * @return void
      * @throws UploadException
      */

@@ -22,6 +22,8 @@ interface IUPPTranslations
 
     public function uppKeyVariantNotSet(): string;
 
+    public function uppKeyVariantIsWrong(string $className): string;
+
     public function uppTargetDirIsEmpty(): string;
 
     public function uppDriveFileAlreadyExists(string $driveFile): string;
@@ -31,6 +33,8 @@ interface IUPPTranslations
     public function uppDriveFileCannotRemove(string $key): string;
 
     public function uppDriveFileVariantNotSet(): string;
+
+    public function uppDriveFileVariantIsWrong(string $className): string;
 
     public function uppDriveFileCannotRead(string $key): string;
 

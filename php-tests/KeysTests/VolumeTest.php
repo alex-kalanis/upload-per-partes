@@ -18,7 +18,7 @@ class VolumeTest extends CommonTestClass
      */
     public function testThru(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $target->setRemoteFileName('poiuztrewq')->setTargetDir('/tmp/')->process();
         $lib = new Keys\SimpleVolume($lang, $target);

@@ -1,0 +1,19 @@
+parameters:
+	level: 7
+	paths:
+		- 'php-src'
+	scanFiles:
+		- 'php-tests/CommonTestClass.php'
+	excludePaths:
+		- 'php-src/InfoStorage/Predis.php'
+		- 'php-src/InfoStorage/Redis.php'
+		- 'php-tests/_autoload.php'
+		- 'php-tests/_bootstrap.php'
+		- 'php-tests/CommonTestClass.php'
+		- 'php-tests/testing-ipsum.txt'
+	bootstrapFiles:
+		- 'php-tests/_autoload.php'
+	ignoreErrors:
+		# integers into limited integers
+		- '#expects int\<0, max\>, int given.#'
+		- '#expects int\<0, max\>\|null, int given.#'

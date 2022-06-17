@@ -17,6 +17,7 @@ class Factory
     const FORMAT_TEXT = 1;
     const FORMAT_JSON = 2;
 
+    /** @var array<int, string> */
     protected static $map = [
         self::FORMAT_TEXT => '\kalanis\UploadPerPartes\InfoFormat\Text',
         self::FORMAT_JSON => '\kalanis\UploadPerPartes\InfoFormat\Json',
@@ -34,6 +35,10 @@ class Factory
             throw new UploadException($lang->uppDriveFileVariantNotSet());
         }
         $class = static::$map[$variant];
-        return new $class();
+        $lib = new $class();
+        if (!$lib instanceof AFormat) {
+            throw new UploadException($lang->uppDriveFileVariantIsWrong($class));
+        }
+        return $lib;
     }
 }

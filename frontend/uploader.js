@@ -1445,5 +1445,3 @@ var uploaderQuery = new UploaderQuery();
 var uploaderRemoteQuery = new UploaderRemoteQuery();
 var uploaderHandler = new UploaderHandler();
 var uploaderRenderer = new UploaderRenderer();
-
-

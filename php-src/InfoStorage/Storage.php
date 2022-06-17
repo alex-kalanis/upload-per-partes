@@ -3,7 +3,7 @@
 namespace kalanis\UploadPerPartes\InfoStorage;
 
 
-use kalanis\kw_storage\Storage as lib;
+use kalanis\kw_storage\Storage\Storage as lib;
 use kalanis\kw_storage\StorageException;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
@@ -13,7 +13,6 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  * Class Storage
  * @package kalanis\UploadPerPartes\InfoStorage
  * Processing info file in kw_storage
- * @codeCoverageIgnore
  */
 class Storage extends AStorage
 {
@@ -33,8 +32,6 @@ class Storage extends AStorage
     /**
      * @param string $key
      * @return bool
-     * @throws StorageException
-     * @codeCoverageIgnore
      */
     public function exists(string $key): bool
     {
@@ -44,38 +41,45 @@ class Storage extends AStorage
     /**
      * @param string $key
      * @return string
-     * @throws StorageException
-     * @codeCoverageIgnore
+     * @throws UploadException
      */
     public function load(string $key): string
     {
-        return (string)$this->storage->get($key);
-    }
-
-    /**
-     * @param string $key
-     * @param string $data
-     * @throws StorageException
-     * @throws UploadException
-     * @codeCoverageIgnore
-     */
-    public function save(string $key, string $data): void
-    {
-        if (false === $this->storage->set($key, $data, $this->timeout)) {
-            throw new UploadException($this->lang->uppDriveFileCannotWrite($key));
+        try {
+            return (string)$this->storage->read($key);
+        } catch (StorageException $ex) {
+            throw new UploadException($this->lang->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
         }
     }
 
     /**
      * @param string $key
-     * @throws StorageException
+     * @param string $data
      * @throws UploadException
-     * @codeCoverageIgnore
+     */
+    public function save(string $key, string $data): void
+    {
+        try {
+            if (false === $this->storage->write($key, $data, $this->timeout)) {
+                throw new UploadException($this->lang->uppDriveFileCannotWrite($key));
+            }
+        } catch (StorageException $ex) {
+            throw new UploadException($this->lang->uppDriveFileCannotWrite($key), $ex->getCode(), $ex);
+        }
+    }
+
+    /**
+     * @param string $key
+     * @throws UploadException
      */
     public function remove(string $key): void
     {
-        if (!$this->storage->delete($key)) {
-            throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
+        try {
+            if (!$this->storage->remove($key)) {
+                throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
+            }
+        } catch (StorageException $ex) {
+            throw new UploadException($this->lang->uppDriveFileCannotRemove($key), $ex->getCode(), $ex);
         }
     }
 }

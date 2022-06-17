@@ -14,7 +14,7 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
 abstract class AFormat
 {
     /**
-     * @param mixed $content
+     * @param string $content
      * @return Data
      * @throws UploadException
      */

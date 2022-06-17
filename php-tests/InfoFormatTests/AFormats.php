@@ -13,7 +13,7 @@ abstract class AFormats extends CommonTestClass
     public function tearDown(): void
     {
         if (is_file($this->mockTestFile())) {
-            $lib = new InfoStorage\Volume(Translations::init());
+            $lib = new InfoStorage\Volume(new Translations());
             $lib->remove($this->mockTestFile());
         }
         parent::tearDown();

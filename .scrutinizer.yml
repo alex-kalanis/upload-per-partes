@@ -1,0 +1,41 @@
+filter:
+  excluded_paths:
+    - 'vendor/*'
+    - 'php-tests/_autoload.php'
+    - 'php-tests/_bootstrap.php'
+    - 'php-tests/data/*'
+    - 'kw_tests/*'
+    - 'kw_upload/*'
+  paths: {  }
+
+build:
+  environment:
+    php:
+      version: '7.4'
+  dependencies:
+    before:
+      - wget -O composer.phar https://getcomposer.org/composer.phar
+      - chmod +x composer.phar
+      - ./composer.phar install
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
+    coverage:
+      tests:
+        override:
+          - command: XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover php-tests/data/clover.xml
+            coverage:
+              file:  php-tests/data/clover.xml
+              format: php-clover
+
+coding_style:
+  php:
+    spaces:
+      around_operators:
+        concatenation: true
+      ternary_operator:
+        in_short_version: false
+      other:
+        after_type_cast: true

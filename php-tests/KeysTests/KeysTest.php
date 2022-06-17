@@ -18,7 +18,7 @@ class KeysTest extends CommonTestClass
      */
     public function testInit(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\SimpleVolume', Keys\Factory::getVariant($lang, $target, Keys\Factory::VARIANT_VOLUME));
         $this->assertInstanceOf('\kalanis\UploadPerPartes\Keys\Random', Keys\Factory::getVariant($lang, $target, Keys\Factory::VARIANT_RANDOM));
@@ -30,7 +30,7 @@ class KeysTest extends CommonTestClass
      */
     public function testInitFail(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
         Keys\Factory::getVariant($lang, $target, 0);
@@ -40,9 +40,21 @@ class KeysTest extends CommonTestClass
     /**
      * @throws UploadException
      */
+    public function testClassFail(): void
+    {
+        $lang = new Translations();
+        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
+        $this->expectException(UploadException::class);
+        XFactory::getVariant($lang, $target, 10);
+        $this->expectExceptionMessageMatches('KEY VARIANT IS WRONG');
+    }
+
+    /**
+     * @throws UploadException
+     */
     public function testSharedFail(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new Keys\Random($lang, new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang)));
         $this->expectException(UploadException::class);
         $lib->getSharedKey(); // no key set!
@@ -56,8 +68,16 @@ class KeysTest extends CommonTestClass
     {
         $this->assertEquals('aaaaaaa', Keys\Random::generateRandomText(7, ['a','a','a','a']));
 
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new Keys\Random($lang, new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang)));
         $this->assertEquals('abcdefghi' . TargetSearch::FILE_DRIVER_SUFF, $lib->fromSharedKey('abcdefghi'));
     }
+}
+
+
+class XFactory extends Keys\Factory
+{
+    protected static $map = [
+        10 => '\stdClass',
+    ];
 }

@@ -212,13 +212,13 @@ class ProcessorTest extends CommonTestClass
 
     protected function initProcessor(): void
     {
-        $lang = Uploader\Translations::init();
+        $lang = new Uploader\Translations();
         $this->infoStorage = new Support\InfoRam($lang);
         $this->dataStorage = new Support\DataRam($lang);
         $target = new Uploader\TargetSearch($lang, $this->infoStorage, $this->dataStorage);
         $key = new Support\Key($lang, $target);
         $format = new InfoFormat\Json();
-        $hashed = Uploader\Hashed::init();
+        $hashed = new Uploader\Hashed();
         $this->driveFile = new Uploader\DriveFile($lang, $this->infoStorage, $format, $key);
         $this->processor = new Uploader\Processor($lang, $this->driveFile, $this->dataStorage, $hashed);
     }

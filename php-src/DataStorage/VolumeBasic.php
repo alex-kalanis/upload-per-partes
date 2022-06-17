@@ -20,10 +20,16 @@ class VolumeBasic extends AStorage
         return is_file($location);
     }
 
+    /**
+     * @param string $location
+     * @param string $content
+     * @param int<0, max>|null $seek
+     * @throws UploadException
+     */
     public function addPart(string $location, string $content, ?int $seek = null): void
     {
         if (is_null($seek)) {  // append to end
-            $pointer = @fopen($location, 'a');
+            $pointer = @fopen($location, 'ab');
             if (false == $pointer) {
                 throw new UploadException($this->lang->uppCannotOpenFile($location));
             }
@@ -35,7 +41,7 @@ class VolumeBasic extends AStorage
             }
             @fclose($pointer);
         } else { // append from position
-            $pointer = @fopen($location, 'r+');
+            $pointer = @fopen($location, 'rb+');
             if (false === $pointer) {
                 throw new UploadException($this->lang->uppCannotOpenFile($location));
             }
@@ -56,9 +62,16 @@ class VolumeBasic extends AStorage
         }
     }
 
+    /**
+     * @param string $location
+     * @param int $offset
+     * @param int|null $limit
+     * @return string
+     * @throws UploadException
+     */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        $pointer = @fopen($location, 'r');
+        $pointer = @fopen($location, 'rb');
         if (false == $pointer) {
             // @codeCoverageIgnoreStart
             throw new UploadException($this->lang->uppCannotOpenFile($location));
@@ -75,7 +88,7 @@ class VolumeBasic extends AStorage
             throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
         // @codeCoverageIgnoreEnd
-        $data = @fread($pointer, (int)$limit);
+        $data = @fread($pointer, intval($limit)); // @phpstan-ignore-line
 
         if (false === $data) {
             // @codeCoverageIgnoreStart
@@ -85,18 +98,25 @@ class VolumeBasic extends AStorage
         return $data;
     }
 
+    /**
+     * @param string $location
+     * @param int $offset
+     * @throws UploadException
+     */
     public function truncate(string $location, int $offset): void
     {
-        $pointer = @fopen($location, 'r+');
-        @rewind($pointer);
-        if (!ftruncate($pointer, $offset)) {
-            // @codeCoverageIgnoreStart
+        $pointer = @fopen($location, 'rb+');
+        if (false !== $pointer) {
+            @rewind($pointer);
+            if (!ftruncate($pointer, $offset)) { // @phpstan-ignore-line
+                // @codeCoverageIgnoreStart
+                @fclose($pointer);
+                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+                // @codeCoverageIgnoreEnd
+            }
+            @rewind($pointer);
             @fclose($pointer);
-            throw new UploadException($this->lang->uppCannotTruncateFile($location));
-            // @codeCoverageIgnoreEnd
         }
-        @rewind($pointer);
-        @fclose($pointer);
     }
 
     public function remove(string $location): void

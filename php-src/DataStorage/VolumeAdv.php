@@ -18,7 +18,7 @@ class VolumeAdv extends VolumeBasic
     /**
      * @param string $location
      * @param string $content
-     * @param int|null $seek
+     * @param int<0, max>|null $seek
      * @throws UploadException
      * @codeCoverageIgnore
      */
@@ -36,7 +36,7 @@ class VolumeAdv extends VolumeBasic
     /**
      * @param string $location
      * @param int $offset
-     * @param int|null $limit
+     * @param int<0, max>|null $limit
      * @return string
      * @throws UploadException
      * @codeCoverageIgnore

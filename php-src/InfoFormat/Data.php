@@ -8,21 +8,36 @@ namespace kalanis\UploadPerPartes\InfoFormat;
  * @package kalanis\UploadPerPartes\DriveFile
  * Driver metadata about processed file
  */
-class Data
+final class Data
 {
+    /** @var string */
     public $fileName = '';
+    /** @var string */
     public $tempLocation = '';
+    /** @var int */
     public $fileSize = 0;
+    /** @var int */
     public $partsCount = 0;
+    /** @var int */
     public $bytesPerPart = 0;
+    /** @var int */
     public $lastKnownPart = 0;
 
-    public static function init()
+    public static function init(): self
     {
         return new static();
     }
 
-    public function setData(string $fileName, string $tempLocation, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0)
+    /**
+     * @param string $fileName
+     * @param string $tempLocation
+     * @param int $fileSize
+     * @param int $partsCount
+     * @param int $bytesPerPart
+     * @param int $lastKnownPart
+     * @return $this
+     */
+    public function setData(string $fileName, string $tempLocation, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0): self
     {
         $this->fileName = $fileName; // final file path
         $this->tempLocation = $tempLocation; // path to temp file
@@ -33,7 +48,7 @@ class Data
         return $this;
     }
 
-    public function sanitizeData()
+    public function sanitizeData(): self
     {
         $this->fileName = (string)$this->fileName;
         $this->tempLocation = (string)$this->tempLocation;

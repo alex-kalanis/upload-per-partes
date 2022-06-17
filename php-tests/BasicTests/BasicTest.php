@@ -36,10 +36,10 @@ class BasicTest extends CommonTestClass
      */
     public function testCalculate(): void
     {
-        $lib = Calculates::init();
+        $lib = new Calculates();
         $this->assertEquals(Calculates::DEFAULT_BYTES_PER_PART, $lib->getBytesPerPart());
 
-        $lib2 = Calculates::init(20);
+        $lib2 = new Calculates(20);
         $this->assertEquals(20, $lib2->getBytesPerPart());
         $this->assertEquals(2, $lib2->calcParts(35));
         $this->assertEquals(2, $lib2->calcParts(40));

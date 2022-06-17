@@ -15,11 +15,6 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class Translations implements IUPPTranslations
 {
-    public static function init(): Translations
-    {
-        return new static();
-    }
-
     public function uppSentNameIsEmpty(): string
     {
         return 'SENT FILE NAME IS EMPTY';
@@ -45,6 +40,11 @@ class Translations implements IUPPTranslations
         return 'KEY VARIANT NOT SET';
     }
 
+    public function uppKeyVariantIsWrong(string $className): string
+    {
+        return 'KEY VARIANT IS WRONG';
+    }
+
     public function uppTargetDirIsEmpty(): string
     {
         return 'TARGET DIR IS NOT SET';
@@ -68,6 +68,11 @@ class Translations implements IUPPTranslations
     public function uppDriveFileVariantNotSet(): string
     {
         return 'DRIVEFILE VARIANT NOT SET';
+    }
+
+    public function uppDriveFileVariantIsWrong(string $className): string
+    {
+        return 'DRIVEFILE VARIANT IS WRONG';
     }
 
     public function uppDriveFileCannotRead(string $key): string

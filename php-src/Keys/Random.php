@@ -16,6 +16,7 @@ class Random extends AKey
     /** @var int */
     protected $keyLength = 64;
 
+    /** @var string[] */
     public static $possibilities = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 
     public function fromSharedKey(string $key): string
@@ -33,6 +34,11 @@ class Random extends AKey
         return $this;
     }
 
+    /**
+     * @param int $length
+     * @param string[] $possibilities
+     * @return string
+     */
     public static function generateRandomText(int $length, array $possibilities): string
     {
         $string = '';

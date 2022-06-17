@@ -13,19 +13,19 @@ use Exception;
  */
 class CancelResponse extends AResponse
 {
-    public static function initCancel(string $sharedKey): CancelResponse
+    public static function initCancel(string $sharedKey): self
     {
         $l = new static();
         return $l->setData($sharedKey, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, Exception $ex): CancelResponse
+    public static function initError(string $sharedKey, Exception $ex): self
     {
         $l = new static();
         return $l->setData($sharedKey, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, string $status, string $errorMessage = self::STATUS_OK): self
     {
         $this->sharedKey = $sharedKey;
         $this->status = $status;
@@ -36,9 +36,9 @@ class CancelResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            "sharedKey" => (string)$this->sharedKey,
-            "status" => (string)$this->status,
-            "errorMessage" => (string)$this->errorMessage,
+            'sharedKey' => (string)$this->sharedKey,
+            'status' => (string)$this->status,
+            'errorMessage' => (string)$this->errorMessage,
         ];
     }
 }

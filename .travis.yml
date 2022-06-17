@@ -12,11 +12,9 @@ before_script:
   - composer install
 
 script:
-  - XDEBUG_MODE=coverage phpunit --configuration phpunit.xml --coverage-clover php-tests/data/clover.xml
-
-after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover php-tests/data/clover.xml
+  - phpunit --configuration phpunit.xml --no-coverage
+  - PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --format=txt --verbose --diff --allow-risky=yes --config=.php-cs-fixer.dist.php
+  - vendor/bin/phpstan analyse -c phpstan.neon
 
 notifications:
   email: "me@kalanys.com"

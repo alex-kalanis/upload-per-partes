@@ -17,7 +17,7 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoRemote(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
         $lib->process();
@@ -29,7 +29,7 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoTarget(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $lib->setRemoteFileName('abcdefg');
         $this->expectException(UploadException::class);
@@ -42,7 +42,7 @@ class TargetTest extends CommonTestClass
      */
     public function testFailNoBase(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $this->expectException(UploadException::class);
         $lib->getFinalTargetName();
@@ -54,7 +54,7 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessClear(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what can be found$.here')->process();
         $this->assertEquals('what_can_be_found.here', $lib->getFinalTargetName());
@@ -67,7 +67,7 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessNoClear(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $lib = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang), false, false);
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('what el$e can be found')->process();
         $this->assertEquals('what el$e can be found', $lib->getFinalTargetName());
@@ -80,7 +80,7 @@ class TargetTest extends CommonTestClass
      */
     public function testProcessNameLookup(): void
     {
-        $lang = Translations::init();
+        $lang = new Translations();
         $dataRam = new Support\DataRam($lang);
         $dataRam->addPart($this->getTestDir() . 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm');
         $dataRam->addPart($this->getTestDir() . 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm');

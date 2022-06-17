@@ -67,7 +67,7 @@ class DriveFile
      * Update upload info
      * @param string $sharedKey
      * @param InfoFormat\Data $data
-     * @param int $last
+     * @param int<0, max> $last
      * @param bool $checkContinuous
      * @return bool
      * @throws Exceptions\UploadException

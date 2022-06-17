@@ -17,19 +17,19 @@ class UploadResponse extends AResponse
     /** @var null|InfoFormat\Data */
     protected $data = null;
 
-    public static function initOK(string $sharedKey, InfoFormat\Data $data): UploadResponse
+    public static function initOK(string $sharedKey, InfoFormat\Data $data): self
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, InfoFormat\Data $data, Exception $ex): UploadResponse
+    public static function initError(string $sharedKey, InfoFormat\Data $data, Exception $ex): self
     {
         $l = new static();
         return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
     }
 
-    public function setData(string $sharedKey, InfoFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK)
+    public function setData(string $sharedKey, InfoFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK): self
     {
         $this->sharedKey = $sharedKey;
         $this->data = $data;
@@ -41,10 +41,10 @@ class UploadResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            "sharedKey" => $this->sharedKey,
-            "lastKnownPart" => (int)$this->data->lastKnownPart,
-            "status" => $this->status,
-            "errorMessage" => $this->errorMessage,
+            'sharedKey' => $this->sharedKey,
+            'lastKnownPart' => (int)$this->data->lastKnownPart,
+            'status' => $this->status,
+            'errorMessage' => $this->errorMessage,
         ];
     }
 }

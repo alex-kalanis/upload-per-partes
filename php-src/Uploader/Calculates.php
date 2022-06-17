@@ -15,11 +15,6 @@ class Calculates
     /** @var int */
     protected $bytesPerPart = 0;
 
-    public static function init(int $bytesPerPart = null): Calculates
-    {
-        return new static($bytesPerPart);
-    }
-
     public function __construct(int $bytesPerPart = null)
     {
         $this->bytesPerPart = empty($bytesPerPart) ? static::DEFAULT_BYTES_PER_PART : $bytesPerPart ;
