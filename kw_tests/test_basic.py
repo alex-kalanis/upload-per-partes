@@ -31,10 +31,10 @@ class BasicTest(CommonTestClass):
         assert 'f'      == Strings.substr('abcdef', -1, None)
 
     def test_calculate(self):
-        lib = Calculates.init()
+        lib = Calculates()
         assert Calculates.DEFAULT_BYTES_PER_PART == lib.get_bytes_per_part()
 
-        lib2 = Calculates.init(20)
+        lib2 = Calculates(20)
         assert 20 == lib2.get_bytes_per_part()
         assert  2 == lib2.calc_parts(35)
         assert  2 == lib2.calc_parts(40)

@@ -14,10 +14,6 @@ class Calculates:
 
     DEFAULT_BYTES_PER_PART = 262144  # 1024*256
 
-    @staticmethod
-    def init(bytes_per_part: int = None):
-        return Calculates(bytes_per_part)
-
     def __init__(self, bytes_per_part: int = None):
         self._bytes_per_part = bytes_per_part if bytes_per_part else self.DEFAULT_BYTES_PER_PART
 
@@ -94,15 +90,15 @@ class TargetSearch:
 
     def _check_remote_name(self):
         if not len(self._remote_file_name):
-            raise UploadException(self._lang.sent_name_is_empty())
+            raise UploadException(self._lang.upp_sent_name_is_empty())
 
     def _check_target_dir(self):
         if not len(self._target_dir):
-            raise UploadException(self._lang.target_dir_is_empty())
+            raise UploadException(self._lang.upp_target_dir_is_empty())
 
     def _check_file_base(self):
         if not len(self._file_base):
-            raise UploadException(self._lang.upload_name_is_empty())
+            raise UploadException(self._lang.upp_upload_name_is_empty())
 
     def _find_free_name(self):
         """

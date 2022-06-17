@@ -32,7 +32,7 @@ class DriveFile:
         :raise: ContinuityUploadException
         """
         if is_new and self.exists(shared_key):
-            raise ContinuityUploadException(self._lang.drive_file_already_exists())
+            raise ContinuityUploadException(self._lang.upp_drive_file_already_exists(shared_key))
         self._storage.save(self._key.from_shared_key(shared_key), self._format.to_format(data_pack))
         return True
 
@@ -57,7 +57,7 @@ class DriveFile:
         """
         if check_continuous:
             if (data_pack.last_known_part + 1) != last:
-                raise UploadException(self._lang.drive_file_not_continuous())
+                raise UploadException(self._lang.upp_drive_file_not_continuous(shared_key))
 
         data_pack.last_known_part = last
         self._storage.save(self._key.from_shared_key(shared_key), self._format.to_format(data_pack))
@@ -128,7 +128,7 @@ class Processor:
 
         if segment:
             if segment > data_pack.last_known_part + 1:
-                raise UploadException(self._lang.read_too_early())
+                raise UploadException(self._lang.upp_read_too_early(shared_key))
             self._storage.add_part(data_pack.temp_location, content, segment * data_pack.bytes_per_part)
         else:
             segment = data_pack.last_known_part + 1
@@ -187,11 +187,11 @@ class Processor:
         :raise: UploadException
         """
         if segment < 0:
-            raise UploadException(self._lang.segment_out_of_bounds())
+            raise UploadException(self._lang.upp_segment_out_of_bounds(segment))
         if segment > data_pack.parts_count:
-            raise UploadException(self._lang.segment_out_of_bounds())
+            raise UploadException(self._lang.upp_segment_out_of_bounds(segment))
         if segment > data_pack.last_known_part:
-            raise UploadException(self._lang.segment_not_uploaded_yet())
+            raise UploadException(self._lang.upp_segment_not_uploaded_yet(segment))
 
 
 class Uploader:

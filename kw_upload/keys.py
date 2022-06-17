@@ -26,7 +26,7 @@ class AKey:
 
     def _check_shared_key(self):
         if not self._shared_key or 0 == len(self._shared_key):
-            raise UploadException(self._lang.shared_key_is_empty())
+            raise UploadException(self._lang.upp_shared_key_is_empty())
 
 
 class SimpleVolume(AKey):
@@ -41,7 +41,7 @@ class SimpleVolume(AKey):
         try:
             return base64.b64decode(key.encode("utf-8")).decode("utf-8").strip()
         except binascii.Error:
-            raise UploadException(self._lang.shared_key_is_invalid())
+            raise UploadException(self._lang.upp_shared_key_is_invalid())
 
     def generate_keys(self):
         import base64

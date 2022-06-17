@@ -78,13 +78,13 @@ class VolumeBasic(AStorage):
             try:
                 fp = open(location, 'ab')
                 if 'fp' not in locals():
-                    raise UploadException(self._lang.cannot_open_file())
+                    raise UploadException(self._lang.upp_cannot_open_file(location))
                 if not fp.write(content):
-                    raise UploadException(self._lang.cannot_write_file())
+                    raise UploadException(self._lang.upp_cannot_write_file(location))
             except IsADirectoryError as err:
-                raise UploadException(self._lang.cannot_open_file()) from err
+                raise UploadException(self._lang.upp_cannot_open_file(location)) from err
             except PermissionError as err:
-                raise UploadException(self._lang.cannot_write_file()) from err
+                raise UploadException(self._lang.upp_cannot_write_file(location)) from err
             finally:
                 if 'fp' in locals():
                     fp.close()
@@ -92,15 +92,15 @@ class VolumeBasic(AStorage):
             try:
                 fp = open(location, 'rb+')
                 if 'fp' not in locals():
-                    raise UploadException(self._lang.cannot_open_file())
+                    raise UploadException(self._lang.upp_cannot_open_file(location))
                 if not fp.seek(seek):
-                    raise UploadException(self._lang.cannot_seek_file())
+                    raise UploadException(self._lang.upp_cannot_seek_file(location))
                 if not fp.write(content):
-                    raise UploadException(self._lang.cannot_write_file())
+                    raise UploadException(self._lang.upp_cannot_write_file(location))
             except IsADirectoryError as err:
-                raise UploadException(self._lang.cannot_open_file()) from err
+                raise UploadException(self._lang.upp_cannot_open_file(location)) from err
             except PermissionError as err:
-                raise UploadException(self._lang.cannot_write_file()) from err
+                raise UploadException(self._lang.upp_cannot_write_file(location)) from err
             finally:
                 if 'fp' in locals():
                     fp.close()
@@ -109,7 +109,7 @@ class VolumeBasic(AStorage):
         try:
             fp = open(location, 'rb')
             if 'fp' not in locals():
-                raise UploadException(self._lang.cannot_open_file())
+                raise UploadException(self._lang.upp_cannot_open_file(location))
 
             if not limit:
                 fp.seek(0, 2)
@@ -117,18 +117,18 @@ class VolumeBasic(AStorage):
 
             position = fp.seek(offset, 0)
             if position < 0:
-                raise UploadException(self._lang.cannot_seek_file())
+                raise UploadException(self._lang.upp_cannot_seek_file(location))
 
             data = fp.read(limit if limit else -1)
             if not data:
-                raise UploadException(self._lang.cannot_read_file())
+                raise UploadException(self._lang.upp_cannot_read_file(location))
 
             return bytes(data)
 
         except IsADirectoryError as err:
-            raise UploadException(self._lang.cannot_open_file()) from err
+            raise UploadException(self._lang.upp_cannot_open_file()) from err
         except PermissionError as err:
-            raise UploadException(self._lang.cannot_read_file()) from err
+            raise UploadException(self._lang.upp_cannot_read_file()) from err
         finally:
             if 'fp' in locals():
                 fp.close()
@@ -137,15 +137,15 @@ class VolumeBasic(AStorage):
         try:
             fp = open(location, 'rb+')
             if 'fp' not in locals():
-                raise UploadException(self._lang.cannot_open_file())
+                raise UploadException(self._lang.upp_cannot_open_file(location))
             fp.seek(0)
             if not fp.truncate(offset):
-                raise UploadException(self._lang.cannot_truncate_file())
+                raise UploadException(self._lang.upp_cannot_truncate_file(location))
             fp.seek(0)
         except IsADirectoryError as err:
-            raise UploadException(self._lang.cannot_open_file()) from err
+            raise UploadException(self._lang.upp_cannot_open_file(location)) from err
         except PermissionError as err:
-            raise UploadException(self._lang.cannot_truncate_file()) from err
+            raise UploadException(self._lang.upp_cannot_truncate_file(location)) from err
         finally:
             if 'fp' in locals():
                 fp.close()
@@ -155,4 +155,4 @@ class VolumeBasic(AStorage):
         try:
             os.unlink(location)
         except OSError as err:
-            raise UploadException(self._lang.cannot_remove_data()) from err
+            raise UploadException(self._lang.upp_cannot_remove_data(location)) from err

@@ -39,13 +39,13 @@ class Volume(AStorage):
             fp = open(key, 'r+')
             content = fp.read(10000)
             if not content:
-                raise UploadException(self._lang.drive_file_cannot_read())
+                raise UploadException(self._lang.upp_drive_file_cannot_read(key))
             return str(content)
 
         except IsADirectoryError as err:
-            raise UploadException(self._lang.drive_file_cannot_read()) from err
+            raise UploadException(self._lang.upp_drive_file_cannot_read(key)) from err
         except PermissionError as err:
-            raise UploadException(self._lang.drive_file_cannot_read()) from err
+            raise UploadException(self._lang.upp_drive_file_cannot_read(key)) from err
         finally:
             if 'fp' in locals():
                 fp.close()
@@ -54,14 +54,14 @@ class Volume(AStorage):
         try:
             fp = open(key, 'w')
             if 'fp' not in locals():
-                raise UploadException(self._lang.drive_file_cannot_write())
+                raise UploadException(self._lang.upp_drive_file_cannot_write(key))
             if not fp.write(data):
-                raise UploadException(self._lang.drive_file_cannot_write())
+                raise UploadException(self._lang.upp_drive_file_cannot_write(key))
 
         except IsADirectoryError as err:
-            raise UploadException(self._lang.drive_file_cannot_write()) from err
+            raise UploadException(self._lang.upp_drive_file_cannot_write(key)) from err
         except PermissionError as err:
-            raise UploadException(self._lang.drive_file_cannot_write()) from err
+            raise UploadException(self._lang.upp_drive_file_cannot_write(key)) from err
         finally:
             if 'fp' in locals():
                 fp.close()
@@ -70,7 +70,7 @@ class Volume(AStorage):
         try:
             os.unlink(key)
         except OSError as err:
-            raise UploadException(self._lang.drive_file_cannot_remove()) from err
+            raise UploadException(self._lang.upp_drive_file_cannot_remove(key)) from err
 
 
 class Redis(AStorage):
