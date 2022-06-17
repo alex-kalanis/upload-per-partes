@@ -22,7 +22,7 @@ class TargetSearch
     const FILE_VER_SEP = '.';
     const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    /** @var IUPPTranslations|null */
+    /** @var IUPPTranslations */
     protected $lang = null;
     /** @var InfoStorage\AStorage */
     protected $infoStorage = null;

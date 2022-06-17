@@ -35,7 +35,7 @@ class VolumeBasic extends AStorage
             }
             if (false === @fwrite($pointer, $content)) {
                 // @codeCoverageIgnoreStart
-                @fclose($pointer);
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
                 throw new UploadException($this->lang->uppCannotWriteFile($location));
                 // @codeCoverageIgnoreEnd
             }
@@ -75,16 +75,22 @@ class VolumeBasic extends AStorage
         if (false == $pointer) {
             // @codeCoverageIgnoreStart
             throw new UploadException($this->lang->uppCannotOpenFile($location));
-            // @codeCoverageIgnoreEnd
         }
+        // @codeCoverageIgnoreEnd
         if (empty($limit)) {
-            @fseek($pointer, 0, SEEK_END);
+            $stat = @fseek($pointer, 0, SEEK_END);
+            if (-1 == $stat) {
+                // @codeCoverageIgnoreStart
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
+                throw new UploadException($this->lang->uppCannotSeekFile($location));
+            }
+            // @codeCoverageIgnoreEnd
             $limit = @ftell($pointer) - $offset;
         }
         // @codeCoverageIgnoreStart
         $position = @fseek($pointer, $offset, SEEK_SET);
-        if ($position == -1) {
-            @fclose($pointer);
+        if (-1 == $position) {
+            /** @scrutinizer ignore-unhandled */@fclose($pointer);
             throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
         // @codeCoverageIgnoreEnd
@@ -107,15 +113,21 @@ class VolumeBasic extends AStorage
     {
         $pointer = @fopen($location, 'rb+');
         if (false !== $pointer) {
-            @rewind($pointer);
+            $stat = @rewind($pointer);
+            if (false === $stat) {
+                // @codeCoverageIgnoreStart
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
+                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+            }
+            // @codeCoverageIgnoreEnd
             if (!ftruncate($pointer, $offset)) { // @phpstan-ignore-line
                 // @codeCoverageIgnoreStart
-                @fclose($pointer);
+                /** @scrutinizer ignore-unhandled */@fclose($pointer);
                 throw new UploadException($this->lang->uppCannotTruncateFile($location));
-                // @codeCoverageIgnoreEnd
             }
-            @rewind($pointer);
-            @fclose($pointer);
+            // @codeCoverageIgnoreEnd
+            /** @scrutinizer ignore-unhandled */@rewind($pointer);
+            /** @scrutinizer ignore-unhandled */@fclose($pointer);
         }
     }
 

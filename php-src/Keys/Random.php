@@ -26,7 +26,7 @@ class Random extends AKey
 
     /**
      * @return AKey
-     * @codeCoverageIgnore are you really want to check random key generator?
+     * @codeCoverageIgnore do you really want to check random key generator?
      */
     public function generateKeys(): parent
     {

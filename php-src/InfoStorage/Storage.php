@@ -16,7 +16,7 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class Storage extends AStorage
 {
-    /** @var null|lib */
+    /** @var lib */
     protected $storage = null;
     /** @var int */
     protected $timeout = 0;

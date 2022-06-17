@@ -45,7 +45,7 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()->getAll($target);
+        $uploaded = $lib->getStorage()/** @scrutinizer ignore-call */->getAll($target);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
@@ -98,6 +98,10 @@ class UploadTest extends CommonTestClass
                 $this->assertEquals(md5($part), $result4->jsonSerialize()['checksum']);
             }
         }
+        if (!isset($result5)) {
+            $this->assertTrue(false, 'No results');
+            return;
+        }
         $lastKnownPart = $result5->jsonSerialize()['lastKnownPart'];
         $this->assertEquals(314, $lastKnownPart);
 
@@ -115,7 +119,7 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result7->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()->getAll($target);
+        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
@@ -145,7 +149,7 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $this->assertEmpty($lib->getStorage()->getAll($target));
+        $this->assertEmpty($lib->getStorage()->/** @scrutinizer ignore-call */getAll($target));
     }
 
     /**

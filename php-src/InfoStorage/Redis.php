@@ -16,7 +16,7 @@ use Redis as lib;
  */
 class Redis extends AStorage
 {
-    /** @var null|lib */
+    /** @var lib */
     protected $redis = null;
     /** @var int */
     protected $timeout = 0;

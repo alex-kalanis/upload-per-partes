@@ -16,12 +16,12 @@ use Predis as lib;
  */
 class Predis extends AStorage
 {
-    /** @var null|lib\Client */
+    /** @var lib\Client */
     protected $redis = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(IUPPTranslations $lang, lib\Client $redis, int $timeout = 3600)
+    public function __construct(IUPPTranslations $lang, lib\Client $redis, ?int $timeout = 3600)
     {
         // path is not a route but redis key
         parent::__construct($lang);
@@ -56,7 +56,7 @@ class Predis extends AStorage
      */
     public function save(string $key, string $data): void
     {
-        if (is_null($this->timeout)) {
+        if (empty($this->timeout)) {
             $this->redis->set($key, $data);
         } else {
             $this->redis->set($key, $data, 'EX', $this->timeout);

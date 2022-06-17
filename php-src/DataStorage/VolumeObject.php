@@ -4,6 +4,7 @@ namespace kalanis\UploadPerPartes\DataStorage;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use RuntimeException;
 use SplFileObject;
 
 
@@ -53,27 +54,35 @@ class VolumeObject extends VolumeBasic
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
-        $file = new SplFileObject($location, 'rb+');
-        if (false === @$file->ftell()) {
-            throw new UploadException($this->lang->uppCannotOpenFile($location));
-        }
-        if (empty($limit)) {
-            @$file->fseek(0, SEEK_END);
-            $limit = @$file->ftell() - $offset;
-        }
-        $position = @$file->fseek($offset, SEEK_SET);
-        if ($position == -1) {
-            unset($file);
-            throw new UploadException($this->lang->uppCannotSeekFile($location));
-        }
-        $data = @$file->fread(intval($limit));
+        try {
+            $file = new SplFileObject($location, 'rb+');
+            if (false === @$file->ftell()) {
+                throw new UploadException($this->lang->uppCannotOpenFile($location));
+            }
+            if (empty($limit)) {
+                $position = @$file->fseek(0, SEEK_END);
+                if ($position == -1) {
+                    unset($file);
+                    throw new UploadException($this->lang->uppCannotSeekFile($location));
+                }
+                $limit = @$file->ftell() - $offset;
+            }
+            $position = @$file->fseek($offset, SEEK_SET);
+            if ($position == -1) {
+                unset($file);
+                throw new UploadException($this->lang->uppCannotSeekFile($location));
+            }
+            $data = @$file->fread(intval($limit));
 
-        if (false === $data) {
+            if (false === $data) {
+                unset($file);
+                throw new UploadException($this->lang->uppCannotReadFile($location));
+            }
             unset($file);
-            throw new UploadException($this->lang->uppCannotReadFile($location));
+            return $data;
+        } catch (RuntimeException $ex) {
+            throw new UploadException($this->lang->uppCannotReadFile($location), 0, $ex);
         }
-        unset($file);
-        return $data;
     }
 
     /**
@@ -84,13 +93,17 @@ class VolumeObject extends VolumeBasic
      */
     public function truncate(string $location, int $offset): void
     {
-        $file = new SplFileObject($location, 'rb+');
-        $file->rewind();
-        if (!$file->ftruncate($offset)) {
+        try {
+            $file = new SplFileObject($location, 'rb+');
+            $file->rewind();
+            if (!$file->ftruncate($offset)) {
+                unset($file);
+                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+            }
+            $file->rewind();
             unset($file);
-            throw new UploadException($this->lang->uppCannotTruncateFile($location));
+        } catch (RuntimeException $ex) {
+            throw new UploadException($this->lang->uppCannotTruncateFile($location), 0, $ex);
         }
-        @$file->rewind();
-        unset($file);
     }
 }
