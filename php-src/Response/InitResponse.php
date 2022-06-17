@@ -41,13 +41,13 @@ class InitResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'name' => (string)$this->data->fileName,
-            'sharedKey' => (string)$this->sharedKey,
-            'totalParts' => (int)$this->data->partsCount,
-            'lastKnownPart' => (int)$this->data->lastKnownPart,
-            'partSize' => (int)$this->data->bytesPerPart,
-            'status' => (string)$this->status,
-            'errorMessage' => (string)$this->errorMessage,
+            'name' => strval($this->data->fileName),
+            'sharedKey' => strval($this->sharedKey),
+            'totalParts' => intval($this->data->partsCount),
+            'lastKnownPart' => intval($this->data->lastKnownPart),
+            'partSize' => intval($this->data->bytesPerPart),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

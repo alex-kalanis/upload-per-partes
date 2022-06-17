@@ -56,10 +56,10 @@ class DoneResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'name' => (string)$this->data->fileName,
-            'sharedKey' => (string)$this->sharedKey,
-            'status' => (string)$this->status,
-            'errorMessage' => (string)$this->errorMessage,
+            'name' => strval($this->data->fileName),
+            'sharedKey' => strval($this->sharedKey),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

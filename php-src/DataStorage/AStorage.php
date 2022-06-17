@@ -25,8 +25,8 @@ abstract class AStorage
     /**
      * If that file exists
      * @param string $location
-     * @return bool
      * @throws UploadException
+     * @return bool
      */
     abstract public function exists(string $location): bool;
 
@@ -35,8 +35,8 @@ abstract class AStorage
      * @param string $location
      * @param string $content binary content
      * @param int<0, max>|null $seek where it save
-     * @return void
      * @throws UploadException
+     * @return void
      */
     abstract public function addPart(string $location, string $content, ?int $seek = null): void;
 
@@ -45,8 +45,8 @@ abstract class AStorage
      * @param string $location
      * @param int<0, max> $offset
      * @param int<0, max>|null $limit
-     * @return string
      * @throws UploadException
+     * @return string
      */
     abstract public function getPart(string $location, int $offset, ?int $limit = null): string;
 
@@ -54,8 +54,8 @@ abstract class AStorage
      * Truncate data file
      * @param string $location
      * @param int<0, max> $offset
-     * @return void
      * @throws UploadException
+     * @return void
      */
     abstract public function truncate(string $location, int $offset): void;
 

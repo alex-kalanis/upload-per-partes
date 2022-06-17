@@ -39,9 +39,9 @@ class DriveFile
      * @param string $sharedKey
      * @param InfoFormat\Data $data
      * @param bool $isNew
-     * @return bool
      * @throws Exceptions\UploadException
      * @throws Exceptions\ContinuityUploadException
+     * @return bool
      */
     public function write(string $sharedKey, InfoFormat\Data $data, bool $isNew = false): bool
     {
@@ -55,8 +55,8 @@ class DriveFile
     /**
      * Read drive file
      * @param string $sharedKey
-     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
+     * @return InfoFormat\Data
      */
     public function read(string $sharedKey): InfoFormat\Data
     {
@@ -69,8 +69,8 @@ class DriveFile
      * @param InfoFormat\Data $data
      * @param int<0, max> $last
      * @param bool $checkContinuous
-     * @return bool
      * @throws Exceptions\UploadException
+     * @return bool
      */
     public function updateLastPart(string $sharedKey, InfoFormat\Data $data, int $last, bool $checkContinuous = true): bool
     {
@@ -87,8 +87,8 @@ class DriveFile
     /**
      * Delete drive file - usually on finish or discard
      * @param string $sharedKey
-     * @return bool
      * @throws Exceptions\UploadException
+     * @return bool
      */
     public function remove(string $sharedKey): bool
     {
@@ -99,8 +99,8 @@ class DriveFile
     /**
      * Has driver data? Mainly for testing
      * @param string $sharedKey
-     * @return bool
      * @throws Exceptions\UploadException
+     * @return bool
      */
     public function exists(string $sharedKey): bool
     {

@@ -32,7 +32,7 @@ class VolumeObject extends VolumeBasic
             throw new UploadException($this->lang->uppCannotOpenFile($location));
         }
         $position = is_null($seek) ? @$file->fseek(0, SEEK_END) : @$file->fseek($seek) ;
-        if ($position == -1) {
+        if (-1 == $position) {
             unset($file);
             throw new UploadException($this->lang->uppCannotSeekFile($location));
         }
@@ -48,8 +48,8 @@ class VolumeObject extends VolumeBasic
      * @param string $location
      * @param int<0, max> $offset
      * @param int<0, max>|null $limit
-     * @return string
      * @throws UploadException
+     * @return string
      * @codeCoverageIgnore
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string
@@ -61,14 +61,14 @@ class VolumeObject extends VolumeBasic
             }
             if (empty($limit)) {
                 $position = @$file->fseek(0, SEEK_END);
-                if ($position == -1) {
+                if (-1 == $position) {
                     unset($file);
                     throw new UploadException($this->lang->uppCannotSeekFile($location));
                 }
                 $limit = @$file->ftell() - $offset;
             }
             $position = @$file->fseek($offset, SEEK_SET);
-            if ($position == -1) {
+            if (-1 == $position) {
                 unset($file);
                 throw new UploadException($this->lang->uppCannotSeekFile($location));
             }

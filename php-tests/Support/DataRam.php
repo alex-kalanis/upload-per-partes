@@ -59,8 +59,8 @@ class DataRam extends AStorage
 
     /**
      * @param string $location
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getAll(string $location = ''): string
     {

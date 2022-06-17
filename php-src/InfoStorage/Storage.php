@@ -40,8 +40,8 @@ class Storage extends AStorage
 
     /**
      * @param string $key
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function load(string $key): string
     {

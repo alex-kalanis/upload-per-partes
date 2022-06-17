@@ -15,15 +15,15 @@ abstract class AFormat
 {
     /**
      * @param string $content
-     * @return Data
      * @throws UploadException
+     * @return Data
      */
     abstract public function fromFormat(string $content): Data;
 
     /**
      * @param Data $data
-     * @return string
      * @throws UploadException
+     * @return string
      */
     abstract public function toFormat(Data $data): string;
 }

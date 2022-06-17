@@ -41,10 +41,10 @@ class UploadResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => $this->sharedKey,
-            'lastKnownPart' => (int)$this->data->lastKnownPart,
-            'status' => $this->status,
-            'errorMessage' => $this->errorMessage,
+            'sharedKey' => strval($this->sharedKey),
+            'lastKnownPart' => intval($this->data->lastKnownPart),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

@@ -50,12 +50,12 @@ final class Data
 
     public function sanitizeData(): self
     {
-        $this->fileName = (string)$this->fileName;
-        $this->tempLocation = (string)$this->tempLocation;
-        $this->fileSize = (int)$this->fileSize;
-        $this->partsCount = (int)$this->partsCount;
-        $this->bytesPerPart = (int)$this->bytesPerPart;
-        $this->lastKnownPart = (int)$this->lastKnownPart;
+        $this->fileName = strval($this->fileName);
+        $this->tempLocation = strval($this->tempLocation);
+        $this->fileSize = intval($this->fileSize);
+        $this->partsCount = intval($this->partsCount);
+        $this->bytesPerPart = intval($this->bytesPerPart);
+        $this->lastKnownPart = intval($this->lastKnownPart);
         return $this;
     }
 }

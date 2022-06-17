@@ -41,10 +41,10 @@ class TruncateResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => (string)$this->sharedKey,
-            'lastKnownPart' => (int)$this->data->lastKnownPart,
-            'status' => (string)$this->status,
-            'errorMessage' => (string)$this->errorMessage,
+            'sharedKey' => strval($this->sharedKey),
+            'lastKnownPart' => intval($this->data->lastKnownPart),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

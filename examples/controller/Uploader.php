@@ -31,7 +31,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         $lib = new UploadPerPartes\examples\Uploader();
         $this->sendResponse($lib->check(
             $this->getHttpRequest()->getPost()->__get('sharedKey'),
-            (int)$this->getHttpRequest()->getPost()->__get('segment'))
+            intval($this->getHttpRequest()->getPost()->__get('segment')))
         );
     }
 

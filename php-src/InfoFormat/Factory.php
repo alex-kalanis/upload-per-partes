@@ -26,8 +26,8 @@ class Factory
     /**
      * @param IUPPTranslations $lang
      * @param int $variant
-     * @return AFormat
      * @throws UploadException
+     * @return AFormat
      */
     public static function getFormat(IUPPTranslations $lang, int $variant): AFormat
     {

@@ -81,8 +81,8 @@ class TargetSearch
     }
 
     /**
-     * @return $this
      * @throws UploadException
+     * @return $this
      */
     public function process(): self
     {
@@ -97,8 +97,8 @@ class TargetSearch
 
 
     /**
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getDriverLocation(): string
     {
@@ -107,8 +107,8 @@ class TargetSearch
     }
 
     /**
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getFinalTargetName(): string
     {
@@ -117,8 +117,8 @@ class TargetSearch
     }
 
     /**
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getTemporaryTargetLocation(): string
     {
@@ -186,7 +186,7 @@ class TargetSearch
         $this->fileBase = mb_substr(
             $this->fileBase($f),
             0,
-            (static::WIN_NAME_LEN_LIMIT - (int)mb_strlen($this->fileExt))
+            (static::WIN_NAME_LEN_LIMIT - intval(mb_strlen($this->fileExt)))
         ); // win limit... cut more due possibility of uploading multiple files with same name
     }
 

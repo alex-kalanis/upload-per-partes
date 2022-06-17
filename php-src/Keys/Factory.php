@@ -30,8 +30,8 @@ class Factory
      * @param IUPPTranslations $lang
      * @param TargetSearch $target
      * @param int $variant
-     * @return AKey
      * @throws UploadException
+     * @return AKey
      */
     public static function getVariant(IUPPTranslations $lang, TargetSearch $target, int $variant): AKey
     {

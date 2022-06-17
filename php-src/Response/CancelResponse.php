@@ -36,9 +36,9 @@ class CancelResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => (string)$this->sharedKey,
-            'status' => (string)$this->status,
-            'errorMessage' => (string)$this->errorMessage,
+            'sharedKey' => strval($this->sharedKey),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

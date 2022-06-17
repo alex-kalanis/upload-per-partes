@@ -18,7 +18,7 @@ class Text extends AFormat
         $lines = explode(static::LINE_SEPARATOR, $content);
         $libData = new Data();
         foreach ($lines as $line) {
-            if (mb_strlen($line) > 0) {
+            if (0 < mb_strlen($line)) {
                 list($key, $value, $nothing) = explode(static::DATA_SEPARATOR, $line);
                 $libData->{$key} = $value;
             }
@@ -28,7 +28,7 @@ class Text extends AFormat
 
     public function toFormat(Data $data): string
     {
-        $dataArray = (array)$data;
+        $dataArray = (array) $data;
         $dataLines = [];
         foreach ($dataArray as $key => $value) {
             $dataLines[] = implode(static::DATA_SEPARATOR, [$key, $value, '']);

@@ -20,8 +20,8 @@ class Strings
      * @param int $offset
      * @param int|null $limit
      * @param string $errorMessage
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public static function substr(string $what, int $offset, ?int $limit, string $errorMessage = ''): string
     {

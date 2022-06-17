@@ -22,6 +22,6 @@ class Json extends AFormat
 
     public function toFormat(Data $data): string
     {
-        return (string)json_encode($data);
+        return strval(json_encode($data));
     }
 }

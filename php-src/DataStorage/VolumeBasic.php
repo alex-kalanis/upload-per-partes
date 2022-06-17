@@ -47,7 +47,7 @@ class VolumeBasic extends AStorage
             }
             // @codeCoverageIgnoreStart
             $position = @fseek($pointer, $seek);
-            if ($position == -1) {
+            if (-1 == $position) {
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
                 throw new UploadException($this->lang->uppCannotSeekFile($location));
             }
@@ -66,8 +66,8 @@ class VolumeBasic extends AStorage
      * @param string $location
      * @param int $offset
      * @param int|null $limit
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {

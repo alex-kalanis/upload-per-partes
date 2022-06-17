@@ -27,7 +27,7 @@ class Calculates
 
     public function calcParts(int $length): int
     {
-        $partsCounter = (int)($length / $this->bytesPerPart);
-        return (($length % $this->bytesPerPart) == 0) ? (int)$partsCounter : (int)($partsCounter + 1);
+        $partsCounter = intval($length / $this->bytesPerPart);
+        return (($length % $this->bytesPerPart) == 0) ? intval($partsCounter) : intval($partsCounter + 1);
     }
 }

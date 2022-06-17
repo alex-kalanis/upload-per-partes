@@ -46,7 +46,7 @@ class Predis extends AStorage
      */
     public function load(string $key): string
     {
-        return (string)$this->redis->get($key);
+        return strval($this->redis->get($key));
     }
 
     /**

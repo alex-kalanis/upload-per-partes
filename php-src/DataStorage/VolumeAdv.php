@@ -37,8 +37,8 @@ class VolumeAdv extends VolumeBasic
      * @param string $location
      * @param int $offset
      * @param int<0, max>|null $limit
-     * @return string
      * @throws UploadException
+     * @return string
      * @codeCoverageIgnore
      */
     public function getPart(string $location, int $offset, ?int $limit = null): string

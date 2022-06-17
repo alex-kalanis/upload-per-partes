@@ -42,8 +42,8 @@ class Processor
     /**
      * Upload file by parts, final status - cancel that
      * @param string $sharedKey
-     * @return void
      * @throws Exceptions\UploadException
+     * @return void
      */
     public function cancel(string $sharedKey): void
     {
@@ -55,8 +55,8 @@ class Processor
     /**
      * Upload file by parts, final status
      * @param string $sharedKey
-     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
+     * @return InfoFormat\Data
      */
     public function done(string $sharedKey): InfoFormat\Data
     {
@@ -70,8 +70,8 @@ class Processor
      * @param string $sharedKey
      * @param string $content binary content
      * @param int|null $segment where it save
-     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
+     * @return InfoFormat\Data
      */
     public function upload(string $sharedKey, string $content, ?int $segment = null): InfoFormat\Data
     {
@@ -95,8 +95,8 @@ class Processor
      * Delete problematic segments
      * @param string $sharedKey
      * @param int $segment
-     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
+     * @return InfoFormat\Data
      */
     public function truncateFrom(string $sharedKey, int $segment): InfoFormat\Data
     {
@@ -111,8 +111,8 @@ class Processor
      * Check already uploaded parts
      * @param string $sharedKey
      * @param int $segment
-     * @return string
      * @throws Exceptions\UploadException
+     * @return string
      */
     public function check(string $sharedKey, int $segment): string
     {
@@ -125,8 +125,8 @@ class Processor
      * Upload file by parts, create driving file, returns correct one (because it can exist)
      * @param InfoFormat\Data $dataPack
      * @param string $sharedKey
-     * @return InfoFormat\Data
      * @throws Exceptions\UploadException
+     * @return InfoFormat\Data
      */
     public function init(InfoFormat\Data $dataPack, string $sharedKey): InfoFormat\Data
     {
@@ -145,7 +145,7 @@ class Processor
      */
     protected function checkSegment(InfoFormat\Data $data, int $segment): void
     {
-        if ($segment < 0) {
+        if (0 > $segment) {
             throw new Exceptions\UploadException($this->lang->uppSegmentOutOfBounds($segment));
         }
         if ($segment > $data->partsCount) {

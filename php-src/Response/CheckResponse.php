@@ -40,10 +40,10 @@ class CheckResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => (string)$this->sharedKey,
-            'checksum' => (string)$this->checksum,
-            'status' => (string)$this->status,
-            'errorMessage' => (string)$this->errorMessage,
+            'sharedKey' => strval($this->sharedKey),
+            'checksum' => strval($this->checksum),
+            'status' => strval($this->status),
+            'errorMessage' => strval($this->errorMessage),
         ];
     }
 }

@@ -30,20 +30,20 @@ abstract class AKey
 
     /**
      * @param string $key
-     * @return string
      * @throws UploadException
+     * @return string
      */
     abstract public function fromSharedKey(string $key): string;
 
     /**
-     * @return $this
      * @throws UploadException
+     * @return $this
      */
     abstract public function generateKeys(): self;
 
     /**
-     * @return string
      * @throws UploadException
+     * @return string
      */
     public function getSharedKey(): string
     {
