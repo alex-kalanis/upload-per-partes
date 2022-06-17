@@ -17,11 +17,11 @@
     },
     "suggest": {
         "predis/predis": "Redis client",
-        "kalanis/kw_storage": "Universal storage library for store data as key-value pairs"
+        "alex-kalanis/kw_storage": "Universal storage library for store data as key-value pairs"
     },
     "require-dev": {
+        "alex-kalanis/kw_storage": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "kalanis/kw_storage": "^1.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": ">7.2"
