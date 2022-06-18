@@ -46,7 +46,7 @@ class Storage extends AStorage
     public function load(string $key): string
     {
         try {
-            return (string)$this->storage->read($key);
+            return strval($this->storage->read($key));
         } catch (StorageException $ex) {
             throw new UploadException($this->lang->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
         }
