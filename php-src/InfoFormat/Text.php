@@ -20,8 +20,11 @@ class Text extends AFormat
         if (false !== $lines) {
             foreach ($lines as $line) {
                 if (0 < mb_strlen($line)) {
-                    list($key, $value, $nothing) = explode(static::DATA_SEPARATOR, $line);
-                    $libData->{$key} = $value;
+                    $data = explode(static::DATA_SEPARATOR, $line);
+                    if (false !== $data) {
+                        list($key, $value, $nothing) = $data;
+                        $libData->{$key} = $value;
+                    }
                 }
             }
         }
