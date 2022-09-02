@@ -53,6 +53,7 @@ class DoneResponse extends AResponse
         return $this->data->fileName;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

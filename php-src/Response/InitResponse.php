@@ -38,6 +38,7 @@ class InitResponse extends AResponse
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

@@ -17,10 +17,12 @@ class Text extends AFormat
     {
         $lines = explode(static::LINE_SEPARATOR, $content);
         $libData = new Data();
-        foreach ($lines as $line) {
-            if (0 < mb_strlen($line)) {
-                list($key, $value, $nothing) = explode(static::DATA_SEPARATOR, $line);
-                $libData->{$key} = $value;
+        if (false !== $lines) {
+            foreach ($lines as $line) {
+                if (0 < mb_strlen($line)) {
+                    list($key, $value, $nothing) = explode(static::DATA_SEPARATOR, $line);
+                    $libData->{$key} = $value;
+                }
             }
         }
         return $libData->sanitizeData();
