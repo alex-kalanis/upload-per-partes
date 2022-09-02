@@ -24,6 +24,7 @@ abstract class AStorage
 
     /**
      * @param string $key
+     * @throws UploadException
      * @return bool
      */
     abstract public function exists(string $key): bool;

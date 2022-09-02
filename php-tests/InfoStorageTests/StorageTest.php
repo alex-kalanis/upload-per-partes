@@ -4,8 +4,7 @@ namespace InfoStorageTests;
 
 
 use CommonTestClass;
-use kalanis\kw_storage\Interfaces\IStorage;
-use kalanis\kw_storage\Storage\Format\Raw;
+use kalanis\kw_storage\Interfaces\ITarget;
 use kalanis\kw_storage\Storage\Key\DefaultKey;
 use kalanis\kw_storage\Storage;
 use kalanis\kw_storage\StorageException;
@@ -102,24 +101,41 @@ class StorageTest extends CommonTestClass
         $this->expectExceptionMessageMatches('DRIVEFILE CANNOT BE REMOVED');
     }
 
+    /**
+     * @throws UploadException
+     */
+    public function testExistsDied(): void
+    {
+        $file = $this->mockTestFile();
+        $storage = $this->mockStorageCrashExist();
+        $this->expectException(UploadException::class);
+        $storage->exists($file); // dies here
+        $this->expectExceptionMessageMatches('CANNOT READ DRIVEFILE');
+    }
+
     protected function mockStorage(): InfoStorage\AStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new XRemStorage(), new Raw(), new DefaultKey()));
+        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XRemStorage()));
     }
 
     protected function mockStorageFail(): InfoStorage\AStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new XFailStorage(), new Raw(), new DefaultKey()));
+        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XFailStorage()));
     }
 
     protected function mockStorageCrash(): InfoStorage\AStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new XCrashStorage(), new Raw(), new DefaultKey()));
+        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashStorage()));
+    }
+
+    protected function mockStorageCrashExist(): InfoStorage\AStorage
+    {
+        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashExistenceStorage()));
     }
 }
 
 
-class XRemStorage implements IStorage
+class XRemStorage implements ITarget
 {
     protected $data = [];
 
@@ -152,7 +168,7 @@ class XRemStorage implements IStorage
         return true;
     }
 
-    public function lookup(string $key): iterable
+    public function lookup(string $key): \Traversable
     {
         yield from $this->data;
     }
@@ -176,7 +192,7 @@ class XRemStorage implements IStorage
 }
 
 
-class XFailStorage implements IStorage
+class XFailStorage implements ITarget
 {
     protected $data = [];
 
@@ -205,9 +221,9 @@ class XFailStorage implements IStorage
         return false;
     }
 
-    public function lookup(string $key): iterable
+    public function lookup(string $key): \Traversable
     {
-        return [];
+        yield from [];
     }
 
     public function increment(string $key): bool
@@ -227,7 +243,7 @@ class XFailStorage implements IStorage
 }
 
 
-class XCrashStorage implements IStorage
+class XCrashStorage implements ITarget
 {
     protected $data = [];
 
@@ -256,7 +272,7 @@ class XCrashStorage implements IStorage
         throw new StorageException('not del');
     }
 
-    public function lookup(string $key): iterable
+    public function lookup(string $key): \Traversable
     {
         throw new StorageException('not look');
     }
@@ -274,5 +290,14 @@ class XCrashStorage implements IStorage
     public function removeMulti(array $keys): array
     {
         return [];
+    }
+}
+
+
+class XCrashExistenceStorage extends XCrashStorage
+{
+    public function exists(string $key): bool
+    {
+        throw new StorageException('not available');
     }
 }
