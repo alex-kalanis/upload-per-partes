@@ -2,8 +2,7 @@ import hashlib
 import re
 from .translations import Translations
 from kw_upload.exceptions import UploadException
-from kw_upload.data_storage import AStorage as DataStorage
-from kw_upload.info_storage import AStorage as InfoStorage
+from kw_upload.interfaces import IDataStorage, IInfoStorage
 
 
 class Calculates:
@@ -47,7 +46,7 @@ class TargetSearch:
     FILE_VER_SEP = '.'
     WIN_NAME_LEN_LIMIT = 110  # minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    def __init__(self, lang: Translations, info_storage: InfoStorage, data_storage: DataStorage, sanitize_whitespace: bool = True, sanitize_alnum: bool = True):
+    def __init__(self, lang: Translations, info_storage: IInfoStorage, data_storage: IDataStorage, sanitize_whitespace: bool = True, sanitize_alnum: bool = True):
         self._lang = lang
         self._info_storage = info_storage
         self._data_storage = data_storage

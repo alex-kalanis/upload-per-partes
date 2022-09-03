@@ -1,9 +1,9 @@
 from kw_tests.common_class import CommonTestClass
 from kw_tests.support import Files, Dirs, DataRam, InfoRam
 from kw_upload.data_storage import VolumeBasic
-from kw_upload.data_storage import AStorage as DataStorage
-from kw_upload.uploader.essentials import Calculates, Hashed, TargetSearch
 from kw_upload.exceptions import UploadException
+from kw_upload.interfaces import IDataStorage
+from kw_upload.uploader.essentials import TargetSearch
 from kw_upload.uploader.translations import Translations
 
 
@@ -16,7 +16,7 @@ class ADataStorageTest(CommonTestClass):
             Dirs.rmdir(self._mock_test_file())
         super().tearDown()
 
-    def _mock_storage(self) -> DataStorage:
+    def _mock_storage(self) -> IDataStorage:
         return VolumeBasic(Translations())
 
 
@@ -147,10 +147,10 @@ class TargetTest(CommonTestClass):
     def test_process_name_lookup(self):
         lang = Translations()
         data_ram = DataRam(lang)
-        data_ram.add_part(self._get_test_dir() + 'dummyFile.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        data_ram.add_part(self._get_test_dir() + 'dummyFile.0.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        data_ram.add_part(self._get_test_dir() + 'dummyFile.1.tst', 'asdfghjklqwertzuiopyxcvbnm')
-        data_ram.add_part(self._get_test_dir() + 'dummyFile.2.tst', 'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.tst', b'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.0.tst', b'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.1.tst', b'asdfghjklqwertzuiopyxcvbnm')
+        data_ram.add_part(self._get_test_dir() + 'dummyFile.2.tst', b'asdfghjklqwertzuiopyxcvbnm')
         lib = TargetSearch(lang, InfoRam(lang), data_ram, False, False)
         lib.set_target_dir(self._get_test_dir()).set_remote_file_name('dummyFile.tst').process()
         assert self._get_test_dir() + 'dummyFile.3.tst' + TargetSearch.FILE_UPLOAD_SUFF == lib.get_temporary_target_location()

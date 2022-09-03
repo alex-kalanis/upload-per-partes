@@ -1,6 +1,6 @@
 from kw_tests.common_class import CommonTestClass
 from kw_tests.support import Files
-from kw_upload.info_format import Factory, AFormat, Json, Text
+from kw_upload.info_format import Factory, Json, Text
 from kw_upload.info_storage import Volume
 from kw_upload.exceptions import UploadException
 from kw_upload.uploader.translations import Translations

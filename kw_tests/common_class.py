@@ -1,6 +1,6 @@
 import os
 import unittest
-from kw_upload.info_format import DataPack
+from kw_upload.uploader.data import DataPack
 
 
 class CommonTestClass(unittest.TestCase):

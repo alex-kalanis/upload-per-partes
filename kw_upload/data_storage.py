@@ -1,73 +1,16 @@
 from .uploader.translations import Translations
+from .interfaces import IDataStorage
 from .exceptions import UploadException
 
 
-class AStorage:
-    """
-     * Class AStorage
-     * Target storage for data stream
-    """
-
-    def __init__(self, lang: Translations):
-        self._lang = lang
-
-    def exists(self, location: str) -> bool:
-        """
-         * If that file exists
-        :param location: string
-        :return bool:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBA')
-
-    def add_part(self, location: str, content: bytes, seek: int = None):
-        """
-         * Add part to file
-        :param location: string
-        :param content:
-        :param seek:
-        :return void:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBA')
-
-    def get_part(self, location: str, offset: int, limit: int = None) -> bytes:
-        """
-         * Get part of file
-        :param location:
-        :param offset:
-        :param limit:
-        :return void:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBA')
-
-    def truncate(self, location: str, offset: int):
-        """
-         * Truncate data file
-        :param location:
-        :param offset:
-        :return void:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBA')
-
-    def remove(self, location: str):
-        """
-         * Remove whole data file
-        :param location:
-        :return void:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBA')
-
-
-class VolumeBasic(AStorage):
+class VolumeBasic(IDataStorage):
     """
      * Class VolumeBasic
      * Processing info file on disk volume
      * Filesystem behaves oddly - beware of fucked up caching!
     """
+    def __init__(self, lang: Translations):
+        self._lang = lang
 
     def exists(self, location: str) -> bool:
         import os.path

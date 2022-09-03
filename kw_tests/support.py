@@ -1,7 +1,6 @@
-from kw_upload.data_storage import AStorage as DataStorage
+from kw_upload.interfaces import IDataStorage, IInfoStorage
 from kw_upload.exceptions import UploadException
 from kw_upload.keys import AKey
-from kw_upload.info_storage import AStorage as InfoStorage
 from kw_upload.uploader.translations import Translations
 
 
@@ -90,13 +89,13 @@ class Dirs:
         os.rmdir(dirname)
 
 
-class DataRam(DataStorage):
+class DataRam(IDataStorage):
     """
      * Processing data file on ram volume
     """
 
     def __init__(self, lang: Translations):
-        super().__init__(lang)
+        self._lang = lang
         self._data = {}
 
     def add_part(self, location: str, content: bytes, seek: int = None):
@@ -129,13 +128,13 @@ class DataRam(DataStorage):
         return self.get_part(location, 0, None)
 
 
-class InfoRam(InfoStorage):
+class InfoRam(IInfoStorage):
     """
      * Processing info file on ram volume
     """
 
     def __init__(self, lang: Translations):
-        super().__init__(lang)
+        self._lang = lang
         self._data = {}
 
     def exists(self, key: str) -> bool:
@@ -144,7 +143,7 @@ class InfoRam(InfoStorage):
     def load(self, key: str) -> str:
         content = self._data[key]
         if not bool(len(content)):
-            raise UploadException(self._lang.drive_file_cannot_read())
+            raise UploadException(self._lang.upp_drive_file_cannot_read(key))
         return content
 
     def save(self, key: str, data: str):

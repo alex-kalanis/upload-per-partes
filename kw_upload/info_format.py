@@ -1,71 +1,10 @@
+from .interfaces import IInfoFormatting
+from .uploader.data import DataPack
 from .uploader.translations import Translations
 from .exceptions import UploadException
 
 
-class DataPack:
-
-    @staticmethod
-    def init():
-        return DataPack()
-
-    def __init__(self):
-        self.file_name = ''
-        self.temp_location = ''
-        self.file_size = 0
-        self.parts_count = 0
-        self.bytes_per_part = 0
-        self.last_known_part = 0
-
-    def set_data(self,
-                 file_name: str,
-                 temp_location: str,
-                 file_size: int,
-                 parts_count: int = 0,
-                 bytes_per_part: int = 0,
-                 last_known_part: int = 0
-                 ):
-        self.file_name = file_name
-        self.temp_location = temp_location
-        self.file_size = file_size
-        self.parts_count = parts_count
-        self.bytes_per_part = bytes_per_part
-        self.last_known_part = last_known_part
-        return self
-
-    def sanitize_data(self):
-        self.file_name = str(self.file_name)
-        self.temp_location = str(self.temp_location)
-        self.file_size = int(self.file_size)
-        self.parts_count = int(self.parts_count)
-        self.bytes_per_part = int(self.bytes_per_part)
-        self.last_known_part = int(self.last_known_part)
-        return self
-
-
-class AFormat:
-    """
-     * Class AFormat
-     * Drive file format - abstract for each variant
-    """
-
-    def from_format(self, content: str) -> DataPack:
-        """
-        :param content:
-        :return DataPack:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBI')
-
-    def to_format(self, data: DataPack) -> str:
-        """
-        :param data:
-        :return str:
-        :raise UploadException:
-        """
-        raise NotImplementedError('TBI')
-
-
-class Text(AFormat):
+class Text(IInfoFormatting):
     """
      * Processing driver file - variant plaintext
     """
@@ -89,7 +28,7 @@ class Text(AFormat):
         return self.LINE_SEPARATOR.join(data_lines)
 
 
-class Json(AFormat):
+class Json(IInfoFormatting):
 
     def from_format(self, content: str) -> DataPack:
         import json
@@ -114,11 +53,11 @@ class Factory:
     FORMAT_JSON = 2
 
     @staticmethod
-    def get_format(lang: Translations, variant: int):
+    def get_format(lang: Translations, variant: int) -> IInfoFormatting:
         """
         :param lang: Translations
         :param variant: int
-        :return: AFormat
+        :return: IInfoFormatting
         :raise: UploadException
         """
         if Factory.FORMAT_TEXT == variant:
@@ -126,4 +65,4 @@ class Factory:
         elif Factory.FORMAT_JSON == variant:
             return Json()
         else:
-            raise UploadException(lang.drive_file_variant_not_set())
+            raise UploadException(lang.upp_drive_file_variant_not_set())

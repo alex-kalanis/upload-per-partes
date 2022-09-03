@@ -1,7 +1,7 @@
 from kw_tests.common_class import CommonTestClass
 from kw_tests.support import Files
 from kw_upload.info_storage import Volume
-from kw_upload.info_storage import AStorage as InfoStorage
+from kw_upload.interfaces import IInfoStorage
 from kw_upload.exceptions import UploadException
 from kw_upload.uploader.translations import Translations
 
@@ -13,7 +13,7 @@ class AInfoStorage(CommonTestClass):
             self._mock_storage().remove(self._mock_test_file())
         super().tearDown()
 
-    def _mock_storage(self) -> InfoStorage:
+    def _mock_storage(self) -> IInfoStorage:
         return Volume(Translations())
 
     def test_thru(self):

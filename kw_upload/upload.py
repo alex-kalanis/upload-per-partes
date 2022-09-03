@@ -1,11 +1,10 @@
-from .data_storage import AStorage as DataStorage
 from .exceptions import UploadException, ContinuityUploadException
-from .info_format import AFormat, DataPack
 from .info_format import Factory as InfoFactory
-from .info_storage import AStorage as InfoStorage
+from .interfaces import IInfoFormatting, IInfoStorage, IDataStorage
 from .keys import AKey
 from .keys import Factory as KeyFactory
 from .responses import DoneResponse, CancelResponse, UploadResponse, TruncateResponse, CheckResponse, InitResponse
+from .uploader.data import DataPack
 from .uploader.essentials import Calculates, Hashed, TargetSearch
 from .uploader.translations import Translations
 
@@ -15,7 +14,7 @@ class DriveFile:
      * Processing drive file
     """
 
-    def __init__(self, lang: Translations, storage: InfoStorage, formatted: AFormat, key: AKey):
+    def __init__(self, lang: Translations, storage: IInfoStorage, formatted: IInfoFormatting, key: AKey):
         self._storage = storage
         self._format = formatted
         self._lang = lang
@@ -87,7 +86,7 @@ class Processor:
      * Processing upload per-partes
     """
 
-    def __init__(self, lang: Translations, driver: DriveFile, storage: DataStorage, hashed: Hashed):
+    def __init__(self, lang: Translations, driver: DriveFile, storage: IDataStorage, hashed: Hashed):
         self._lang = lang
         self._driver = driver
         self._storage = storage
@@ -220,15 +219,15 @@ class Uploader:
     def _get_translations(self) -> Translations:
         return Translations()
 
-    def _get_info_storage(self, lang: Translations) -> InfoStorage:
+    def _get_info_storage(self, lang: Translations) -> IInfoStorage:
         from .info_storage import Volume
         return Volume(lang)
 
-    def _get_data_storage(self, lang: Translations) -> DataStorage:
+    def _get_data_storage(self, lang: Translations) -> IDataStorage:
         from .data_storage import VolumeBasic
         return VolumeBasic(lang)
 
-    def _get_target(self, lang: Translations, info_storage: InfoStorage, data_storage: DataStorage) -> TargetSearch:
+    def _get_target(self, lang: Translations, info_storage: IInfoStorage, data_storage: IDataStorage) -> TargetSearch:
         return TargetSearch(lang, info_storage, data_storage)
 
     def _get_calc(self) -> Calculates:
@@ -237,7 +236,7 @@ class Uploader:
     def _get_hashed(self) -> Hashed:
         return Hashed()
 
-    def _get_processor(self, lang: Translations, driver: DriveFile, storage: DataStorage, hashed: Hashed) -> Processor:
+    def _get_processor(self, lang: Translations, driver: DriveFile, storage: IDataStorage, hashed: Hashed) -> Processor:
         return Processor(lang, driver, storage, hashed)
 
     def cancel(self, shared_key: str) -> CancelResponse:

@@ -119,4 +119,4 @@ class Factory:
         elif Factory.VARIANT_REDIS == variant:
             return Redis(lang, target)
         else:
-            raise UploadException(lang.key_variant_not_set())
+            raise UploadException(lang.upp_key_variant_not_set())

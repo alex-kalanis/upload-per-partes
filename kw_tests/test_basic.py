@@ -1,10 +1,10 @@
 from kw_tests.common_class import CommonTestClass
 from kw_tests.support import DataRam, InfoRam, Key, Strings, Files
 from kw_upload.exceptions import UploadException, ContinuityUploadException
-from kw_upload.data_storage import AStorage as DataStorage
-from kw_upload.info_storage import AStorage as InfoStorage
-from kw_upload.info_format import DataPack, Json
+from kw_upload.info_format import Json
+from kw_upload.interfaces import IDataStorage, IInfoStorage
 from kw_upload.upload import DriveFile, Processor, Uploader
+from kw_upload.uploader.data import DataPack
 from kw_upload.uploader.essentials import Calculates, Hashed, TargetSearch
 from kw_upload.uploader.translations import Translations
 
@@ -482,11 +482,11 @@ class UploadTest(CommonTestClass):
 
 class UploaderMock(Uploader):
 
-    def _get_info_storage(self, lang: Translations) -> InfoStorage:
+    def _get_info_storage(self, lang: Translations) -> IInfoStorage:
         super()._get_info_storage(lang)
         return InfoRam(lang)
 
-    def _get_data_storage(self, lang: Translations) -> DataStorage:
+    def _get_data_storage(self, lang: Translations) -> IDataStorage:
         super()._get_data_storage(lang)
         return DataRam(lang)
 
@@ -494,7 +494,7 @@ class UploaderMock(Uploader):
         super()._get_calc()
         return Calculates(1024)
 
-    def get_storage(self) -> DataStorage:
+    def get_storage(self) -> IDataStorage:
         return self._data_storage
 
     def get_lib_driver(self) -> DriveFile:

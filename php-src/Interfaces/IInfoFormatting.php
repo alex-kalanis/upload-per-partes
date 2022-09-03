@@ -8,7 +8,7 @@ use kalanis\UploadPerPartes\InfoFormat\Data;
 
 
 /**
- * Interface IInfoFormat
+ * Interface IInfoFormatting
  * @package kalanis\UploadPerPartes\Interfaces
  * Drive file format - abstract for each variant
  */

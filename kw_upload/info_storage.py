@@ -1,35 +1,17 @@
 from .uploader.translations import Translations
 from .exceptions import UploadException
+from .interfaces import IInfoStorage
 import os
 
 
-class AStorage:
-    """
-     * Class AStorage
-     * Target storage for data stream
-    """
-
-    def __init__(self, lang: Translations):
-        self._lang = lang
-
-    def exists(self, key: str) -> bool:
-        raise NotImplementedError('TBI')
-
-    def load(self, key: str) -> str:
-        raise NotImplementedError('TBI')
-
-    def save(self, key: str, data: str):
-        raise NotImplementedError('TBI')
-
-    def remove(self, key: str):
-        raise NotImplementedError('TBI')
-
-
-class Volume(AStorage):
+class Volume(IInfoStorage):
     """
      * Class Volume
      * Processing info file on disk volume
     """
+
+    def __init__(self, lang: Translations):
+        self._lang = lang
 
     def exists(self, key: str) -> bool:
         return os.path.isfile(key)
@@ -73,7 +55,7 @@ class Volume(AStorage):
             raise UploadException(self._lang.upp_drive_file_cannot_remove(key)) from err
 
 
-class Redis(AStorage):
+class Redis(IInfoStorage):
     """
      * Class Redis
      * Processing info file on redis connection
@@ -81,7 +63,7 @@ class Redis(AStorage):
     import redis
 
     def __init__(self, lang: Translations, rc: redis.Redis):
-        super().__init__(lang)
+        self._lang = lang
         self._rc = rc
 
     def exists(self, key: str) -> bool:
@@ -97,7 +79,7 @@ class Redis(AStorage):
         self._rc.delete(key)
 
 
-class MemCache(AStorage):
+class MemCache(IInfoStorage):
     """
      * Class MemCache
      * Processing info file on Memcache connection
@@ -105,7 +87,7 @@ class MemCache(AStorage):
     import pymemcache
 
     def __init__(self, lang: Translations, mc: pymemcache.Client):
-        super().__init__(lang)
+        self._lang = lang
         self._mc = mc
 
     def exists(self, key: str) -> bool:
