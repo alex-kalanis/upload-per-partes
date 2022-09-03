@@ -4,6 +4,7 @@ namespace kalanis\UploadPerPartes\InfoFormat;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
@@ -27,16 +28,16 @@ class Factory
      * @param IUPPTranslations $lang
      * @param int $variant
      * @throws UploadException
-     * @return AFormat
+     * @return IInfoFormatting
      */
-    public static function getFormat(IUPPTranslations $lang, int $variant): AFormat
+    public static function getFormat(IUPPTranslations $lang, int $variant): IInfoFormatting
     {
         if (!isset(static::$map[$variant])) {
             throw new UploadException($lang->uppDriveFileVariantNotSet());
         }
         $class = static::$map[$variant];
         $lib = new $class();
-        if (!$lib instanceof AFormat) {
+        if (!$lib instanceof IInfoFormatting) {
             throw new UploadException($lang->uppDriveFileVariantIsWrong($class));
         }
         return $lib;

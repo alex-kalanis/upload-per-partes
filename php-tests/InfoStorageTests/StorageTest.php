@@ -10,6 +10,7 @@ use kalanis\kw_storage\Storage;
 use kalanis\kw_storage\StorageException;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\InfoStorage;
+use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
 
@@ -113,22 +114,22 @@ class StorageTest extends CommonTestClass
         $this->expectExceptionMessageMatches('CANNOT READ DRIVEFILE');
     }
 
-    protected function mockStorage(): InfoStorage\AStorage
+    protected function mockStorage(): IInfoStorage
     {
         return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XRemStorage()));
     }
 
-    protected function mockStorageFail(): InfoStorage\AStorage
+    protected function mockStorageFail(): IInfoStorage
     {
         return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XFailStorage()));
     }
 
-    protected function mockStorageCrash(): InfoStorage\AStorage
+    protected function mockStorageCrash(): IInfoStorage
     {
         return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashStorage()));
     }
 
-    protected function mockStorageCrashExist(): InfoStorage\AStorage
+    protected function mockStorageCrashExist(): IInfoStorage
     {
         return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashExistenceStorage()));
     }

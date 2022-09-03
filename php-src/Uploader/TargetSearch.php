@@ -3,10 +3,8 @@
 namespace kalanis\UploadPerPartes\Uploader;
 
 
-use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoStorage;
-use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Interfaces;
 
 
 /**
@@ -22,11 +20,11 @@ class TargetSearch
     const FILE_VER_SEP = '.';
     const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    /** @var IUPPTranslations */
+    /** @var Interfaces\IUPPTranslations */
     protected $lang = null;
-    /** @var InfoStorage\AStorage */
+    /** @var Interfaces\IInfoStorage */
     protected $infoStorage = null;
-    /** @var DataStorage\AStorage */
+    /** @var Interfaces\IDataStorage */
     protected $dataStorage = null;
     /** @var bool */
     protected $sanitizeAlnum = true;
@@ -45,13 +43,13 @@ class TargetSearch
 
 
     /**
-     * @param IUPPTranslations $lang
-     * @param InfoStorage\AStorage $infoStorage
-     * @param DataStorage\AStorage $dataStorage
+     * @param Interfaces\IUPPTranslations $lang
+     * @param Interfaces\IInfoStorage $infoStorage
+     * @param Interfaces\IDataStorage $dataStorage
      * @param bool $sanitizeWhitespace
      * @param bool $sanitizeAlnum
      */
-    public function __construct(IUPPTranslations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
+    public function __construct(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $infoStorage, Interfaces\IDataStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
     {
         $this->lang = $lang;
         $this->infoStorage = $infoStorage;

@@ -5,24 +5,26 @@ namespace BasicTests;
 
 use CommonTestClass;
 use Support;
-use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
-use kalanis\UploadPerPartes\InfoStorage;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Uploader;
 
 
 class ProcessorTest extends CommonTestClass
 {
-    /** @var InfoStorage\AStorage|null */
+    /** @var Interfaces\IInfoStorage|null */
     protected $infoStorage = null;
-    /** @var DataStorage\AStorage|null */
+    /** @var Interfaces\IDataStorage|null */
     protected $dataStorage = null;
     /** @var Uploader\DriveFile|null */
     protected $driveFile = null;
     /** @var Uploader\Processor|null */
     protected $processor = null;
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function tearDown(): void
     {
         $this->initProcessor();

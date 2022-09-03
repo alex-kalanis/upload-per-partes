@@ -3,12 +3,15 @@
 namespace kalanis\UploadPerPartes\InfoFormat;
 
 
+use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
+
+
 /**
  * Class Text
  * @package kalanis\UploadPerPartes\DriveFile
  * Driver file - format plaintext
  */
-class Text extends AFormat
+class Text implements IInfoFormatting
 {
     const DATA_SEPARATOR = ':';
     const LINE_SEPARATOR = "\r\n";

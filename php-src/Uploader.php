@@ -3,6 +3,7 @@
 namespace kalanis\UploadPerPartes;
 
 
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Uploader\Calculates;
 use kalanis\UploadPerPartes\Uploader\Hashed;
 
@@ -16,9 +17,9 @@ class Uploader
 {
     /** @var Keys\AKey */
     protected $key = null;
-    /** @var InfoStorage\AStorage */
+    /** @var Interfaces\IInfoStorage */
     protected $infoStorage = null;
-    /** @var DataStorage\AStorage */
+    /** @var Interfaces\IDataStorage */
     protected $dataStorage = null;
     /** @var Uploader\TargetSearch */
     protected $targetSearch = null;
@@ -63,17 +64,17 @@ class Uploader
         return new Uploader\Translations();
     }
 
-    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): InfoStorage\AStorage
+    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): Interfaces\IInfoStorage
     {
         return new InfoStorage\Volume($lang);
     }
 
-    protected function getDataStorage(Interfaces\IUPPTranslations $lang): DataStorage\AStorage
+    protected function getDataStorage(Interfaces\IUPPTranslations $lang): Interfaces\IDataStorage
     {
         return new DataStorage\VolumeBasic($lang);
     }
 
-    protected function getTarget(Interfaces\IUPPTranslations $lang, InfoStorage\AStorage $infoStorage, DataStorage\AStorage $dataStorage): Uploader\TargetSearch
+    protected function getTarget(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $infoStorage, Interfaces\IDataStorage $dataStorage): Uploader\TargetSearch
     {
         return new Uploader\TargetSearch($lang, $infoStorage, $dataStorage);
     }
@@ -88,7 +89,7 @@ class Uploader
         return new Hashed();
     }
 
-    protected function getProcessor(Interfaces\IUPPTranslations $lang, Uploader\DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed): Uploader\Processor
+    protected function getProcessor(Interfaces\IUPPTranslations $lang, Uploader\DriveFile $driver, Interfaces\IDataStorage $storage, Hashed $hashed): Uploader\Processor
     {
         return new Uploader\Processor($lang, $driver, $storage, $hashed);
     }

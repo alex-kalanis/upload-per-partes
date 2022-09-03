@@ -3,13 +3,14 @@
 namespace InfoFormatTests;
 
 
+use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\InfoFormat;
 
 
 class JsonTest extends AFormats
 {
     /**
-     * @throws \kalanis\UploadPerPartes\Exceptions\UploadException
+     * @throws UploadException
      */
     public function testThru(): void
     {

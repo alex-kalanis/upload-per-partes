@@ -3,7 +3,7 @@
 namespace kalanis\UploadPerPartes\InfoStorage;
 
 
-use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
@@ -12,7 +12,7 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  * @package kalanis\UploadPerPartes\InfoStorage
  * Target storage for data stream
  */
-abstract class AStorage
+abstract class AStorage implements IInfoStorage
 {
     /** @var IUPPTranslations */
     protected $lang = null;
@@ -21,31 +21,4 @@ abstract class AStorage
     {
         $this->lang = $lang;
     }
-
-    /**
-     * @param string $key
-     * @throws UploadException
-     * @return bool
-     */
-    abstract public function exists(string $key): bool;
-
-    /**
-     * @param string $key
-     * @throws UploadException
-     * @return string
-     */
-    abstract public function load(string $key): string;
-
-    /**
-     * @param string $key
-     * @param string $data
-     * @throws UploadException
-     */
-    abstract public function save(string $key, string $data): void;
-
-    /**
-     * @param string $key
-     * @throws UploadException
-     */
-    abstract public function remove(string $key): void;
 }

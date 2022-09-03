@@ -6,6 +6,7 @@ namespace kalanis\UploadPerPartes\InfoStorage;
 use kalanis\kw_storage\Interfaces\IStorage;
 use kalanis\kw_storage\StorageException;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
@@ -14,8 +15,10 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  * @package kalanis\UploadPerPartes\InfoStorage
  * Processing info file in kw_storage
  */
-class Storage extends AStorage
+class Storage implements IInfoStorage
 {
+    /** @var IUPPTranslations */
+    protected $lang = null;
     /** @var IStorage */
     protected $storage = null;
     /** @var int */
@@ -23,8 +26,7 @@ class Storage extends AStorage
 
     public function __construct(IUPPTranslations $lang, IStorage $storage, int $timeout = 3600)
     {
-        // path is not a route but redis key
-        parent::__construct($lang);
+        $this->lang = $lang;
         $this->storage = $storage;
         $this->timeout = $timeout;
     }

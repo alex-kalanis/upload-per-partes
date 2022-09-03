@@ -1,29 +1,30 @@
 <?php
 
-namespace kalanis\UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\Interfaces;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\InfoFormat\Data;
 
 
 /**
- * Class AFormat
- * @package kalanis\UploadPerPartes\DriveFile
+ * Interface IInfoFormat
+ * @package kalanis\UploadPerPartes\Interfaces
  * Drive file format - abstract for each variant
  */
-abstract class AFormat
+interface IInfoFormatting
 {
     /**
      * @param string $content
      * @throws UploadException
      * @return Data
      */
-    abstract public function fromFormat(string $content): Data;
+    public function fromFormat(string $content): Data;
 
     /**
      * @param Data $data
      * @throws UploadException
      * @return string
      */
-    abstract public function toFormat(Data $data): string;
+    public function toFormat(Data $data): string;
 }

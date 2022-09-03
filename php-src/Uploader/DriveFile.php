@@ -5,9 +5,8 @@ namespace kalanis\UploadPerPartes\Uploader;
 
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Exceptions;
-use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Keys;
-use kalanis\UploadPerPartes\InfoStorage;
 
 
 /**
@@ -17,16 +16,16 @@ use kalanis\UploadPerPartes\InfoStorage;
  */
 class DriveFile
 {
-    /** @var InfoStorage\AStorage */
+    /** @var Interfaces\IInfoStorage */
     protected $storage = null;
-    /** @var InfoFormat\AFormat */
+    /** @var Interfaces\IInfoFormatting */
     protected $format = null;
     /** @var Keys\AKey */
     protected $key = null;
-    /** @var IUPPTranslations */
+    /** @var Interfaces\IUPPTranslations */
     protected $lang = null;
 
-    public function __construct(IUPPTranslations $lang, InfoStorage\AStorage $storage, InfoFormat\AFormat $format, Keys\AKey $key)
+    public function __construct(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $storage, Interfaces\IInfoFormatting $format, Keys\AKey $key)
     {
         $this->storage = $storage;
         $this->format = $format;

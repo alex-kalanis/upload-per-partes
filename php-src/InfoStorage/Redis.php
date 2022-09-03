@@ -4,6 +4,7 @@ namespace kalanis\UploadPerPartes\InfoStorage;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use Redis as lib;
 
@@ -14,8 +15,10 @@ use Redis as lib;
  * Processing info file in Redis
  * @codeCoverageIgnore
  */
-class Redis extends AStorage
+class Redis implements IInfoStorage
 {
+    /** @var IUPPTranslations */
+    protected $lang = null;
     /** @var lib */
     protected $redis = null;
     /** @var int */
@@ -24,7 +27,7 @@ class Redis extends AStorage
     public function __construct(IUPPTranslations $lang, lib $redis, int $timeout = 3600)
     {
         // path is not a route but redis key
-        parent::__construct($lang);
+        $this->lang = $lang;
         $this->redis = $redis;
         $this->timeout = $timeout;
     }

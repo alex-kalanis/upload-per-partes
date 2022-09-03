@@ -4,9 +4,8 @@ namespace kalanis\UploadPerPartes\Uploader;
 
 
 use kalanis\UploadPerPartes\InfoFormat;
-use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions;
-use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Interfaces;
 
 
 /**
@@ -18,20 +17,20 @@ class Processor
 {
     /** @var DriveFile */
     protected $driver = null;
-    /** @var DataStorage\AStorage */
+    /** @var Interfaces\IDataStorage */
     protected $storage = null;
     /** @var Hashed */
     protected $hashed = null;
-    /** @var IUPPTranslations */
+    /** @var Interfaces\IUPPTranslations */
     protected $lang = null;
 
     /**
-     * @param IUPPTranslations $lang
+     * @param Interfaces\IUPPTranslations $lang
      * @param DriveFile $driver
-     * @param DataStorage\AStorage $storage
+     * @param Interfaces\IDataStorage $storage
      * @param Hashed $hashed
      */
-    public function __construct(IUPPTranslations $lang, DriveFile $driver, DataStorage\AStorage $storage, Hashed $hashed)
+    public function __construct(Interfaces\IUPPTranslations $lang, DriveFile $driver, Interfaces\IDataStorage $storage, Hashed $hashed)
     {
         $this->lang = $lang;
         $this->driver = $driver;

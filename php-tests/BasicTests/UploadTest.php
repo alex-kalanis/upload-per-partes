@@ -4,11 +4,9 @@ namespace BasicTests;
 
 
 use CommonTestClass;
-use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Response;
-use kalanis\UploadPerPartes\InfoStorage;
 use kalanis\UploadPerPartes\Uploader;
 use Support;
 
@@ -258,13 +256,13 @@ class UploadTest extends CommonTestClass
 
 class UploaderMock extends Uploader
 {
-    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): InfoStorage\AStorage
+    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): Interfaces\IInfoStorage
     {
         parent::getInfoStorage($lang);
         return new Support\InfoRam($lang);
     }
 
-    protected function getDataStorage(Interfaces\IUPPTranslations $lang): DataStorage\AStorage
+    protected function getDataStorage(Interfaces\IUPPTranslations $lang): Interfaces\IDataStorage
     {
         parent::getDataStorage($lang);
         return new Support\DataRam($lang);
@@ -279,7 +277,7 @@ class UploaderMock extends Uploader
     /**
      * @return Support\DataRam
      */
-    public function getStorage(): DataStorage\AStorage
+    public function getStorage(): Interfaces\IDataStorage
     {
         return $this->dataStorage;
     }

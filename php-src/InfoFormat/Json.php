@@ -3,12 +3,15 @@
 namespace kalanis\UploadPerPartes\InfoFormat;
 
 
+use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
+
+
 /**
  * Class Json
  * @package kalanis\UploadPerPartes\DataFormat
  * Driver file - format JSON
  */
-class Json extends AFormat
+class Json implements IInfoFormatting
 {
     public function fromFormat(string $content): Data
     {

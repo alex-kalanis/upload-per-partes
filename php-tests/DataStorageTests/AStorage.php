@@ -5,6 +5,7 @@ namespace DataStorageTests;
 
 use CommonTestClass;
 use kalanis\UploadPerPartes\DataStorage;
+use kalanis\UploadPerPartes\Interfaces\IDataStorage;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
 
@@ -34,7 +35,7 @@ abstract class AStorage extends CommonTestClass
         parent::tearDown();
     }
 
-    protected function mockStorage(): DataStorage\AStorage
+    protected function mockStorage(): IDataStorage
     {
         return new DataStorage\VolumeBasic(new Translations());
     }
