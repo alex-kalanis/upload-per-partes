@@ -1,0 +1,9 @@
+* text=auto
+
+# Ignore stuff for export
+/.github     export-ignore
+/doc         export-ignore
+/examples    export-ignore
+/kw_tests    export-ignore
+/kw_upload   export-ignore
+/php-tests   export-ignore
