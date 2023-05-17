@@ -45,7 +45,7 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 5;
         $data = $this->processor->init($pack, $this->mockSharedKey());
 
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data);
+        $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals('abcdef', $data->fileName);
         $this->assertEquals($this->getTestDir() . 'abcdef', $data->tempLocation);
         $this->assertEquals(123456, $data->fileSize);
@@ -54,7 +54,7 @@ class ProcessorTest extends CommonTestClass
         $this->assertEquals(5, $data->lastKnownPart);
 
         $data2 = $this->processor->done($this->mockKey());
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data2);
+        $this->assertInstanceOf(InfoFormat\Data::class, $data2);
         $this->assertEquals('abcdef', $data2->fileName);
         $this->assertEquals($this->getTestDir() . 'abcdef', $data2->tempLocation);
         $this->assertEquals(123456, $data2->fileSize);
@@ -74,7 +74,7 @@ class ProcessorTest extends CommonTestClass
         $pack->lastKnownPart = 4;
         $data = $this->processor->init($pack, $this->mockSharedKey());
 
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data);
+        $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals(4, $data->lastKnownPart);
 
         $pack->lastKnownPart = 8;
@@ -217,11 +217,11 @@ class ProcessorTest extends CommonTestClass
         $lang = new Uploader\Translations();
         $this->infoStorage = new Support\InfoRam($lang);
         $this->dataStorage = new Support\DataRam($lang);
-        $target = new Uploader\TargetSearch($lang, $this->infoStorage, $this->dataStorage);
-        $key = new Support\Key($lang, $target);
+        $target = new Uploader\TargetSearch($this->infoStorage, $this->dataStorage, $lang);
+        $key = new Support\Key($target, $lang);
         $format = new InfoFormat\Json();
         $hashed = new Uploader\Hashed();
-        $this->driveFile = new Uploader\DriveFile($lang, $this->infoStorage, $format, $key);
-        $this->processor = new Uploader\Processor($lang, $this->driveFile, $this->dataStorage, $hashed);
+        $this->driveFile = new Uploader\DriveFile($this->infoStorage, $format, $key, $lang);
+        $this->processor = new Uploader\Processor($this->driveFile, $this->dataStorage, $hashed, $lang);
     }
 }

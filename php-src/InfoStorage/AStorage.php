@@ -5,6 +5,7 @@ namespace kalanis\UploadPerPartes\InfoStorage;
 
 use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TLang;
 
 
 /**
@@ -14,11 +15,10 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 abstract class AStorage implements IInfoStorage
 {
-    /** @var IUPPTranslations */
-    protected $lang = null;
+    use TLang;
 
-    public function __construct(IUPPTranslations $lang)
+    public function __construct(?IUPPTranslations $lang = null)
     {
-        $this->lang = $lang;
+        $this->setUppLang($lang);
     }
 }

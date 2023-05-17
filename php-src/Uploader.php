@@ -40,13 +40,13 @@ class Uploader
         $lang = $this->getTranslations();
         $this->infoStorage = $this->getInfoStorage($lang);
         $this->dataStorage = $this->getDataStorage($lang);
-        $format = InfoFormat\Factory::getFormat($lang, $this->getFormat());
-        $this->targetSearch = $this->getTarget($lang, $this->infoStorage, $this->dataStorage);
+        $format = InfoFormat\Factory::getFormat($this->getFormat(), $lang);
+        $this->targetSearch = $this->getTarget($this->infoStorage, $this->dataStorage, $lang);
         $this->calculations = $this->getCalc();
         $this->hashed = $this->getHashed();
-        $this->key = Keys\Factory::getVariant($lang, $this->targetSearch, $this->getKeyVariant());
-        $this->driver = new Uploader\DriveFile($lang, $this->infoStorage, $format, $this->key);
-        $this->processor = $this->getProcessor($lang, $this->driver, $this->dataStorage, $this->hashed);
+        $this->key = Keys\Factory::getVariant($this->targetSearch, $this->getKeyVariant(), $lang);
+        $this->driver = new Uploader\DriveFile($this->infoStorage, $format, $this->key, $lang);
+        $this->processor = $this->getProcessor($this->driver, $this->dataStorage, $this->hashed, $lang);
     }
 
     protected function getFormat(): int
@@ -59,24 +59,28 @@ class Uploader
         return Keys\Factory::VARIANT_VOLUME;
     }
 
-    protected function getTranslations(): Interfaces\IUPPTranslations
+    protected function getTranslations(): ?Interfaces\IUPPTranslations
     {
         return new Uploader\Translations();
     }
 
-    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): Interfaces\IInfoStorage
+    protected function getInfoStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IInfoStorage
     {
         return new InfoStorage\Volume($lang);
     }
 
-    protected function getDataStorage(Interfaces\IUPPTranslations $lang): Interfaces\IDataStorage
+    protected function getDataStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IDataStorage
     {
         return new DataStorage\VolumeBasic($lang);
     }
 
-    protected function getTarget(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $infoStorage, Interfaces\IDataStorage $dataStorage): Uploader\TargetSearch
+    protected function getTarget(
+        Interfaces\IInfoStorage $infoStorage,
+        Interfaces\IDataStorage $dataStorage,
+        Interfaces\IUPPTranslations $lang = null
+    ): Uploader\TargetSearch
     {
-        return new Uploader\TargetSearch($lang, $infoStorage, $dataStorage);
+        return new Uploader\TargetSearch($infoStorage, $dataStorage, $lang);
     }
 
     protected function getCalc(): Calculates
@@ -89,9 +93,14 @@ class Uploader
         return new Hashed();
     }
 
-    protected function getProcessor(Interfaces\IUPPTranslations $lang, Uploader\DriveFile $driver, Interfaces\IDataStorage $storage, Hashed $hashed): Uploader\Processor
+    protected function getProcessor(
+        Uploader\DriveFile $driver,
+        Interfaces\IDataStorage $storage,
+        Hashed $hashed,
+        ?Interfaces\IUPPTranslations $lang = null
+    ): Uploader\Processor
     {
-        return new Uploader\Processor($lang, $driver, $storage, $hashed);
+        return new Uploader\Processor($driver, $storage, $hashed, $lang);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace kalanis\UploadPerPartes\InfoStorage;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TLang;
 use Predis as lib;
 
 
@@ -17,17 +18,17 @@ use Predis as lib;
  */
 class Predis implements IInfoStorage
 {
-    /** @var IUPPTranslations */
-    protected $lang = null;
+    use TLang;
+
     /** @var lib\Client */
     protected $redis = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(IUPPTranslations $lang, lib\Client $redis, ?int $timeout = 3600)
+    public function __construct(lib\Client $redis, ?int $timeout = 3600, ?IUPPTranslations $lang = null)
     {
         // path is not a route but redis key
-        $this->lang = $lang;
+        $this->setUppLang($lang);
         $this->redis = $redis;
         $this->timeout = $timeout;
     }
@@ -74,7 +75,7 @@ class Predis implements IInfoStorage
     public function remove(string $key): void
     {
         if (!$this->redis->del($key)) {
-            throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
+            throw new UploadException($this->getUppLang()->uppDriveFileCannotRemove($key));
         }
     }
 }

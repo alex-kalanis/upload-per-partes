@@ -116,22 +116,22 @@ class StorageTest extends CommonTestClass
 
     protected function mockStorage(): IInfoStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XRemStorage()));
+        return new InfoStorage\Storage(new Storage\Storage(new DefaultKey(), new XRemStorage()));
     }
 
     protected function mockStorageFail(): IInfoStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XFailStorage()));
+        return new InfoStorage\Storage(new Storage\Storage(new DefaultKey(), new XFailStorage()));
     }
 
     protected function mockStorageCrash(): IInfoStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashStorage()));
+        return new InfoStorage\Storage(new Storage\Storage(new DefaultKey(), new XCrashStorage()));
     }
 
     protected function mockStorageCrashExist(): IInfoStorage
     {
-        return new InfoStorage\Storage(new Translations(), new Storage\Storage(new DefaultKey(), new XCrashExistenceStorage()));
+        return new InfoStorage\Storage(new Storage\Storage(new DefaultKey(), new XCrashExistenceStorage()));
     }
 }
 

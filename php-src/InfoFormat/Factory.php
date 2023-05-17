@@ -20,17 +20,17 @@ class Factory
 
     /** @var array<int, string> */
     protected static $map = [
-        self::FORMAT_TEXT => '\kalanis\UploadPerPartes\InfoFormat\Text',
-        self::FORMAT_JSON => '\kalanis\UploadPerPartes\InfoFormat\Json',
+        self::FORMAT_TEXT => Text::class,
+        self::FORMAT_JSON => Json::class,
     ];
 
     /**
-     * @param IUPPTranslations $lang
      * @param int $variant
+     * @param IUPPTranslations $lang
      * @throws UploadException
      * @return IInfoFormatting
      */
-    public static function getFormat(IUPPTranslations $lang, int $variant): IInfoFormatting
+    public static function getFormat(int $variant, IUPPTranslations $lang): IInfoFormatting
     {
         if (!isset(static::$map[$variant])) {
             throw new UploadException($lang->uppDriveFileVariantNotSet());

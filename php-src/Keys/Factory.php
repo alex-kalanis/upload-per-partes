@@ -21,25 +21,25 @@ class Factory
 
     /** @var array<int, string> */
     protected static $map = [
-        self::VARIANT_VOLUME => '\kalanis\UploadPerPartes\Keys\SimpleVolume',
-        self::VARIANT_RANDOM => '\kalanis\UploadPerPartes\Keys\Random',
-        self::VARIANT_REDIS => '\kalanis\UploadPerPartes\Keys\Redis',
+        self::VARIANT_VOLUME => SimpleVolume::class,
+        self::VARIANT_RANDOM => Random::class,
+        self::VARIANT_REDIS => Redis::class,
     ];
 
     /**
-     * @param IUPPTranslations $lang
      * @param TargetSearch $target
      * @param int $variant
+     * @param IUPPTranslations|null $lang
      * @throws UploadException
      * @return AKey
      */
-    public static function getVariant(IUPPTranslations $lang, TargetSearch $target, int $variant): AKey
+    public static function getVariant(TargetSearch $target, int $variant, ?IUPPTranslations $lang = null): AKey
     {
         if (!isset(static::$map[$variant])) {
             throw new UploadException($lang->uppKeyVariantNotSet());
         }
         $class = static::$map[$variant];
-        $lib = new $class($lang, $target);
+        $lib = new $class($target, $lang);
         if (!$lib instanceof AKey) {
             throw new UploadException($lang->uppKeyVariantIsWrong($class));
         }

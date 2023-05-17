@@ -1,6 +1,6 @@
 # Upload Per-Partes
 
-[![Build Status](https://travis-ci.org/alex-kalanis/upload-per-partes.svg?branch=master)](https://travis-ci.org/alex-kalanis/upload-per-partes)
+[![Build Status](https://app.travis-ci.com/alex-kalanis/upload-per-partes.svg?branch=master)](https://app.travis-ci.com/github/alex-kalanis/upload-per-partes)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/alex-kalanis/upload-per-partes/v/stable.svg?v=1)](https://packagist.org/packages/alex-kalanis/upload-per-partes)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.3-8892BF.svg)](https://php.net/)

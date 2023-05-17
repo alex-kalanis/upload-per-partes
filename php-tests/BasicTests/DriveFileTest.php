@@ -29,7 +29,7 @@ class DriveFileTest extends CommonTestClass
         $driveFile = $this->getDriveFile();
         $this->assertTrue($driveFile->write($this->mockKey(), $this->mockData()));
         $data = $driveFile->read($this->mockKey());
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Data', $data);
+        $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals('abcdef', $data->fileName);
         $this->assertEquals($this->getTestDir() . 'abcdef', $data->tempLocation);
         $this->assertEquals(123456, $data->fileSize);
@@ -87,9 +87,9 @@ class DriveFileTest extends CommonTestClass
     {
         $lang = new Uploader\Translations();
         $storage = new Support\InfoRam($lang);
-        $target = new Uploader\TargetSearch($lang, $storage, new Support\DataRam($lang));
-        $key = new Support\Key($lang, $target);
+        $target = new Uploader\TargetSearch($storage, new Support\DataRam($lang), $lang);
+        $key = new Support\Key($target, $lang);
         $format = new InfoFormat\Json();
-        return new Uploader\DriveFile($lang, $storage, $format, $key);
+        return new Uploader\DriveFile($storage, $format, $key, $lang);
     }
 }

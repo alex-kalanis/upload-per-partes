@@ -29,17 +29,17 @@ class VolumeObject extends VolumeBasic
     {
         $file = new SplFileObject($location, 'rb+');
         if (false === @$file->ftell()) {
-            throw new UploadException($this->lang->uppCannotOpenFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotOpenFile($location));
         }
         $position = is_null($seek) ? @$file->fseek(0, SEEK_END) : @$file->fseek($seek) ;
         if (-1 == $position) {
             unset($file);
-            throw new UploadException($this->lang->uppCannotSeekFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
         }
         $status = @$file->fwrite($content);
         if (false === $status || is_null($status)) { /** @phpstan-ignore-line probably bug in phpstan definitions */
             unset($file);
-            throw new UploadException($this->lang->uppCannotWriteFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
         }
         unset($file);
     }
@@ -57,31 +57,31 @@ class VolumeObject extends VolumeBasic
         try {
             $file = new SplFileObject($location, 'rb+');
             if (false === @$file->ftell()) {
-                throw new UploadException($this->lang->uppCannotOpenFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotOpenFile($location));
             }
             if (empty($limit)) {
                 $position = @$file->fseek(0, SEEK_END);
                 if (-1 == $position) {
                     unset($file);
-                    throw new UploadException($this->lang->uppCannotSeekFile($location));
+                    throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
                 }
                 $limit = @$file->ftell() - $offset;
             }
             $position = @$file->fseek($offset, SEEK_SET);
             if (-1 == $position) {
                 unset($file);
-                throw new UploadException($this->lang->uppCannotSeekFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
             }
             $data = @$file->fread(intval($limit));
 
             if (false === $data) {
                 unset($file);
-                throw new UploadException($this->lang->uppCannotReadFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotReadFile($location));
             }
             unset($file);
             return $data;
         } catch (RuntimeException $ex) {
-            throw new UploadException($this->lang->uppCannotReadFile($location), 0, $ex);
+            throw new UploadException($this->getUppLang()->uppCannotReadFile($location), 0, $ex);
         }
     }
 
@@ -98,12 +98,12 @@ class VolumeObject extends VolumeBasic
             $file->rewind();
             if (!$file->ftruncate($offset)) {
                 unset($file);
-                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location));
             }
             $file->rewind();
             unset($file);
         } catch (RuntimeException $ex) {
-            throw new UploadException($this->lang->uppCannotTruncateFile($location), 0, $ex);
+            throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location), 0, $ex);
         }
     }
 }

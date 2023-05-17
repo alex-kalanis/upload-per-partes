@@ -1,10 +1,11 @@
 filter:
   excluded_paths:
-    - 'examples/*'
     - 'vendor/*'
-    - 'php-tests/_autoload.php'
-    - 'php-tests/_bootstrap.php'
-    - 'php-tests/data/*'
+    - '.github/*'
+    - 'doc/*'
+    - 'examples/*'
+    - 'frontend/*'
+    - 'php-tests/*'
     - 'kw_tests/*'
     - 'kw_upload/*'
   paths: {  }

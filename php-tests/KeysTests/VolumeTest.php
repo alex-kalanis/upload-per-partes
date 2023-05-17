@@ -19,9 +19,9 @@ class VolumeTest extends CommonTestClass
     public function testThru(): void
     {
         $lang = new Translations();
-        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
+        $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
         $target->setRemoteFileName('poiuztrewq')->setTargetDir('/tmp/')->process();
-        $lib = new Keys\SimpleVolume($lang, $target);
+        $lib = new Keys\SimpleVolume($target, $lang);
         $lib->generateKeys();
 
         $this->assertEquals(base64_encode('/tmp/poiuztrewq' . TargetSearch::FILE_DRIVER_SUFF), $lib->getSharedKey());

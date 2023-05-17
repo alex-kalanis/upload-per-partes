@@ -19,9 +19,9 @@ class RedisTest extends CommonTestClass
     public function testThru(): void
     {
         $lang = new Translations();
-        $target = new TargetSearch($lang, new Support\InfoRam($lang), new Support\DataRam($lang));
+        $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
         $target->setRemoteFileName('poiuztrewq')->setTargetDir($this->getTestDir())->process();
-        $lib = new Keys\Redis($lang, $target);
+        $lib = new Keys\Redis($target, $lang);
         $lib->generateKeys();
 
         $this->assertEquals(md5('poiuztrewq'), $lib->getSharedKey());

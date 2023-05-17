@@ -16,8 +16,8 @@ class FormatsTest extends AFormats
     public function testInit(): void
     {
         $lang = new Translations();
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Text', InfoFormat\Factory::getFormat($lang, InfoFormat\Factory::FORMAT_TEXT));
-        $this->assertInstanceOf('\kalanis\UploadPerPartes\InfoFormat\Json', InfoFormat\Factory::getFormat($lang, InfoFormat\Factory::FORMAT_JSON));
+        $this->assertInstanceOf(InfoFormat\Text::class, InfoFormat\Factory::getFormat(InfoFormat\Factory::FORMAT_TEXT, $lang));
+        $this->assertInstanceOf(InfoFormat\Json::class, InfoFormat\Factory::getFormat(InfoFormat\Factory::FORMAT_JSON, $lang));
     }
 
     /**
@@ -26,7 +26,7 @@ class FormatsTest extends AFormats
     public function testInitFail(): void
     {
         $this->expectException(UploadException::class);
-        InfoFormat\Factory::getFormat(new Translations(), 0);
+        InfoFormat\Factory::getFormat(0, new Translations());
         $this->expectExceptionMessageMatches('DRIVEFILE VARIANT NOT SET');
     }
 
@@ -36,7 +36,7 @@ class FormatsTest extends AFormats
     public function testClassFail(): void
     {
         $this->expectException(UploadException::class);
-        XFactory::getFormat(new Translations(), 10);
+        XFactory::getFormat(10, new Translations());
         $this->expectExceptionMessageMatches('DRIVEFILE VARIANT IS WRONG');
     }
 }
@@ -45,6 +45,6 @@ class FormatsTest extends AFormats
 class XFactory extends InfoFormat\Factory
 {
     protected static $map = [
-        10 => '\stdClass',
+        10 => \stdClass::class,
     ];
 }

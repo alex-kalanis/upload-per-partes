@@ -256,13 +256,13 @@ class UploadTest extends CommonTestClass
 
 class UploaderMock extends Uploader
 {
-    protected function getInfoStorage(Interfaces\IUPPTranslations $lang): Interfaces\IInfoStorage
+    protected function getInfoStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IInfoStorage
     {
         parent::getInfoStorage($lang);
         return new Support\InfoRam($lang);
     }
 
-    protected function getDataStorage(Interfaces\IUPPTranslations $lang): Interfaces\IDataStorage
+    protected function getDataStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IDataStorage
     {
         parent::getDataStorage($lang);
         return new Support\DataRam($lang);

@@ -31,31 +31,31 @@ class VolumeBasic extends AStorage
         if (is_null($seek)) {  // append to end
             $pointer = @fopen($location, 'ab');
             if (false == $pointer) {
-                throw new UploadException($this->lang->uppCannotOpenFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotOpenFile($location));
             }
             if (false === @fwrite($pointer, $content)) {
                 // @codeCoverageIgnoreStart
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotWriteFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
                 // @codeCoverageIgnoreEnd
             }
             /** @scrutinizer ignore-unhandled */@fclose($pointer);
         } else { // append from position
             $pointer = @fopen($location, 'rb+');
             if (false === $pointer) {
-                throw new UploadException($this->lang->uppCannotOpenFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotOpenFile($location));
             }
             // @codeCoverageIgnoreStart
             $position = @fseek($pointer, $seek);
             if (-1 == $position) {
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotSeekFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
             }
             // @codeCoverageIgnoreEnd
             // @codeCoverageIgnoreStart
             if (false === @fwrite($pointer, $content)) {
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotWriteFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
             }
             /** @scrutinizer ignore-unhandled */@fclose($pointer);
             // @codeCoverageIgnoreEnd
@@ -74,7 +74,7 @@ class VolumeBasic extends AStorage
         $pointer = @fopen($location, 'rb');
         if (false == $pointer) {
             // @codeCoverageIgnoreStart
-            throw new UploadException($this->lang->uppCannotOpenFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotOpenFile($location));
         }
         // @codeCoverageIgnoreEnd
         if (empty($limit)) {
@@ -82,7 +82,7 @@ class VolumeBasic extends AStorage
             if (-1 == $stat) {
                 // @codeCoverageIgnoreStart
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotSeekFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
             }
             // @codeCoverageIgnoreEnd
             $limit = @ftell($pointer) - $offset;
@@ -91,14 +91,14 @@ class VolumeBasic extends AStorage
         $position = @fseek($pointer, $offset, SEEK_SET);
         if (-1 == $position) {
             /** @scrutinizer ignore-unhandled */@fclose($pointer);
-            throw new UploadException($this->lang->uppCannotSeekFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotSeekFile($location));
         }
         // @codeCoverageIgnoreEnd
         $data = @fread($pointer, intval($limit)); // @phpstan-ignore-line
 
         if (false === $data) {
             // @codeCoverageIgnoreStart
-            throw new UploadException($this->lang->uppCannotReadFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotReadFile($location));
             // @codeCoverageIgnoreEnd
         }
         return $data;
@@ -117,13 +117,13 @@ class VolumeBasic extends AStorage
             if (false === $stat) {
                 // @codeCoverageIgnoreStart
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location));
             }
             // @codeCoverageIgnoreEnd
             if (!ftruncate($pointer, $offset)) { // @phpstan-ignore-line
                 // @codeCoverageIgnoreStart
                 /** @scrutinizer ignore-unhandled */@fclose($pointer);
-                throw new UploadException($this->lang->uppCannotTruncateFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location));
             }
             // @codeCoverageIgnoreEnd
             /** @scrutinizer ignore-unhandled */@rewind($pointer);
@@ -134,7 +134,7 @@ class VolumeBasic extends AStorage
     public function remove(string $location): void
     {
         if (!@unlink($location)) {
-            throw new UploadException($this->lang->uppCannotRemoveData($location));
+            throw new UploadException($this->getUppLang()->uppCannotRemoveData($location));
         }
     }
 }

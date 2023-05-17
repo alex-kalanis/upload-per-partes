@@ -6,6 +6,7 @@ namespace kalanis\UploadPerPartes\Uploader;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\Interfaces;
+use kalanis\UploadPerPartes\Traits\TLang;
 
 
 /**
@@ -15,24 +16,23 @@ use kalanis\UploadPerPartes\Interfaces;
  */
 class Processor
 {
+    use TLang;
+
     /** @var DriveFile */
     protected $driver = null;
     /** @var Interfaces\IDataStorage */
     protected $storage = null;
     /** @var Hashed */
     protected $hashed = null;
-    /** @var Interfaces\IUPPTranslations */
-    protected $lang = null;
 
-    /**
-     * @param Interfaces\IUPPTranslations $lang
-     * @param DriveFile $driver
-     * @param Interfaces\IDataStorage $storage
-     * @param Hashed $hashed
-     */
-    public function __construct(Interfaces\IUPPTranslations $lang, DriveFile $driver, Interfaces\IDataStorage $storage, Hashed $hashed)
+    public function __construct(
+        DriveFile $driver,
+        Interfaces\IDataStorage $storage,
+        Hashed $hashed,
+        ?Interfaces\IUPPTranslations $lang = null
+    )
     {
-        $this->lang = $lang;
+        $this->setUppLang($lang);
         $this->driver = $driver;
         $this->storage = $storage;
         $this->hashed = $hashed;
@@ -82,7 +82,7 @@ class Processor
             $this->driver->updateLastPart($sharedKey, $data, $segment);
         } else {
             if ($segment > $data->lastKnownPart + 1) {
-                throw new Exceptions\UploadException($this->lang->uppReadTooEarly($sharedKey));
+                throw new Exceptions\UploadException($this->getUppLang()->uppReadTooEarly($sharedKey));
             }
             $this->storage->addPart($data->tempLocation, $content, $segment * $data->bytesPerPart);
         }
@@ -145,13 +145,13 @@ class Processor
     protected function checkSegment(InfoFormat\Data $data, int $segment): void
     {
         if (0 > $segment) {
-            throw new Exceptions\UploadException($this->lang->uppSegmentOutOfBounds($segment));
+            throw new Exceptions\UploadException($this->getUppLang()->uppSegmentOutOfBounds($segment));
         }
         if ($segment > $data->partsCount) {
-            throw new Exceptions\UploadException($this->lang->uppSegmentOutOfBounds($segment));
+            throw new Exceptions\UploadException($this->getUppLang()->uppSegmentOutOfBounds($segment));
         }
         if ($segment > $data->lastKnownPart) {
-            throw new Exceptions\UploadException($this->lang->uppSegmentNotUploadedYet($segment));
+            throw new Exceptions\UploadException($this->getUppLang()->uppSegmentNotUploadedYet($segment));
         }
     }
 }

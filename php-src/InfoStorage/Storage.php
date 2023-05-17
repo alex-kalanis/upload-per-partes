@@ -8,6 +8,7 @@ use kalanis\kw_storage\StorageException;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TLang;
 
 
 /**
@@ -17,16 +18,16 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class Storage implements IInfoStorage
 {
-    /** @var IUPPTranslations */
-    protected $lang = null;
+    use TLang;
+
     /** @var IStorage */
     protected $storage = null;
     /** @var int */
     protected $timeout = 0;
 
-    public function __construct(IUPPTranslations $lang, IStorage $storage, int $timeout = 3600)
+    public function __construct(IStorage $storage, int $timeout = 3600, IUPPTranslations $lang = null)
     {
-        $this->lang = $lang;
+        $this->setUppLang($lang);
         $this->storage = $storage;
         $this->timeout = $timeout;
     }
@@ -41,7 +42,7 @@ class Storage implements IInfoStorage
         try {
             return $this->storage->exists($key);
         } catch (StorageException $ex) {
-            throw new UploadException($this->lang->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
+            throw new UploadException($this->getUppLang()->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
         }
     }
 
@@ -55,7 +56,7 @@ class Storage implements IInfoStorage
         try {
             return strval($this->storage->read($key));
         } catch (StorageException $ex) {
-            throw new UploadException($this->lang->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
+            throw new UploadException($this->getUppLang()->uppDriveFileCannotRead($key), $ex->getCode(), $ex);
         }
     }
 
@@ -68,10 +69,10 @@ class Storage implements IInfoStorage
     {
         try {
             if (false === $this->storage->write($key, $data, $this->timeout)) {
-                throw new UploadException($this->lang->uppDriveFileCannotWrite($key));
+                throw new UploadException($this->getUppLang()->uppDriveFileCannotWrite($key));
             }
         } catch (StorageException $ex) {
-            throw new UploadException($this->lang->uppDriveFileCannotWrite($key), $ex->getCode(), $ex);
+            throw new UploadException($this->getUppLang()->uppDriveFileCannotWrite($key), $ex->getCode(), $ex);
         }
     }
 
@@ -83,10 +84,10 @@ class Storage implements IInfoStorage
     {
         try {
             if (!$this->storage->remove($key)) {
-                throw new UploadException($this->lang->uppDriveFileCannotRemove($key));
+                throw new UploadException($this->getUppLang()->uppDriveFileCannotRemove($key));
             }
         } catch (StorageException $ex) {
-            throw new UploadException($this->lang->uppDriveFileCannotRemove($key), $ex->getCode(), $ex);
+            throw new UploadException($this->getUppLang()->uppDriveFileCannotRemove($key), $ex->getCode(), $ex);
         }
     }
 }

@@ -7,6 +7,7 @@ use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Keys;
+use kalanis\UploadPerPartes\Traits\TLang;
 
 
 /**
@@ -16,20 +17,25 @@ use kalanis\UploadPerPartes\Keys;
  */
 class DriveFile
 {
+    use TLang;
+
     /** @var Interfaces\IInfoStorage */
     protected $storage = null;
     /** @var Interfaces\IInfoFormatting */
     protected $format = null;
     /** @var Keys\AKey */
     protected $key = null;
-    /** @var Interfaces\IUPPTranslations */
-    protected $lang = null;
 
-    public function __construct(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $storage, Interfaces\IInfoFormatting $format, Keys\AKey $key)
+    public function __construct(
+        Interfaces\IInfoStorage $storage,
+        Interfaces\IInfoFormatting $format,
+        Keys\AKey $key,
+        ?Interfaces\IUPPTranslations $lang = null
+    )
     {
+        $this->setUppLang($lang);
         $this->storage = $storage;
         $this->format = $format;
-        $this->lang = $lang;
         $this->key = $key;
     }
 
@@ -45,7 +51,7 @@ class DriveFile
     public function write(string $sharedKey, InfoFormat\Data $data, bool $isNew = false): bool
     {
         if ($isNew && $this->exists($sharedKey)) {
-            throw new Exceptions\ContinuityUploadException($this->lang->uppDriveFileAlreadyExists($sharedKey));
+            throw new Exceptions\ContinuityUploadException($this->getUppLang()->uppDriveFileAlreadyExists($sharedKey));
         }
         $this->storage->save($this->key->fromSharedKey($sharedKey), $this->format->toFormat($data));
         return true;
@@ -75,7 +81,7 @@ class DriveFile
     {
         if ($checkContinuous) {
             if (($data->lastKnownPart + 1) != $last) {
-                throw new Exceptions\UploadException($this->lang->uppDriveFileNotContinuous($sharedKey));
+                throw new Exceptions\UploadException($this->getUppLang()->uppDriveFileNotContinuous($sharedKey));
             }
         }
         $data->lastKnownPart = $last;

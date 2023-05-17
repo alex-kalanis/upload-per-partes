@@ -26,7 +26,7 @@ class VolumeAdv extends VolumeBasic
     {
         if (is_null($seek)) {  // append to end
             if (false === @file_put_contents($location, $content, FILE_APPEND)) {
-                throw new UploadException($this->lang->uppCannotWriteFile($location));
+                throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
             }
         } else { // append from position
             parent::addPart($location, $content, $seek); // do not write another seek func
@@ -45,7 +45,7 @@ class VolumeAdv extends VolumeBasic
     {
         $data = @file_get_contents($location, false, null, $offset, $limit);
         if (false === $data) {
-            throw new UploadException($this->lang->uppCannotReadFile($location));
+            throw new UploadException($this->getUppLang()->uppCannotReadFile($location));
         }
         return $data;
     }

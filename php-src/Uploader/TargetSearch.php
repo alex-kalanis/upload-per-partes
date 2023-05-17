@@ -5,6 +5,7 @@ namespace kalanis\UploadPerPartes\Uploader;
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces;
+use kalanis\UploadPerPartes\Traits\TLang;
 
 
 /**
@@ -14,14 +15,14 @@ use kalanis\UploadPerPartes\Interfaces;
  */
 class TargetSearch
 {
+    use TLang;
+
     const FILE_DRIVER_SUFF = '.partial';
     const FILE_UPLOAD_SUFF = '.upload';
     const FILE_EXT_SEP = '.';
     const FILE_VER_SEP = '.';
     const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
-    /** @var Interfaces\IUPPTranslations */
-    protected $lang = null;
     /** @var Interfaces\IInfoStorage */
     protected $infoStorage = null;
     /** @var Interfaces\IDataStorage */
@@ -42,16 +43,15 @@ class TargetSearch
     protected $fileExt = '';
 
 
-    /**
-     * @param Interfaces\IUPPTranslations $lang
-     * @param Interfaces\IInfoStorage $infoStorage
-     * @param Interfaces\IDataStorage $dataStorage
-     * @param bool $sanitizeWhitespace
-     * @param bool $sanitizeAlnum
-     */
-    public function __construct(Interfaces\IUPPTranslations $lang, Interfaces\IInfoStorage $infoStorage, Interfaces\IDataStorage $dataStorage, bool $sanitizeWhitespace = true, bool $sanitizeAlnum = true)
+    public function __construct(
+        Interfaces\IInfoStorage $infoStorage,
+        Interfaces\IDataStorage $dataStorage,
+        ?Interfaces\IUPPTranslations $lang = null,
+        bool $sanitizeWhitespace = true,
+        bool $sanitizeAlnum = true
+    )
     {
-        $this->lang = $lang;
+        $this->setUppLang($lang);
         $this->infoStorage = $infoStorage;
         $this->dataStorage = $dataStorage;
         $this->sanitizeAlnum = $sanitizeAlnum;
@@ -130,7 +130,7 @@ class TargetSearch
     protected function checkRemoteName(): void
     {
         if (empty($this->remoteFileName)) {
-            throw new UploadException($this->lang->uppSentNameIsEmpty());
+            throw new UploadException($this->getUppLang()->uppSentNameIsEmpty());
         }
     }
 
@@ -140,7 +140,7 @@ class TargetSearch
     protected function checkTargetDir(): void
     {
         if (empty($this->targetDir)) {
-            throw new UploadException($this->lang->uppTargetDirIsEmpty());
+            throw new UploadException($this->getUppLang()->uppTargetDirIsEmpty());
         }
     }
 
@@ -150,7 +150,7 @@ class TargetSearch
     protected function checkFileBase(): void
     {
         if (empty($this->fileBase)) {
-            throw new UploadException($this->lang->uppUploadNameIsEmpty());
+            throw new UploadException($this->getUppLang()->uppUploadNameIsEmpty());
         }
     }
 
