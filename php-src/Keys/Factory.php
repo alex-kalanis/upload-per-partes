@@ -33,7 +33,7 @@ class Factory
      * @throws UploadException
      * @return AKey
      */
-    public static function getVariant(TargetSearch $target, int $variant, ?IUPPTranslations $lang = null): AKey
+    public static function getVariant(TargetSearch $target, int $variant, IUPPTranslations $lang): AKey
     {
         if (!isset(static::$map[$variant])) {
             throw new UploadException($lang->uppKeyVariantNotSet());

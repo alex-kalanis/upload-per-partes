@@ -20,7 +20,7 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 ```
 {
     "require": {
-        "alex-kalanis/upload-per-partes": "1.1"
+        "alex-kalanis/upload-per-partes": "2.0"
     }
 }
 ```
