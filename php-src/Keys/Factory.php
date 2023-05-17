@@ -29,7 +29,7 @@ class Factory
     /**
      * @param TargetSearch $target
      * @param int $variant
-     * @param IUPPTranslations|null $lang
+     * @param IUPPTranslations $lang
      * @throws UploadException
      * @return AKey
      */
