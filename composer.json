@@ -17,10 +17,14 @@
     },
     "suggest": {
         "predis/predis": "Redis client",
+        "alex-kalanis/kw_paths": "Paths for accessing targets in KWCMS",
+        "alex-kalanis/kw_files": "Accessing stored entries as files on some volume",
         "alex-kalanis/kw_storage": "Universal storage library for store data as key-value pairs"
     },
     "require-dev": {
         "alex-kalanis/kw_storage": "~3.0",
+        "alex-kalanis/kw_files": ">=3.4",
+        "alex-kalanis/kw_paths": ">=3.0",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
