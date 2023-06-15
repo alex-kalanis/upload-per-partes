@@ -7,6 +7,7 @@ use kalanis\kw_files\Access\CompositeAdapter;
 use kalanis\kw_files\FilesException;
 use kalanis\kw_files\Traits\TToString;
 use kalanis\kw_paths\PathsException;
+use kalanis\kw_paths\Stuff;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
@@ -32,7 +33,7 @@ class Files extends AStorage
     public function exists(string $key): bool
     {
         try {
-            return $this->lib->exists([$key]);
+            return $this->lib->exists(Stuff::pathToArray($key));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
@@ -41,7 +42,7 @@ class Files extends AStorage
     public function load(string $key): string
     {
         try {
-            return $this->toString($key, $this->lib->readFile([$key]));
+            return $this->toString($key, $this->lib->readFile(Stuff::pathToArray($key)));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotReadFile($key), $ex->getCode(), $ex);
         }
@@ -50,7 +51,7 @@ class Files extends AStorage
     public function save(string $key, string $data): void
     {
         try {
-            $this->lib->saveFile([$key], $data);
+            $this->lib->saveFile(Stuff::pathToArray($key), $data);
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppDriveFileCannotWrite($key), $ex->getCode(), $ex);
         }
@@ -59,7 +60,7 @@ class Files extends AStorage
     public function remove(string $key): void
     {
         try {
-            $this->lib->deleteFile([$key]);
+            $this->lib->deleteFile(Stuff::pathToArray($key));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppDriveFileCannotRemove($key), $ex->getCode(), $ex);
         }

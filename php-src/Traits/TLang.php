@@ -8,7 +8,7 @@ use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 /**
- * Trait TEscape
+ * Trait TLang
  * @package kalanis\UploadPerPartes\Traits
  * Translations
  */
