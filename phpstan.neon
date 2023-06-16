@@ -13,8 +13,9 @@ parameters:
 		- 'php-tests/testing-ipsum.txt'
 	bootstrapFiles:
 		- 'php-tests/_autoload.php'
+	reportUnmatchedIgnoredErrors: false
 	ignoreErrors:
-		# file_get_contents has null as default value of maxlen
+		# file_get_contents has null as default value of maxlen - php7
 		- '#Parameter \#5 \$maxlen of function file_get_contents expects#'
 		# strval, intval
-		- '#Parameter \#1 \$var of function [si][tn][rt]val expects#'
+		- '#Parameter \#1 \$va[rl]u?e? of function [si][tn][rt]val expects#'
