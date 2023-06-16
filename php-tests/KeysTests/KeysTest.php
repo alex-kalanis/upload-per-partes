@@ -19,10 +19,11 @@ class KeysTest extends CommonTestClass
     public function testInit(): void
     {
         $lang = new Translations();
+        $lib = new Keys\Factory($lang);
         $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
-        $this->assertInstanceOf(Keys\SimpleVolume::class, Keys\Factory::getVariant($target, Keys\Factory::VARIANT_VOLUME, $lang));
-        $this->assertInstanceOf(Keys\Random::class, Keys\Factory::getVariant($target, Keys\Factory::VARIANT_RANDOM, $lang));
-        $this->assertInstanceOf(Keys\Redis::class, Keys\Factory::getVariant($target, Keys\Factory::VARIANT_REDIS, $lang));
+        $this->assertInstanceOf(Keys\SimpleVolume::class, $lib->getVariant($target, Keys\Factory::VARIANT_VOLUME));
+        $this->assertInstanceOf(Keys\Random::class, $lib->getVariant($target, Keys\Factory::VARIANT_RANDOM));
+        $this->assertInstanceOf(Keys\Redis::class, $lib->getVariant($target, Keys\Factory::VARIANT_REDIS));
     }
 
     /**
@@ -31,9 +32,10 @@ class KeysTest extends CommonTestClass
     public function testInitFail(): void
     {
         $lang = new Translations();
+        $lib = new Keys\Factory($lang);
         $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
         $this->expectException(UploadException::class);
-        Keys\Factory::getVariant($target, 0, $lang);
+        $lib->getVariant($target, 0);
         $this->expectExceptionMessageMatches('KEY VARIANT NOT SET');
     }
 
@@ -43,9 +45,36 @@ class KeysTest extends CommonTestClass
     public function testClassFail(): void
     {
         $lang = new Translations();
+        $lib = new XFactory($lang);
         $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
         $this->expectException(UploadException::class);
-        XFactory::getVariant($target, 10, $lang);
+        $lib->getVariant($target, 10);
+        $this->expectExceptionMessageMatches('KEY VARIANT IS WRONG');
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testClassDie(): void
+    {
+        $lang = new Translations();
+        $lib = new XFactory($lang);
+        $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
+        $this->expectException(UploadException::class);
+        $lib->getVariant($target, 999);
+        $this->expectExceptionMessageMatches('KEY VARIANT IS WRONG');
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testClassConstructDie(): void
+    {
+        $lang = new Translations();
+        $lib = new XFactory($lang);
+        $target = new TargetSearch(new Support\InfoRam($lang), new Support\DataRam($lang), $lang);
+        $this->expectException(UploadException::class);
+        $lib->getVariant($target, 333);
         $this->expectExceptionMessageMatches('KEY VARIANT IS WRONG');
     }
 
@@ -75,9 +104,19 @@ class KeysTest extends CommonTestClass
 }
 
 
+class WithConstructParamsNoInterface
+{
+    public function __construct($param1, $param2)
+    {
+    }
+}
+
+
 class XFactory extends Keys\Factory
 {
     protected static $map = [
         10 => '\stdClass',
+        333 => WithConstructParamsNoInterface::class,
+        999 => 'this class does not exists',
     ];
 }

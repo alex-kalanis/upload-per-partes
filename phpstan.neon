@@ -1,5 +1,5 @@
 parameters:
-	level: 7
+	level: 9
 	paths:
 		- 'php-src'
 	scanFiles:
@@ -14,6 +14,7 @@ parameters:
 	bootstrapFiles:
 		- 'php-tests/_autoload.php'
 	ignoreErrors:
-		# integers into limited integers
-		- '#expects int\<0, max\>, int given.#'
-		- '#expects int\<0, max\>\|null, int given.#'
+		# file_get_contents has null as default value of maxlen
+		- '#Parameter \#5 \$maxlen of function file_get_contents expects#'
+		# strval, intval
+		- '#Parameter \#1 \$var of function [si][tn][rt]val expects#'

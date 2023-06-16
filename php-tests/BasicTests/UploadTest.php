@@ -258,13 +258,13 @@ class UploaderMock extends Uploader
 {
     protected function getInfoStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IInfoStorage
     {
-        parent::getInfoStorage($lang);
+        parent::getInfoStorage();
         return new Support\InfoRam($lang);
     }
 
     protected function getDataStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IDataStorage
     {
-        parent::getDataStorage($lang);
+        parent::getDataStorage();
         return new Support\DataRam($lang);
     }
 

@@ -68,7 +68,7 @@ class Processor
      * Upload file by parts, use driving file
      * @param string $sharedKey
      * @param string $content binary content
-     * @param int|null $segment where it save
+     * @param int<0, max>|null $segment where it save
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
@@ -93,7 +93,7 @@ class Processor
     /**
      * Delete problematic segments
      * @param string $sharedKey
-     * @param int $segment
+     * @param int<0, max> $segment
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
@@ -109,7 +109,7 @@ class Processor
     /**
      * Check already uploaded parts
      * @param string $sharedKey
-     * @param int $segment
+     * @param int<0, max> $segment
      * @throws Exceptions\UploadException
      * @return string
      */

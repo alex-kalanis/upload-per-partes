@@ -4,6 +4,7 @@ namespace kalanis\UploadPerPartes\Response;
 
 
 use Exception;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
 /**
@@ -16,15 +17,15 @@ class CheckResponse extends AResponse
     /** @var string */
     protected $checksum = '';
 
-    public static function initOk(string $sharedKey, string $checksum): self
+    public static function initOk(?IUPPTranslations $lang, string $sharedKey, string $checksum): self
     {
-        $l = new static();
+        $l = new static($lang);
         return $l->setData($sharedKey, $checksum, static::STATUS_OK);
     }
 
-    public static function initError(string $sharedKey, Exception $ex): self
+    public static function initError(?IUPPTranslations $lang, string $sharedKey, Exception $ex): self
     {
-        $l = new static();
+        $l = new static($lang);
         return $l->setData($sharedKey, '', static::STATUS_FAIL, $ex->getMessage());
     }
 

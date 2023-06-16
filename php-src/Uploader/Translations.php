@@ -70,6 +70,11 @@ class Translations implements IUPPTranslations
         return 'DRIVEFILE VARIANT NOT SET';
     }
 
+    public function uppDriveDataNotSet(): string
+    {
+        return 'DRIVE DATA NOT SET';
+    }
+
     public function uppDriveFileVariantIsWrong(string $className): string
     {
         return 'DRIVEFILE VARIANT IS WRONG';

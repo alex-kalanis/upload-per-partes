@@ -51,6 +51,7 @@
             <directory>php-tests/InfoFormatTests</directory>
             <directory>php-tests/InfoStorageTests</directory>
             <directory>php-tests/KeysTests</directory>
+            <directory>php-tests/TraitsTests</directory>
         </testsuite>
         <testsuite name="Basics">
             <directory>php-tests/BasicTests</directory>

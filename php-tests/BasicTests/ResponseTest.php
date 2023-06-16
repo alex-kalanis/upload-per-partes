@@ -6,13 +6,17 @@ namespace BasicTests;
 use CommonTestClass;
 use kalanis\UploadPerPartes\Response;
 use kalanis\UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 class ResponseTest extends CommonTestClass
 {
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testInitBegin(): void
     {
-        $lib = Response\InitResponse::initOk($this->mockSharedKey(), $this->mockData());
+        $lib = Response\InitResponse::initOk(new Translations(), $this->mockSharedKey(), $this->mockData());
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals('abcdef', $lib->jsonSerialize()['name']);
@@ -22,10 +26,13 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(7, $lib->jsonSerialize()['lastKnownPart']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testInitError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\InitResponse::initError($this->mockData(), $ex);
+        $lib = Response\InitResponse::initError(null, $this->mockData(), $ex);
 
         $this->assertEquals('abcdef', $lib->jsonSerialize()['name']);
         $this->assertEquals(Response\InitResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
@@ -34,7 +41,7 @@ class ResponseTest extends CommonTestClass
 
     public function testCheckOk(): void
     {
-        $lib = Response\CheckResponse::initOk($this->mockSharedKey(), '123abc456def789');
+        $lib = Response\CheckResponse::initOk(null, $this->mockSharedKey(), '123abc456def789');
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals('123abc456def789', $lib->jsonSerialize()['checksum']);
@@ -44,7 +51,7 @@ class ResponseTest extends CommonTestClass
     public function testCheckError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\CheckResponse::initError($this->mockSharedKey(), $ex);
+        $lib = Response\CheckResponse::initError(new Translations(), $this->mockSharedKey(), $ex);
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals('', $lib->jsonSerialize()['checksum']);
@@ -52,48 +59,63 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testTruncateOk(): void
     {
-        $lib = Response\TruncateResponse::initOk($this->mockSharedKey(), $this->mockData());
+        $lib = Response\TruncateResponse::initOk(new Translations(), $this->mockSharedKey(), $this->mockData());
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(7, $lib->jsonSerialize()['lastKnownPart']);
         $this->assertEquals(Response\TruncateResponse::STATUS_OK, $lib->jsonSerialize()['status']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testTruncateError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\TruncateResponse::initError($this->mockSharedKey(), $this->mockData(), $ex);
+        $lib = Response\TruncateResponse::initError(null, $this->mockSharedKey(), $this->mockData(), $ex);
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\TruncateResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testUploadOk(): void
     {
-        $lib = Response\UploadResponse::initOK($this->mockSharedKey(), $this->mockData());
+        $lib = Response\UploadResponse::initOK(null, $this->mockSharedKey(), $this->mockData());
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testUploadFail(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\UploadResponse::initError($this->mockSharedKey(), $this->mockData(), $ex);
+        $lib = Response\UploadResponse::initError(new Translations(), $this->mockSharedKey(), $this->mockData(), $ex);
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testDoneComplete(): void
     {
         $data = $this->mockData();
-        $lib = Response\DoneResponse::initDone($this->mockSharedKey(), $data);
+        $lib = Response\DoneResponse::initDone(new Translations(), $this->mockSharedKey(), $data);
 
         $this->assertEquals($this->getTestDir() . $data->fileName, $lib->getTemporaryLocation());
         $this->assertEquals('abcdef', $lib->getFileName());
@@ -103,11 +125,14 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
     }
 
+    /**
+     * @throws Exceptions\UploadException
+     */
     public function testDoneFail(): void
     {
         $data = $this->mockData();
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\DoneResponse::initError($this->mockSharedKey(), $data, $ex);
+        $lib = Response\DoneResponse::initError(null, $this->mockSharedKey(), $data, $ex);
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
@@ -116,7 +141,7 @@ class ResponseTest extends CommonTestClass
 
     public function testCancelOk(): void
     {
-        $lib = Response\CancelResponse::initCancel($this->mockSharedKey());
+        $lib = Response\CancelResponse::initCancel(null, $this->mockSharedKey());
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $lib->jsonSerialize()['status']);
@@ -125,7 +150,7 @@ class ResponseTest extends CommonTestClass
     public function testCancelError(): void
     {
         $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\CancelResponse::initError($this->mockSharedKey(), $ex);
+        $lib = Response\CancelResponse::initError(new Translations(), $this->mockSharedKey(), $ex);
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['sharedKey']);
         $this->assertEquals(Response\CancelResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);

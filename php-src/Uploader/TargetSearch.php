@@ -173,12 +173,12 @@ class TargetSearch
 
     protected function canonize(): void
     {
-        $f = preg_replace('/((&[[:alpha:]]{1,6};)|(&#[[:alnum:]]{1,7};))/', '', $this->remoteFileName);
+        $f = strval(preg_replace('/((&[[:alpha:]]{1,6};)|(&#[[:alnum:]]{1,7};))/', '', $this->remoteFileName));
         if ($this->sanitizeAlnum) {
-            $f = preg_replace('#[^[:alnum:]_\s\-\.]#', '', $f); // remove all which is not alnum or dots
+            $f = strval(preg_replace('#[^[:alnum:]_\s\-\.]#', '', $f)); // remove all which is not alnum or dots
         }
         if ($this->sanitizeWhitespace) {
-            $f = preg_replace('#[\s]#', '_', $f); // whitespaces to underscore
+            $f = strval(preg_replace('#[\s]#', '_', $f)); // whitespaces to underscore
         }
         $this->fileExt = $this->fileExt($f);
         $this->fileBase = mb_substr(

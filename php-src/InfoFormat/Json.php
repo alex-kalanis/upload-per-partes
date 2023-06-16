@@ -17,8 +17,10 @@ class Json implements IInfoFormatting
     {
         $libData = new Data();
         $jsonData = json_decode($content, true);
-        foreach ($jsonData as $key => $value) {
-            $libData->{$key} = $value;
+        if (is_iterable($jsonData)) {
+            foreach ($jsonData as $key => $value) {
+                $libData->{$key} = $value;
+            }
         }
         return $libData->sanitizeData();
     }

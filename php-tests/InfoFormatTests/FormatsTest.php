@@ -15,9 +15,9 @@ class FormatsTest extends AFormats
      */
     public function testInit(): void
     {
-        $lang = new Translations();
-        $this->assertInstanceOf(InfoFormat\Text::class, InfoFormat\Factory::getFormat(InfoFormat\Factory::FORMAT_TEXT, $lang));
-        $this->assertInstanceOf(InfoFormat\Json::class, InfoFormat\Factory::getFormat(InfoFormat\Factory::FORMAT_JSON, $lang));
+        $factory = new InfoFormat\Factory(new Translations());
+        $this->assertInstanceOf(InfoFormat\Text::class, $factory->getFormat(InfoFormat\Factory::FORMAT_TEXT));
+        $this->assertInstanceOf(InfoFormat\Json::class, $factory->getFormat(InfoFormat\Factory::FORMAT_JSON));
     }
 
     /**
@@ -25,8 +25,9 @@ class FormatsTest extends AFormats
      */
     public function testInitFail(): void
     {
+        $factory = new InfoFormat\Factory(new Translations());
         $this->expectException(UploadException::class);
-        InfoFormat\Factory::getFormat(0, new Translations());
+        $factory->getFormat(0);
         $this->expectExceptionMessageMatches('DRIVEFILE VARIANT NOT SET');
     }
 
@@ -35,8 +36,20 @@ class FormatsTest extends AFormats
      */
     public function testClassFail(): void
     {
+        $factory = new XFactory();
         $this->expectException(UploadException::class);
-        XFactory::getFormat(10, new Translations());
+        $factory->getFormat(10);
+        $this->expectExceptionMessageMatches('DRIVEFILE VARIANT IS WRONG');
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testClassDie(): void
+    {
+        $factory = new XFactory();
+        $this->expectException(UploadException::class);
+        $factory->getFormat(999);
         $this->expectExceptionMessageMatches('DRIVEFILE VARIANT IS WRONG');
     }
 }
@@ -46,5 +59,6 @@ class XFactory extends InfoFormat\Factory
 {
     protected static $map = [
         10 => \stdClass::class,
+        999 => 'this-class-does-not-exists',
     ];
 }

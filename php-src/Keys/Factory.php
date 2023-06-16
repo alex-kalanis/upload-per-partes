@@ -5,7 +5,10 @@ namespace kalanis\UploadPerPartes\Keys;
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TLang;
 use kalanis\UploadPerPartes\Uploader\TargetSearch;
+use ReflectionClass;
+use ReflectionException;
 
 
 /**
@@ -15,34 +18,47 @@ use kalanis\UploadPerPartes\Uploader\TargetSearch;
  */
 class Factory
 {
+    use TLang;
+
     const VARIANT_VOLUME = 1;
     const VARIANT_RANDOM = 2;
     const VARIANT_REDIS = 3;
 
-    /** @var array<int, string> */
+    /** @var array<int, class-string<AKey>> */
     protected static $map = [
         self::VARIANT_VOLUME => SimpleVolume::class,
         self::VARIANT_RANDOM => Random::class,
         self::VARIANT_REDIS => Redis::class,
     ];
 
+    public function __construct(?IUPPTranslations $lang = null)
+    {
+        $this->setUppLang($lang);
+    }
+
     /**
      * @param TargetSearch $target
      * @param int $variant
-     * @param IUPPTranslations $lang
      * @throws UploadException
      * @return AKey
      */
-    public static function getVariant(TargetSearch $target, int $variant, IUPPTranslations $lang): AKey
+    public function getVariant(TargetSearch $target, int $variant): AKey
     {
         if (!isset(static::$map[$variant])) {
-            throw new UploadException($lang->uppKeyVariantNotSet());
+            throw new UploadException($this->getUppLang()->uppKeyVariantNotSet());
         }
         $class = static::$map[$variant];
-        $lib = new $class($target, $lang);
-        if (!$lib instanceof AKey) {
-            throw new UploadException($lang->uppKeyVariantIsWrong($class));
+        try {
+            $ref = new ReflectionClass($class);
+            if ($ref->isInstantiable()) {
+                $lib = $ref->newInstance($target, $this->getUppLang());
+                if ($lib instanceof AKey) {
+                    return $lib;
+                }
+            }
+            throw new UploadException($this->getUppLang()->uppKeyVariantIsWrong($class));
+        } catch (ReflectionException $ex) {
+            throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
-        return $lib;
     }
 }

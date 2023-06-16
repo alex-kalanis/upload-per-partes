@@ -14,13 +14,13 @@ final class Data
     public $fileName = '';
     /** @var string */
     public $tempLocation = '';
-    /** @var int */
+    /** @var int<0, max> */
     public $fileSize = 0;
-    /** @var int */
+    /** @var int<0, max> */
     public $partsCount = 0;
-    /** @var int */
+    /** @var int<0, max> */
     public $bytesPerPart = 0;
-    /** @var int */
+    /** @var int<0, max> */
     public $lastKnownPart = 0;
 
     public static function init(): self
@@ -31,10 +31,10 @@ final class Data
     /**
      * @param string $fileName
      * @param string $tempLocation
-     * @param int $fileSize
-     * @param int $partsCount
-     * @param int $bytesPerPart
-     * @param int $lastKnownPart
+     * @param int<0, max> $fileSize
+     * @param int<0, max> $partsCount
+     * @param int<0, max> $bytesPerPart
+     * @param int<0, max> $lastKnownPart
      * @return $this
      */
     public function setData(string $fileName, string $tempLocation, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0): self

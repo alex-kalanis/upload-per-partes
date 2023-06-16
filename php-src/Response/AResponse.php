@@ -4,6 +4,8 @@ namespace kalanis\UploadPerPartes\Response;
 
 
 use JsonSerializable;
+use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TData;
 
 
 /**
@@ -13,6 +15,8 @@ use JsonSerializable;
  */
 abstract class AResponse implements JsonSerializable
 {
+    use TData;
+
     const STATUS_OK = 'OK';
     const STATUS_FAIL = 'FAIL';
 
@@ -23,7 +27,8 @@ abstract class AResponse implements JsonSerializable
     /** @var string */
     protected $status = self::STATUS_OK;
 
-    final public function __construct()
+    final public function __construct(?IUPPTranslations $lang = null)
     {
+        $this->setUppLang($lang);
     }
 }

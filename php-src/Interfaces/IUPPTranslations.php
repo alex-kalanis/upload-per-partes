@@ -34,6 +34,8 @@ interface IUPPTranslations
 
     public function uppDriveFileVariantNotSet(): string;
 
+    public function uppDriveDataNotSet(): string;
+
     public function uppDriveFileVariantIsWrong(string $className): string;
 
     public function uppDriveFileCannotRead(string $key): string;

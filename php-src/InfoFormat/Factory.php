@@ -6,6 +6,9 @@ namespace kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Traits\TLang;
+use ReflectionClass;
+use ReflectionException;
 
 
 /**
@@ -15,31 +18,44 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class Factory
 {
+    use TLang;
+
     const FORMAT_TEXT = 1;
     const FORMAT_JSON = 2;
 
-    /** @var array<int, string> */
+    /** @var array<int, class-string<IInfoFormatting>> */
     protected static $map = [
         self::FORMAT_TEXT => Text::class,
         self::FORMAT_JSON => Json::class,
     ];
 
+    public function __construct(?IUPPTranslations $lang = null)
+    {
+        $this->setUppLang($lang);
+    }
+
     /**
      * @param int $variant
-     * @param IUPPTranslations $lang
      * @throws UploadException
      * @return IInfoFormatting
      */
-    public static function getFormat(int $variant, IUPPTranslations $lang): IInfoFormatting
+    public function getFormat(int $variant): IInfoFormatting
     {
         if (!isset(static::$map[$variant])) {
-            throw new UploadException($lang->uppDriveFileVariantNotSet());
+            throw new UploadException($this->getUppLang()->uppDriveFileVariantNotSet());
         }
         $class = static::$map[$variant];
-        $lib = new $class();
-        if (!$lib instanceof IInfoFormatting) {
-            throw new UploadException($lang->uppDriveFileVariantIsWrong($class));
+        try {
+            $ref = new ReflectionClass($class);
+            if ($ref->isInstantiable()) {
+                $lib = $ref->newInstance();
+                if ($lib instanceof IInfoFormatting) {
+                    return $lib;
+                }
+            }
+            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong($class));
+        } catch (ReflectionException $ex) {
+            throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
-        return $lib;
     }
 }

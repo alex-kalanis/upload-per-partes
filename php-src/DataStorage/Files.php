@@ -51,7 +51,7 @@ class Files extends AStorage
                     $seek = strlen($this->toString($location, $this->lib->readFile($path)));
                 }
             }
-            $this->lib->saveFile($path, $content, $seek);
+            $this->lib->saveFile($path, $content, abs($seek));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
