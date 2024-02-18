@@ -16,24 +16,46 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class TruncateResponse extends AResponse
 {
-    public static function initOk(?IUPPTranslations $lang, string $sharedKey, InfoFormat\Data $data): self
+    public static function initOk(
+        ?IUPPTranslations $lang,
+        string $sharedKey,
+        InfoFormat\Data $data,
+        string $roundaboutClient = '',
+        string $roundaboutServer = ''
+    ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, $data, static::STATUS_OK);
+        return $l->setData($sharedKey, $data, static::STATUS_OK, static::STATUS_OK, $roundaboutClient, $roundaboutServer);
     }
 
-    public static function initError(?IUPPTranslations $lang, string $sharedKey, InfoFormat\Data $data, Exception $ex): self
+    public static function initError(
+        ?IUPPTranslations $lang,
+        string $sharedKey,
+        InfoFormat\Data $data,
+        Exception $ex,
+        string $roundaboutClient = '',
+        string $roundaboutServer = ''
+    ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage());
+        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient, $roundaboutServer);
     }
 
-    public function setData(string $sharedKey, InfoFormat\Data $data, string $status, string $errorMessage = self::STATUS_OK): self
+    public function setData(
+        string $sharedKey,
+        InfoFormat\Data $data,
+        string $status,
+        string $errorMessage = self::STATUS_OK,
+        string $roundaboutClient = '',
+        string $roundaboutServer = ''
+    ): self
     {
         $this->sharedKey = $sharedKey;
         $this->setInfoData($data);
         $this->status = $status;
         $this->errorMessage = $errorMessage;
+        $this->roundaboutClient = $roundaboutClient;
+        $this->roundaboutServer = $roundaboutServer;
         return $this;
     }
 
@@ -49,6 +71,8 @@ class TruncateResponse extends AResponse
             'lastKnownPart' => intval($this->getInfoData()->lastKnownPart),
             'status' => strval($this->status),
             'errorMessage' => strval($this->errorMessage),
+            'serverData' => strval($this->roundaboutServer),
+            'clientData' => strval($this->roundaboutClient),
         ];
     }
 }

@@ -83,6 +83,10 @@ var UploadedFile = function () {
     this.errorMessage = "";
     /** @var {number} when the upload starts */
     this.startTime = 0;
+    /** @var {string} what passed back to this client */
+    this.clientData = "";
+    /** @var {string} what will be passed back to the server */
+    this.serverData = "";
 
     // setters
     /**
@@ -124,6 +128,8 @@ var UploadedFile = function () {
         uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         uploadedFile.partSize = parseInt(serverResponse.partSize);
         uploadedFile.errorMessage = serverResponse.errorMessage;
+        uploadedFile.clientData = serverResponse.clientData;
+        uploadedFile.serverData = serverResponse.serverData;
         return uploadedFile;
     };
 
@@ -316,7 +322,8 @@ var UploadInit = function () {
         uploadInit.upQuery.begin(
             {
                 fileName: uploadedFile.fileName,
-                fileSize: uploadedFile.fileSize
+                fileSize: uploadedFile.fileSize,
+                clientData: uploadedFile.clientData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -419,7 +426,9 @@ var UploaderChecker = function () {
             uploaderChecker.upQuery.check(
                 {
                     sharedKey: uploadedFile.sharedKey,
-                    segment: uploadedFile.lastCheckedPart
+                    segment: uploadedFile.lastCheckedPart,
+                    clientData: uploadedFile.clientData,
+                    serverData: uploadedFile.serverData
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -482,7 +491,9 @@ var UploaderChecker = function () {
         uploaderChecker.upQuery.trim(
             {
                 sharedKey: uploadedFile.sharedKey,
-                segment: uploadedFile.lastCheckedPart
+                segment: uploadedFile.lastCheckedPart,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -577,7 +588,9 @@ var UploaderRunner = function () {
                 {
                     sharedKey: uploadedFile.sharedKey,
                     content: uploaderRunner.upEncoder.base64(result),
-                    // lastKnownPart: uploadedFile.lastKnownPart
+                    // lastKnownPart: uploadedFile.lastKnownPart,
+                    clientData: uploadedFile.clientData,
+                    serverData: uploadedFile.serverData
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -611,7 +624,9 @@ var UploaderRunner = function () {
     this.closePart = function(uploadedFile) {
         uploaderRunner.upQuery.done(
             {
-                sharedKey: uploadedFile.sharedKey
+                sharedKey: uploadedFile.sharedKey,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -704,7 +719,9 @@ var UploaderFailure = function () {
     this.contentRemoval = function(uploadedFile) {
         uploaderFailure.upQuery.cancel(
             {
-                sharedKey: uploadedFile.sharedKey
+                sharedKey: uploadedFile.sharedKey,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData
             },
             function(responseData) {
                 if (typeof responseData == "object") {

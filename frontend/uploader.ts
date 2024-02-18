@@ -83,6 +83,10 @@ class UploadedFile {
     errorMessage = "";
     /** @var {number} when the upload starts */
     startTime = 0;
+    /** @var {string} what passed back to this client */
+    clientData = "";
+    /** @var {string} what will be passed back to the server */
+    serverData = "";
 
     // setters
     /**
@@ -124,6 +128,8 @@ class UploadedFile {
         this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         this.partSize = parseInt(serverResponse.partSize);
         this.errorMessage = serverResponse.errorMessage;
+        this.clientData = serverResponse.clientData;
+        this.serverData = serverResponse.serverData;
         return this;
     }
 
@@ -303,7 +309,8 @@ class UploadInit {
         this.upQuery.init(
             {
                 fileName: uploadedFile.fileName,
-                fileSize: uploadedFile.fileSize
+                fileSize: uploadedFile.fileSize,
+                clientData: uploadedFile.clientData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -406,7 +413,9 @@ class UploaderChecker {
             this.upQuery.check(
                 {
                     sharedKey: uploadedFile.sharedKey,
-                    segment: uploadedFile.lastCheckedPart
+                    segment: uploadedFile.lastCheckedPart,
+                    clientData: uploadedFile.clientData,
+                    serverData: uploadedFile.serverData,
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -470,7 +479,9 @@ class UploaderChecker {
         this.upQuery.trim(
             {
                 sharedKey: uploadedFile.sharedKey,
-                segment: uploadedFile.lastCheckedPart
+                segment: uploadedFile.lastCheckedPart,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -565,7 +576,9 @@ class UploaderRunner {
                 {
                     sharedKey: uploadedFile.sharedKey,
                     content: self.upEncoder.base64(result),
-                    // lastKnownPart: uploadedFile.lastKnownPart
+                    // lastKnownPart: uploadedFile.lastKnownPart,
+                    clientData: uploadedFile.clientData,
+                    serverData: uploadedFile.serverData,
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -599,7 +612,9 @@ class UploaderRunner {
         let self = this;
         this.upQuery.done(
             {
-                sharedKey: uploadedFile.sharedKey
+                sharedKey: uploadedFile.sharedKey,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -689,7 +704,9 @@ class UploaderFailure {
         let self = this;
         this.upQuery.cancel(
             {
-                sharedKey: uploadedFile.sharedKey
+                sharedKey: uploadedFile.sharedKey,
+                clientData: uploadedFile.clientData,
+                serverData: uploadedFile.serverData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {

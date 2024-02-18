@@ -26,6 +26,10 @@ abstract class AResponse implements JsonSerializable
     protected $errorMessage = self::STATUS_OK;
     /** @var string */
     protected $status = self::STATUS_OK;
+    /** @var string */
+    protected $roundaboutServer = '';
+    /** @var string */
+    protected $roundaboutClient = '';
 
     final public function __construct(?IUPPTranslations $lang = null)
     {

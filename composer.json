@@ -23,8 +23,8 @@
     },
     "require-dev": {
         "alex-kalanis/kw_storage": "~3.0",
-        "alex-kalanis/kw_files": ">=3.4",
-        "alex-kalanis/kw_paths": ">=3.0",
+        "alex-kalanis/kw_files": ">=3.4 <4",
+        "alex-kalanis/kw_paths": ">=3.0 <4",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
