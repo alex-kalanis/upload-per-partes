@@ -61,32 +61,30 @@ class UploadedFile {
     localId = "";
     /** @var {string} */
     fileName = "";
-    /** @var {number} */
+    /** @var {numeric} */
     fileSize = 0;
     /** @var {File} */
     fileHandler = null;
 
     // processing
-    /** @var {number} upload status */
+    /** @var {numeric} upload status */
     readStatus = this.STATUS_STOP;
-    /** @var {string} shared key - need to remember during init and then sent repeatedly!!! */
-    sharedKey = "";
-    /** @var {number} total parts number */
+    /** @var {string} what will be passed back to the server - need to remember during init and then sent repeatedly!!! */
+    serverData = "";
+    /** @var {numeric} total parts number */
     totalParts = 0;
-    /** @var {number} last known part on both sides is... */
+    /** @var {numeric} last known part on both sides is... */
     lastKnownPart = 0;
-    /** @var {number} last checked part on both sides is... */
+    /** @var {numeric} last checked part on both sides is... */
     lastCheckedPart = 0;
-    /** @var {number} max part size in bytes */
+    /** @var {numeric} max part size in bytes */
     partSize = 0;
     /** @var {string} when it dies... */
     errorMessage = "";
-    /** @var {number} when the upload starts */
+    /** @var {numeric} when the upload starts */
     startTime = 0;
     /** @var {string} what passed back to this client */
     clientData = "";
-    /** @var {string} what will be passed back to the server */
-    serverData = "";
 
     // setters
     /**
@@ -123,13 +121,12 @@ class UploadedFile {
      */
     setInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_RUN;
-        this.sharedKey = serverResponse.sharedKey;
+        this.serverData = serverResponse.serverData;
         this.totalParts = parseInt(serverResponse.totalParts);
         this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         this.partSize = parseInt(serverResponse.partSize);
         this.errorMessage = serverResponse.errorMessage;
         this.clientData = serverResponse.clientData;
-        this.serverData = serverResponse.serverData;
         return this;
     }
 
@@ -145,7 +142,7 @@ class UploadedFile {
 
     /**
      * @param {string} message
-     * @param {number} status
+     * @param {numeric} status
      * @returns {UploadedFile}
      */
     setError(message, status = this.STATUS_STOP) {
@@ -412,10 +409,9 @@ class UploaderChecker {
         if (this.upChecksum.can()) {
             this.upQuery.check(
                 {
-                    sharedKey: uploadedFile.sharedKey,
+                    serverData: uploadedFile.serverData,
                     segment: uploadedFile.lastCheckedPart,
                     clientData: uploadedFile.clientData,
-                    serverData: uploadedFile.serverData,
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -478,10 +474,9 @@ class UploaderChecker {
         let self = this;
         this.upQuery.trim(
             {
-                sharedKey: uploadedFile.sharedKey,
+                serverData: uploadedFile.serverData,
                 segment: uploadedFile.lastCheckedPart,
                 clientData: uploadedFile.clientData,
-                serverData: uploadedFile.serverData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -574,11 +569,10 @@ class UploaderRunner {
         this.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
             self.upQuery.upload(
                 {
-                    sharedKey: uploadedFile.sharedKey,
+                    serverData: uploadedFile.serverData,
                     content: self.upEncoder.base64(result),
                     // lastKnownPart: uploadedFile.lastKnownPart,
                     clientData: uploadedFile.clientData,
-                    serverData: uploadedFile.serverData,
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -612,9 +606,8 @@ class UploaderRunner {
         let self = this;
         this.upQuery.done(
             {
-                sharedKey: uploadedFile.sharedKey,
-                clientData: uploadedFile.clientData,
                 serverData: uploadedFile.serverData,
+                clientData: uploadedFile.clientData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -704,9 +697,8 @@ class UploaderFailure {
         let self = this;
         this.upQuery.cancel(
             {
-                sharedKey: uploadedFile.sharedKey,
-                clientData: uploadedFile.clientData,
                 serverData: uploadedFile.serverData,
+                clientData: uploadedFile.clientData,
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -756,7 +748,7 @@ class UploaderReader {
     /**
      * Processing check response that came from server
      * @param {UploadedFile} uploadedFile
-     * @param {number} segment
+     * @param {numeric} segment
      * @param {*} onSuccess
      * @param {*} onFailure
      */
@@ -787,8 +779,8 @@ class UploaderReader {
 
     /**
      * @param {UploadedFile} uploadedFile
-     * @param {number} begin seek at beginning of segment
-     * @param {number} end   seek of ending of segment
+     * @param {numeric} begin seek at beginning of segment
+     * @param {numeric} end   seek of ending of segment
      * @returns {null|Blob}
      */
     static fileSlice(uploadedFile, begin, end) {
@@ -1235,7 +1227,7 @@ class UploaderRenderer {
         let node: any = this.upQuery.getObjectById(uploadedFile.localId);
         let button: any = node.find("button").eq(1);
         button.removeAttr("disabled");
-        node.attr(this.upIdent.localId, uploadedFile.sharedKey);
+        node.attr(this.upIdent.localId, uploadedFile.serverData);
     }
 
     /**
@@ -1337,7 +1329,7 @@ class UploaderRenderer {
 
     /**
      * format time into something sane
-     * @param {number} value int
+     * @param {numeric} value int
      * @return {string}
      */
     static formatTime (value) {
@@ -1371,6 +1363,16 @@ class UploaderRenderer {
     }
 
     /**
+     * calculate percents of checked part
+     * @param {UploadedFile} uploadedFile
+     * @return {numeric}
+     */
+    static calculateCheckedPercent (uploadedFile) {
+        let percent = Math.round(uploadedFile.lastCheckedPart / uploadedFile.totalParts);
+        return !percent ? 0 : percent * 100;
+    };
+
+    /**
      * calculate processing speed - bytes/second
      * @param {UploadedFile} uploadedFile
      * @return {numeric}
@@ -1389,7 +1391,7 @@ class UploaderRenderer {
 
     /**
      * calculate sizes
-     * @param {number} bytesProcessed
+     * @param {numeric} bytesProcessed
      * @return {string}
      */
     static calculateSize (bytesProcessed) {
@@ -1406,7 +1408,7 @@ class UploaderRenderer {
     /**
      * amount of passed seconds
      * @param {UploadedFile} uploadedFile
-     * @return {number}
+     * @return {numeric}
      */
     static getElapsedTime (uploadedFile) {
         return UploaderRenderer.getCurrentTime() - uploadedFile.startTime;
@@ -1414,7 +1416,7 @@ class UploaderRenderer {
 
     /**
      * current time for init and calculations
-     * @return {number}
+     * @return {numeric}
      */
     static getCurrentTime () {
         return Math.round(new Date().getTime() / 1000);

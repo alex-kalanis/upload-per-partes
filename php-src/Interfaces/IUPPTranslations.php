@@ -16,15 +16,13 @@ interface IUPPTranslations
 
     public function uppUploadNameIsEmpty(): string;
 
-    public function uppSharedKeyIsEmpty(): string;
-
-    public function uppSharedKeyIsInvalid(): string;
-
     public function uppKeyVariantNotSet(): string;
 
     public function uppKeyVariantIsWrong(string $className): string;
 
     public function uppTargetDirIsEmpty(): string;
+
+    public function uppIncomingDataCannotDecode(): string;
 
     public function uppDriveFileAlreadyExists(string $driveFile): string;
 

@@ -31,10 +31,9 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         $lib = new UploadPerPartes\examples\Uploader();
         $this->sendResponse($lib->check(
-            $this->getHttpRequest()->getPost()->__get('sharedKey'),
+            $this->getHttpRequest()->getPost()->__get('serverData'),
             intval($this->getHttpRequest()->getPost()->__get('segment')),
-            $this->getHttpRequest()->getPost()->__get('clientData'),
-            $this->getHttpRequest()->getPost()->__get('serverData')
+            $this->getHttpRequest()->getPost()->__get('clientData')
         ));
     }
 
@@ -42,10 +41,10 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         $lib = new UploadPerPartes\examples\Uploader();
         $this->sendResponse($lib->upload(
-            $this->getHttpRequest()->getPost()->__get('sharedKey'),
+            $this->getHttpRequest()->getPost()->__get('serverData'),
             base64_decode($this->getHttpRequest()->getPost()->__get('content')),
-            $this->getHttpRequest()->getPost()->__get('clientData'),
-            $this->getHttpRequest()->getPost()->__get('serverData')
+            null,
+            $this->getHttpRequest()->getPost()->__get('clientData')
         ));
     }
 
@@ -53,10 +52,9 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         $lib = new UploadPerPartes\examples\Uploader();
         $this->sendResponse($lib->truncateFrom(
-            $this->getHttpRequest()->getPost()->__get('sharedKey'),
+            $this->getHttpRequest()->getPost()->__get('serverData'),
             $this->getHttpRequest()->getPost()->__get('segment'),
-            $this->getHttpRequest()->getPost()->__get('clientData'),
-            $this->getHttpRequest()->getPost()->__get('serverData')
+            $this->getHttpRequest()->getPost()->__get('clientData')
         ));
     }
 
@@ -64,9 +62,8 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     {
         $lib = new UploadPerPartes\examples\Uploader();
         $this->sendResponse($lib->cancel(
-            $this->getHttpRequest()->getPost()->__get('sharedKey'),
-            $this->getHttpRequest()->getPost()->__get('clientData'),
-            $this->getHttpRequest()->getPost()->__get('serverData')
+            $this->getHttpRequest()->getPost()->__get('serverData'),
+            $this->getHttpRequest()->getPost()->__get('clientData')
         ));
     }
 
@@ -75,9 +72,8 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         try {
             $lib = new UploadPerPartes\examples\Uploader();
             $result = $lib->done(
-                $this->getHttpRequest()->getPost()->__get('sharedKey'),
-                $this->getHttpRequest()->getPost()->__get('clientData'),
-                $this->getHttpRequest()->getPost()->__get('serverData')
+                $this->getHttpRequest()->getPost()->__get('serverData'),
+                $this->getHttpRequest()->getPost()->__get('clientData')
             );
 
             // check uploaded content and move it on drive
@@ -93,11 +89,10 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
         } catch (Lib\Content\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
                 null,
-                $this->getHttpRequest()->getPost()->__get('sharedKey'),
+                $this->getHttpRequest()->getPost()->__get('serverData'),
                 UploadPerPartes\InfoFormat\Data::init(),
                 $ex,
-                $this->getHttpRequest()->getPost()->__get('clientData'),
-                $this->getHttpRequest()->getPost()->__get('serverData')
+                $this->getHttpRequest()->getPost()->__get('clientData')
             ));
         }
     }

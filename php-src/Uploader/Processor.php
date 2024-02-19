@@ -40,49 +40,49 @@ class Processor
 
     /**
      * Upload file by parts, final status - cancel that
-     * @param string $sharedKey
+     * @param Interfaces\IDriverLocation $dataPack
      * @throws Exceptions\UploadException
      * @return void
      */
-    public function cancel(string $sharedKey): void
+    public function cancel(Interfaces\IDriverLocation $dataPack): void
     {
-        $data = $this->driver->read($sharedKey);
+        $data = $this->driver->read($dataPack);
         $this->storage->remove($data->tempLocation);
-        $this->driver->remove($sharedKey);
+        $this->driver->remove($dataPack);
     }
 
     /**
      * Upload file by parts, final status
-     * @param string $sharedKey
+     * @param Interfaces\IDriverLocation $dataPack
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
-    public function done(string $sharedKey): InfoFormat\Data
+    public function done(Interfaces\IDriverLocation $dataPack): InfoFormat\Data
     {
-        $data = $this->driver->read($sharedKey);
-        $this->driver->remove($sharedKey);
+        $data = $this->driver->read($dataPack);
+        $this->driver->remove($dataPack);
         return $data;
     }
 
     /**
      * Upload file by parts, use driving file
-     * @param string $sharedKey
+     * @param Interfaces\IDriverLocation $dataPack
      * @param string $content binary content
      * @param int<0, max>|null $segment where it save
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
-    public function upload(string $sharedKey, string $content, ?int $segment = null): InfoFormat\Data
+    public function upload(Interfaces\IDriverLocation $dataPack, string $content, ?int $segment = null): InfoFormat\Data
     {
-        $data = $this->driver->read($sharedKey);
+        $data = $this->driver->read($dataPack);
 
         if (!is_numeric($segment)) {
             $segment = $data->lastKnownPart + 1;
             $this->storage->addPart($data->tempLocation, $content);
-            $this->driver->updateLastPart($sharedKey, $data, $segment);
+            $this->driver->updateLastPart($data, $segment);
         } else {
             if ($segment > $data->lastKnownPart + 1) {
-                throw new Exceptions\UploadException($this->getUppLang()->uppReadTooEarly($sharedKey));
+                throw new Exceptions\UploadException($this->getUppLang()->uppReadTooEarly($dataPack->getDriverKey()));
             }
             $this->storage->addPart($data->tempLocation, $content, $segment * $data->bytesPerPart);
         }
@@ -92,30 +92,30 @@ class Processor
 
     /**
      * Delete problematic segments
-     * @param string $sharedKey
+     * @param Interfaces\IDriverLocation $dataPack
      * @param int<0, max> $segment
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
-    public function truncateFrom(string $sharedKey, int $segment): InfoFormat\Data
+    public function truncateFrom(Interfaces\IDriverLocation $dataPack, int $segment): InfoFormat\Data
     {
-        $data = $this->driver->read($sharedKey);
+        $data = $this->driver->read($dataPack);
         $this->checkSegment($data, $segment);
         $this->storage->truncate($data->tempLocation, $data->bytesPerPart * $segment);
-        $this->driver->updateLastPart($sharedKey, $data, $segment, false);
+        $this->driver->updateLastPart($data, $segment, false);
         return $data;
     }
 
     /**
      * Check already uploaded parts
-     * @param string $sharedKey
+     * @param Interfaces\IDriverLocation $dataPack
      * @param int<0, max> $segment
      * @throws Exceptions\UploadException
      * @return string
      */
-    public function check(string $sharedKey, int $segment): string
+    public function check(Interfaces\IDriverLocation $dataPack, int $segment): string
     {
-        $data = $this->driver->read($sharedKey);
+        $data = $this->driver->read($dataPack);
         $this->checkSegment($data, $segment);
         return $this->hashed->calcHash($this->storage->getPart($data->tempLocation, $data->bytesPerPart * $segment, $data->bytesPerPart));
     }
@@ -123,16 +123,15 @@ class Processor
     /**
      * Upload file by parts, create driving file, returns correct one (because it can exist)
      * @param InfoFormat\Data $dataPack
-     * @param string $sharedKey
      * @throws Exceptions\UploadException
      * @return InfoFormat\Data
      */
-    public function init(InfoFormat\Data $dataPack, string $sharedKey): InfoFormat\Data
+    public function init(InfoFormat\Data $dataPack): InfoFormat\Data
     {
         try {
-            $this->driver->write($sharedKey, $dataPack, true);
-        } catch (Exceptions\ContinuityUploadException $e) { // continuity from previous try - we got datapack, so we return it
-            $dataPack = $this->driver->read($sharedKey);
+            $this->driver->write($dataPack, true);
+        } catch (Exceptions\ContinuityUploadException $e) { // continuity from previous try - we got data package, so we return it
+            $dataPack = $this->driver->read($dataPack);
         }
         return $dataPack;
     }

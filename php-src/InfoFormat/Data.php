@@ -3,12 +3,15 @@
 namespace kalanis\UploadPerPartes\InfoFormat;
 
 
+use kalanis\UploadPerPartes\Interfaces\IDriverLocation;
+
+
 /**
  * Class Data
  * @package kalanis\UploadPerPartes\DriveFile
  * Driver metadata about processed file
  */
-final class Data
+final class Data implements IDriverLocation
 {
     /** @var string */
     public $fileName = '';
@@ -22,6 +25,10 @@ final class Data
     public $bytesPerPart = 0;
     /** @var int<0, max> */
     public $lastKnownPart = 0;
+    /** @var string */
+    public $targetPath = '';
+    /** @var string */
+    public $driverName = '';
 
     public static function init(): self
     {
@@ -35,9 +42,20 @@ final class Data
      * @param int<0, max> $partsCount
      * @param int<0, max> $bytesPerPart
      * @param int<0, max> $lastKnownPart
+     * @param string $targetPath
+     * @param string $driverName
      * @return $this
      */
-    public function setData(string $fileName, string $tempLocation, int $fileSize, int $partsCount = 0, int $bytesPerPart = 0, int $lastKnownPart = 0): self
+    public function setData(
+        string $fileName,
+        string $tempLocation,
+        int $fileSize,
+        int $partsCount = 0,
+        int $bytesPerPart = 0,
+        int $lastKnownPart = 0,
+        string $targetPath = '',
+        string $driverName = ''
+    ): self
     {
         $this->fileName = $fileName; // final file path
         $this->tempLocation = $tempLocation; // path to temp file
@@ -45,6 +63,9 @@ final class Data
         $this->partsCount = $partsCount; // is on parts...
         $this->bytesPerPart = $bytesPerPart; // how long is single part
         $this->lastKnownPart = $lastKnownPart; // how many parts has been obtained
+        // just for name find
+        $this->targetPath = $targetPath;
+        $this->driverName = $driverName;
         return $this;
     }
 
@@ -56,6 +77,18 @@ final class Data
         $this->partsCount = intval($this->partsCount);
         $this->bytesPerPart = intval($this->bytesPerPart);
         $this->lastKnownPart = intval($this->lastKnownPart);
+        $this->targetPath = strval($this->targetPath);
+        $this->driverName = strval($this->driverName);
         return $this;
+    }
+
+    public function getDriverPrefix(): string
+    {
+        return strval($this->targetPath);
+    }
+
+    public function getDriverKey(): string
+    {
+        return strval($this->driverName);
     }
 }

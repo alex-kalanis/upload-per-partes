@@ -60,6 +60,7 @@ class TargetTest extends CommonTestClass
         $this->assertEquals('what_can_be_found.here', $lib->getFinalTargetName());
         $this->assertEquals($this->getTestDir() . 'what_can_be_found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
         $this->assertEquals($this->getTestDir() . 'what_can_be_found.here' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        $this->assertEquals($this->getTestDir(), $lib->getDriverPrefix());
     }
 
     /**
@@ -73,6 +74,7 @@ class TargetTest extends CommonTestClass
         $this->assertEquals('what el$e can be found', $lib->getFinalTargetName());
         $this->assertEquals($this->getTestDir() . 'what el$e can be found' . TargetSearch::FILE_DRIVER_SUFF, $lib->getDriverLocation());
         $this->assertEquals($this->getTestDir() . 'what el$e can be found' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        $this->assertEquals($this->getTestDir(), $lib->getDriverPrefix());
     }
 
     /**
@@ -89,5 +91,6 @@ class TargetTest extends CommonTestClass
         $lib = new TargetSearch(new Support\InfoRam($lang), $dataRam, $lang, false, false);
         $lib->setTargetDir($this->getTestDir())->setRemoteFileName('dummyFile.tst')->process();
         $this->assertEquals($this->getTestDir() . 'dummyFile.3.tst' . TargetSearch::FILE_UPLOAD_SUFF, $lib->getTemporaryTargetLocation());
+        $this->assertEquals($this->getTestDir(), $lib->getDriverPrefix());
     }
 }

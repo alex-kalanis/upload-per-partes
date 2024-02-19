@@ -19,43 +19,39 @@ class CheckResponse extends AResponse
 
     public static function initOk(
         ?IUPPTranslations $lang,
-        string $sharedKey,
+        string $serverData,
         string $checksum,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, $checksum, static::STATUS_OK, static::STATUS_OK, $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, $checksum, static::STATUS_OK, static::STATUS_OK, $roundaboutClient);
     }
 
     public static function initError(
         ?IUPPTranslations $lang,
-        string $sharedKey,
+        string $serverData,
         Exception $ex,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, '', static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, '', static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient);
     }
 
     public function setData(
-        string $sharedKey,
+        string $serverData,
         string $checksum,
         string $status,
         string $errorMessage = self::STATUS_OK,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
-        $this->sharedKey = $sharedKey;
+        $this->serverData = $serverData;
         $this->checksum = $checksum;
         $this->status = $status;
         $this->errorMessage = $errorMessage;
         $this->roundaboutClient = $roundaboutClient;
-        $this->roundaboutServer = $roundaboutServer;
         return $this;
     }
 
@@ -63,11 +59,10 @@ class CheckResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => strval($this->sharedKey),
+            'serverData' => strval($this->serverData),
             'checksum' => strval($this->checksum),
             'status' => strval($this->status),
             'errorMessage' => strval($this->errorMessage),
-            'serverData' => strval($this->roundaboutServer),
             'clientData' => strval($this->roundaboutClient),
         ];
     }

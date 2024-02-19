@@ -18,44 +18,40 @@ class DoneResponse extends AResponse
 {
     public static function initDone(
         ?IUPPTranslations $lang,
-        string $sharedKey,
+        string $serverData,
         InfoFormat\Data $data,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, $data, static::STATUS_OK, static::STATUS_OK, $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, $data, static::STATUS_OK, static::STATUS_OK, $roundaboutClient);
     }
 
     public static function initError(
         ?IUPPTranslations $lang,
-        string $sharedKey,
+        string $serverData,
         InfoFormat\Data $data,
         Exception $ex,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, $data, static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, $data, static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient);
     }
 
     public function setData(
-        string $sharedKey,
+        string $serverData,
         InfoFormat\Data $data,
         string $status,
         string $errorMessage = self::STATUS_OK,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
-        $this->sharedKey = $sharedKey;
+        $this->serverData = $serverData;
         $this->setInfoData($data);
         $this->status = $status;
         $this->errorMessage = $errorMessage;
         $this->roundaboutClient = $roundaboutClient;
-        $this->roundaboutServer = $roundaboutServer;
         return $this;
     }
 
@@ -95,10 +91,9 @@ class DoneResponse extends AResponse
     {
         return [
             'name' => strval($this->getInfoData()->fileName),
-            'sharedKey' => strval($this->sharedKey),
+            'serverData' => strval($this->serverData),
             'status' => strval($this->status),
             'errorMessage' => strval($this->errorMessage),
-            'serverData' => strval($this->roundaboutServer),
             'clientData' => strval($this->roundaboutClient),
         ];
     }

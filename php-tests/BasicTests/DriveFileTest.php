@@ -6,6 +6,7 @@ namespace BasicTests;
 use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\ServerData\Data;
 use kalanis\UploadPerPartes\Uploader;
 use Support;
 
@@ -27,7 +28,7 @@ class DriveFileTest extends CommonTestClass
     public function testThru(): void
     {
         $driveFile = $this->getDriveFile();
-        $this->assertTrue($driveFile->write($this->mockKey(), $this->mockData()));
+        $this->assertTrue($driveFile->write($this->mockData()));
         $data = $driveFile->read($this->mockKey());
         $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals('abcdef', $data->fileName);
@@ -46,10 +47,10 @@ class DriveFileTest extends CommonTestClass
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
-        $this->assertTrue($driveFile->write($this->mockKey(), $data));
+        $this->assertTrue($driveFile->write($data));
         $this->assertTrue($driveFile->exists($this->mockKey()));
         $this->expectException(Exceptions\ContinuityUploadException::class);
-        $driveFile->write($this->mockKey(), $data, true); // fail
+        $driveFile->write($data, true); // fail
         $this->expectExceptionMessageMatches('DRIVEFILE ALREADY EXISTS');
     }
 
@@ -60,8 +61,8 @@ class DriveFileTest extends CommonTestClass
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
-        $this->assertTrue($driveFile->write($this->mockKey(), $data));
-        $this->assertTrue($driveFile->updateLastPart($this->mockKey(), $data, $data->lastKnownPart + 1));
+        $this->assertTrue($driveFile->write($data));
+        $this->assertTrue($driveFile->updateLastPart($data, $data->lastKnownPart + 1));
         $driveFile->remove($this->mockKey());
     }
 
@@ -72,23 +73,24 @@ class DriveFileTest extends CommonTestClass
     {
         $driveFile = $this->getDriveFile();
         $data = $this->mockData();
-        $this->assertTrue($driveFile->write($this->mockKey(), $data));
+        $this->assertTrue($driveFile->write($data));
         $this->expectException(Exceptions\UploadException::class);
-        $driveFile->updateLastPart($this->mockKey(), $data, $data->lastKnownPart + 5); // fail
+        $driveFile->updateLastPart($data, $data->lastKnownPart + 5); // fail
         $this->expectExceptionMessageMatches('DRIVEFILE IS NOT CONTINUOUS');
     }
 
-    protected function mockKey(): string
+    protected function mockKey(): Data
     {
-        return 'fghjkl' . Uploader\TargetSearch::FILE_DRIVER_SUFF;
+        $data = new Data();
+        $data->sharedKey = 'fghjkl' . Uploader\TargetSearch::FILE_DRIVER_SUFF;
+        return $data;
     }
 
     protected function getDriveFile(): Uploader\DriveFile
     {
         $lang = new Uploader\Translations();
         $storage = new Support\InfoRam($lang);
-        $target = new Uploader\TargetSearch($storage, new Support\DataRam($lang), $lang);
-        $key = new Support\Key($target, $lang);
+        $key = new Support\ServerKey();
         $format = new InfoFormat\Json();
         return new Uploader\DriveFile($storage, $format, $key, $lang);
     }

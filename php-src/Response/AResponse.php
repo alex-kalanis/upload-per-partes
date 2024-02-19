@@ -21,7 +21,7 @@ abstract class AResponse implements JsonSerializable
     const STATUS_FAIL = 'FAIL';
 
     /** @var string */
-    protected $sharedKey = '';
+    protected $serverData = '';
     /** @var string */
     protected $errorMessage = self::STATUS_OK;
     /** @var string */

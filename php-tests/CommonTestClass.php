@@ -41,7 +41,9 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
             123456,
             12,
             64,
-            7
+            7,
+            '/tmp/',
+            'fghjkl.partial'
         );
     }
 }

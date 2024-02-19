@@ -13,7 +13,7 @@ use kalanis\UploadPerPartes\Traits\TLang;
  * @package kalanis\UploadPerPartes\Uploader
  * Search possible target path
  */
-class TargetSearch
+class TargetSearch implements Interfaces\IDriverLocation
 {
     use TLang;
 
@@ -93,15 +93,28 @@ class TargetSearch
         return $this;
     }
 
-
     /**
      * @throws UploadException
      * @return string
      */
     public function getDriverLocation(): string
     {
+        return $this->targetDir . $this->getDriverKey();
+    }
+
+    public function getDriverPrefix(): string
+    {
+        return $this->targetDir;
+    }
+
+    /**
+     * @throws UploadException
+     * @return string
+     */
+    public function getDriverKey(): string
+    {
         $this->checkFileBase();
-        return $this->targetDir . $this->fileBase . static::FILE_DRIVER_SUFF;
+        return $this->fileBase . static::FILE_DRIVER_SUFF;
     }
 
     /**

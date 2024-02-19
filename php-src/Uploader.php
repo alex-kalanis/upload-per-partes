@@ -13,22 +13,16 @@ use kalanis\UploadPerPartes\Interfaces;
  */
 class Uploader
 {
-    /** @var Keys\AKey */
-    protected $key = null;
     /** @var Interfaces\IUPPTranslations */
     protected $lang = null;
-    /** @var Interfaces\IInfoStorage */
-    protected $infoStorage = null;
     /** @var Interfaces\IDataStorage */
     protected $dataStorage = null;
-    /** @var Uploader\TargetSearch */
-    protected $targetSearch = null;
-    /** @var Uploader\Calculates */
-    protected $calculations = null;
-    /** @var Uploader\Hashed */
-    protected $hashed = null;
+    /** @var Uploader\FreeEntry */
+    protected $findFreeEntry = null;
     /** @var Uploader\DriveFile must stay for tests */
     protected $driver = null;
+    /** @var ServerData\Processor */
+    protected $serverData = null;
     /** @var Uploader\Processor */
     protected $processor = null;
 
@@ -38,15 +32,25 @@ class Uploader
     public function __construct()
     {
         $this->lang = $this->getTranslations();
-        $this->infoStorage = $this->getInfoStorage();
+        $infoStorage = $this->getInfoStorage();
         $this->dataStorage = $this->getDataStorage();
-        $this->targetSearch = $this->getTarget($this->infoStorage, $this->dataStorage);
-        $this->calculations = $this->getCalc();
-        $this->hashed = $this->getHashed();
-        $this->key = $this->getKeyFactory()->getVariant($this->targetSearch, $this->getKeyVariant());
+        $this->findFreeEntry = $this->getFreeEntry(
+            $this->getTarget($infoStorage, $this->dataStorage),
+            $this->getCalc(),
+            $this->getGenerateKeyFactory()->getVariant($this->getGenerateKeyVariant())
+        );
         $infoFormat = $this->getInfoFormatFactory()->getFormat($this->getInfoFormat());
-        $this->driver = new Uploader\DriveFile($this->infoStorage, $infoFormat, $this->key, $this->lang);
-        $this->processor = $this->getProcessor($this->driver, $this->dataStorage, $this->hashed);
+        $this->driver = new Uploader\DriveFile(
+            $infoStorage,
+            $infoFormat,
+            $this->getServerKeyFactory()->getVariant($this->getServerKeyVariant()),
+            $this->lang);
+        $this->serverData = $this->getServerData($this->lang);
+        $this->processor = $this->getProcessor(
+            $this->driver,
+            $this->dataStorage,
+            $this->getHashed()
+        );
     }
 
     protected function getTranslations(): Interfaces\IUPPTranslations
@@ -78,9 +82,19 @@ class Uploader
         return new Uploader\Calculates(262144);
     }
 
+    protected function getFreeEntry(Uploader\TargetSearch $targetSearch, Uploader\Calculates $calc, GenerateKeys\AKey $generate): Uploader\FreeEntry
+    {
+        return new Uploader\FreeEntry($targetSearch, $calc, $generate);
+    }
+
     protected function getHashed(): Uploader\Hashed
     {
         return new Uploader\Hashed();
+    }
+
+    protected function getServerData(Interfaces\IUPPTranslations $lang): ServerData\Processor
+    {
+        return new ServerData\Processor($lang);
     }
 
     protected function getInfoFormatFactory(): InfoFormat\Factory
@@ -93,14 +107,24 @@ class Uploader
         return InfoFormat\Factory::FORMAT_JSON;
     }
 
-    protected function getKeyFactory(): Keys\Factory
+    protected function getServerKeyFactory(): ServerKeys\Factory
     {
-        return new Keys\Factory($this->lang);
+        return new ServerKeys\Factory($this->lang);
     }
 
-    protected function getKeyVariant(): int
+    protected function getServerKeyVariant(): int
     {
-        return Keys\Factory::VARIANT_VOLUME;
+        return ServerKeys\Factory::VARIANT_VOLUME;
+    }
+
+    protected function getGenerateKeyFactory(): GenerateKeys\Factory
+    {
+        return new GenerateKeys\Factory($this->lang);
+    }
+
+    protected function getGenerateKeyVariant(): int
+    {
+        return GenerateKeys\Factory::VARIANT_CLEAR;
     }
 
     protected function getProcessor(
@@ -115,110 +139,102 @@ class Uploader
 
     /**
      * Upload file by parts, final status
-     * @param string $sharedKey
-     * @param string $clientData stored string from client
      * @param string $serverData stored string for server
+     * @param string $clientData stored string from client
      * @return Response\AResponse
      */
-    public function cancel(string $sharedKey, string $clientData  = '̈́', string $serverData = ''): Response\AResponse
+    public function cancel(string $serverData, string $clientData = ''): Response\AResponse
     {
         try {
-            $this->processor->cancel($sharedKey);
-            return Response\CancelResponse::initCancel($this->lang, $sharedKey, $clientData, $serverData);
+            $upPath = $this->serverData->readPack($serverData);
+            $this->processor->cancel($upPath);
+            return Response\CancelResponse::initCancel($this->lang, $serverData, $clientData);
         } catch (Exceptions\UploadException $ex) {
-            return Response\CancelResponse::initError($this->lang, $sharedKey, $ex, $clientData, $serverData);
+            return Response\CancelResponse::initError($this->lang, $serverData, $ex, $clientData);
         }
     }
 
     /**
      * Upload file by parts, final status
-     * @param string $sharedKey
-     * @param string $clientData stored string from client
      * @param string $serverData stored string for server
+     * @param string $clientData stored string from client
      * @return Response\AResponse
      */
-    public function done(string $sharedKey, string $clientData  = '̈́', string $serverData = ''): Response\AResponse
+    public function done(string $serverData, string $clientData = ''): Response\AResponse
     {
         try {
             return Response\DoneResponse::initDone(
                 $this->lang,
-                $sharedKey,
-                $this->processor->done($sharedKey),
-                $clientData,
-                $serverData
+                $serverData,
+                $this->processor->done($this->serverData->readPack($serverData)),
+                $clientData
             );
         } catch (Exceptions\UploadException $ex) {
-            return Response\DoneResponse::initError($this->lang, $sharedKey, InfoFormat\Data::init(), $ex, $clientData, $serverData);
+            return Response\DoneResponse::initError($this->lang, $serverData, InfoFormat\Data::init(), $ex, $clientData);
         }
     }
 
     /**
      * Upload file by parts, use driving file
-     * @param string $sharedKey
+     * @param string $serverData stored string for server
      * @param string $content binary content
      * @param int<0, max>|null $segment where it save
      * @param string $clientData stored string from client
-     * @param string $serverData stored string for server
      * @return Response\AResponse
      */
-    public function upload(string $sharedKey, string $content, ?int $segment = null, string $clientData  = '̈́', string $serverData = ''): Response\AResponse
+    public function upload(string $serverData, string $content, ?int $segment = null, string $clientData = ''): Response\AResponse
     {
         try {
             return Response\UploadResponse::initOK(
                 $this->lang,
-                $sharedKey,
-                $this->processor->upload($sharedKey, $content, $segment),
-                $clientData,
-                $serverData
+                $serverData,
+                $this->processor->upload($this->serverData->readPack($serverData), $content, $segment),
+                $clientData
             );
         } catch (Exceptions\UploadException $e) {
-            return Response\UploadResponse::initError($this->lang, $sharedKey, InfoFormat\Data::init(), $e, $clientData, $serverData);
+            return Response\UploadResponse::initError($this->lang, $serverData, InfoFormat\Data::init(), $e, $clientData);
         }
     }
 
     /**
      * Delete problematic segments
-     * @param string $sharedKey
+     * @param string $serverData stored string for server
      * @param int<0, max> $segment
      * @param string $clientData stored string from client
-     * @param string $serverData stored string for server
      * @return Response\AResponse
      */
-    public function truncateFrom(string $sharedKey, int $segment, string $clientData  = '̈́', string $serverData = ''): Response\AResponse
+    public function truncateFrom(string $serverData, int $segment, string $clientData = ''): Response\AResponse
     {
         try {
             return Response\TruncateResponse::initOK(
                 $this->lang,
-                $sharedKey,
-                $this->processor->truncateFrom($sharedKey, $segment),
-                $clientData,
-                $serverData
+                $serverData,
+                $this->processor->truncateFrom($this->serverData->readPack($serverData), $segment),
+                $clientData
             );
         } catch (Exceptions\UploadException $e) {
-            return Response\TruncateResponse::initError($this->lang, $sharedKey, InfoFormat\Data::init(), $e, $clientData, $serverData);
+            return Response\TruncateResponse::initError($this->lang, $serverData, InfoFormat\Data::init(), $e, $clientData);
         }
     }
 
     /**
      * Check already uploaded parts
-     * @param string $sharedKey
+     * @param string $serverData
      * @param int<0, max> $segment
      * @param string $clientData stored string from client
-     * @param string $serverData stored string for server
      * @return Response\AResponse
      */
-    public function check(string $sharedKey, int $segment, string $clientData  = '̈́', string $serverData = ''): Response\AResponse
+    public function check(string $serverData, int $segment, string $clientData = ''): Response\AResponse
     {
         try {
             return Response\CheckResponse::initOK(
                 $this->lang,
-                $sharedKey,
-                $this->processor->check($sharedKey, $segment),
-                $clientData,
-                $serverData
+                $serverData,
+                $this->processor->check($this->serverData->readPack($serverData), $segment),
+                $clientData
             );
         } catch (Exceptions\UploadException $e) {
-            return Response\CheckResponse::initError($this->lang, $sharedKey, $e, $clientData, $serverData);
+            return Response\CheckResponse::initError($this->lang, $serverData, $e, $clientData);
         }
     }
 
@@ -232,29 +248,23 @@ class Uploader
      */
     public function init(string $targetPath, string $remoteFileName, int $length, string $clientData  = '̈́'): Response\AResponse
     {
-        $partsCounter = $this->calculations->calcParts($length);
         try {
-            $this->targetSearch->setTargetDir($targetPath)->setRemoteFileName($remoteFileName)->process();
-            $this->key->generateKeys();
-            $dataPack = InfoFormat\Data::init()->setData(
-                $this->targetSearch->getFinalTargetName(),
-                $this->targetSearch->getTemporaryTargetLocation(),
-                $length,
-                $partsCounter,
-                $this->calculations->getBytesPerPart()
-            );
+            $dataPack = $this->findFreeEntry->find($targetPath, $remoteFileName, $length);
             return Response\InitResponse::initOk(
                 $this->lang,
-                $this->key->getSharedKey(),
-                $this->processor->init($dataPack, $this->key->getSharedKey()),
+                $this->serverData->composePack($this->serverData->packData($dataPack)),
+                $this->processor->init($dataPack),
                 $clientData
-//                , $this->serverData->compose($targetPath, $remoteFileName)
             );
-
-        } catch (Exceptions\UploadException $e) { // obecne neco spatne
-            return Response\InitResponse::initError($this->lang, InfoFormat\Data::init()->setData(
-                $remoteFileName, '', $length, $partsCounter, $this->calculations->getBytesPerPart()
-            ), $e, $clientData);
+        } catch (Exceptions\UploadException $e) { // something go wrong
+            return Response\InitResponse::initError(
+                $this->lang,
+                InfoFormat\Data::init()->setData(
+                    $remoteFileName, '', $length, 0, 0
+                ),
+                $e,
+                $clientData
+            );
         }
     }
 }

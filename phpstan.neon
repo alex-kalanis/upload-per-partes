@@ -19,3 +19,7 @@ parameters:
 		- '#Parameter \#5 \$maxlen of function file_get_contents expects#'
 		# strval, intval
 		- '#Parameter \#1 \$va[rl]u?e? of function [si][tn][rt]val expects#'
+		-
+			# json decoded
+			message: '#Cannot access property \$[a-zA-Z]+ on mixed.#'
+			path: 'php-src/ServerData/Processor.php'

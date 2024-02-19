@@ -66,6 +66,11 @@ class XTrans implements IUPPTranslations
         return 'mock';
     }
 
+    public function uppIncomingDataCannotDecode(): string
+    {
+        return 'mock';
+    }
+
     public function uppDriveFileAlreadyExists(string $driveFile): string
     {
         return 'mock';

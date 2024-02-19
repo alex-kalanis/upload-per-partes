@@ -69,8 +69,8 @@ var UploadedFile = function () {
     // processing
     /** @var {number} upload status */
     this.readStatus = this.STATUS_STOP;
-    /** @var {string} shared key - need to remember during init and then sent repeatedly!!! */
-    this.sharedKey = "";
+    /** @var {string} what will be passed back to the server - need to remember during init and then sent repeatedly!!! */
+    this.serverData = "";
     /** @var {number} total parts number */
     this.totalParts = 0;
     /** @var {number} last known part on both sides is... */
@@ -85,8 +85,6 @@ var UploadedFile = function () {
     this.startTime = 0;
     /** @var {string} what passed back to this client */
     this.clientData = "";
-    /** @var {string} what will be passed back to the server */
-    this.serverData = "";
 
     // setters
     /**
@@ -123,13 +121,12 @@ var UploadedFile = function () {
      */
     this.setInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_RUN;
-        uploadedFile.sharedKey = serverResponse.sharedKey;
+        uploadedFile.serverData = serverResponse.serverData;
         uploadedFile.totalParts = parseInt(serverResponse.totalParts);
         uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         uploadedFile.partSize = parseInt(serverResponse.partSize);
         uploadedFile.errorMessage = serverResponse.errorMessage;
         uploadedFile.clientData = serverResponse.clientData;
-        uploadedFile.serverData = serverResponse.serverData;
         return uploadedFile;
     };
 
@@ -425,10 +422,9 @@ var UploaderChecker = function () {
         if (uploaderChecker.upChecksum.can()) {
             uploaderChecker.upQuery.check(
                 {
-                    sharedKey: uploadedFile.sharedKey,
+                    serverData: uploadedFile.serverData,
                     segment: uploadedFile.lastCheckedPart,
-                    clientData: uploadedFile.clientData,
-                    serverData: uploadedFile.serverData
+                    clientData: uploadedFile.clientData
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -490,10 +486,9 @@ var UploaderChecker = function () {
     this.truncatePart = function(uploadedFile) {
         uploaderChecker.upQuery.trim(
             {
-                sharedKey: uploadedFile.sharedKey,
+                serverData: uploadedFile.serverData,
                 segment: uploadedFile.lastCheckedPart,
-                clientData: uploadedFile.clientData,
-                serverData: uploadedFile.serverData
+                clientData: uploadedFile.clientData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -586,11 +581,10 @@ var UploaderRunner = function () {
         uploaderRunner.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
             uploaderRunner.upQuery.upload(
                 {
-                    sharedKey: uploadedFile.sharedKey,
+                    serverData: uploadedFile.serverData,
                     content: uploaderRunner.upEncoder.base64(result),
                     // lastKnownPart: uploadedFile.lastKnownPart,
-                    clientData: uploadedFile.clientData,
-                    serverData: uploadedFile.serverData
+                    clientData: uploadedFile.clientData
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
@@ -624,9 +618,8 @@ var UploaderRunner = function () {
     this.closePart = function(uploadedFile) {
         uploaderRunner.upQuery.done(
             {
-                sharedKey: uploadedFile.sharedKey,
-                clientData: uploadedFile.clientData,
-                serverData: uploadedFile.serverData
+                serverData: uploadedFile.serverData,
+                clientData: uploadedFile.clientData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -719,9 +712,8 @@ var UploaderFailure = function () {
     this.contentRemoval = function(uploadedFile) {
         uploaderFailure.upQuery.cancel(
             {
-                sharedKey: uploadedFile.sharedKey,
-                clientData: uploadedFile.clientData,
-                serverData: uploadedFile.serverData
+                serverData: uploadedFile.serverData,
+                clientData: uploadedFile.clientData
             },
             function(responseData) {
                 if (typeof responseData == "object") {
@@ -1261,7 +1253,7 @@ var UploaderRenderer  = function () {
         var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
         var button = node.find("button").eq(1);
         button.removeAttr("disabled");
-        node.attr(uploaderRenderer.upIdent.localId, uploadedFile.sharedKey);
+        node.attr(uploaderRenderer.upIdent.localId, uploadedFile.serverData);
     };
 
     /**
@@ -1348,7 +1340,7 @@ var UploaderRenderer  = function () {
     /**
      * calculate passed time
      * @param {UploadedFile} uploadedFile
-     * @param {numeric} percentDone
+     * @param {number} percentDone
      * @return {string}
      */
     this.calculateEstimatedTimeLeft = function(uploadedFile, percentDone) {
@@ -1374,8 +1366,8 @@ var UploaderRenderer  = function () {
     };
 
     /**
-     * @param {numeric} number
-     * @param {numeric} length
+     * @param {number} number
+     * @param {number} length
      * @return {string}
      */
     this.pad = function(number, length) {
@@ -1389,10 +1381,20 @@ var UploaderRenderer  = function () {
     /**
      * calculate percents
      * @param {UploadedFile} uploadedFile
-     * @return {numeric}
+     * @return {number}
      */
     this.calculatePercent = function(uploadedFile) {
         var percent = Math.round((uploadedFile.lastKnownPart) / uploadedFile.totalParts);
+        return !percent ? 0 : percent * 100;
+    };
+
+    /**
+     * calculate percents of checked part
+     * @param {UploadedFile} uploadedFile
+     * @return {number}
+     */
+    this.calculateCheckedPercent = function(uploadedFile) {
+        var percent = Math.round(uploadedFile.lastCheckedPart / uploadedFile.totalParts);
         return !percent ? 0 : percent * 100;
     };
 

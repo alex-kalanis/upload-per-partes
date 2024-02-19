@@ -8,6 +8,7 @@ use Support;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Interfaces;
+use kalanis\UploadPerPartes\ServerData;
 use kalanis\UploadPerPartes\Uploader;
 
 
@@ -43,7 +44,7 @@ class ProcessorTest extends CommonTestClass
 
         $pack = $this->mockData();
         $pack->lastKnownPart = 5;
-        $data = $this->processor->init($pack, $this->mockSharedKey());
+        $data = $this->processor->init($pack);
 
         $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals('abcdef', $data->fileName);
@@ -72,13 +73,13 @@ class ProcessorTest extends CommonTestClass
 
         $pack = $this->mockData();
         $pack->lastKnownPart = 4;
-        $data = $this->processor->init($pack, $this->mockSharedKey());
+        $data = $this->processor->init($pack);
 
         $this->assertInstanceOf(InfoFormat\Data::class, $data);
         $this->assertEquals(4, $data->lastKnownPart);
 
         $pack->lastKnownPart = 8;
-        $data2 = $this->processor->init($pack, $this->mockSharedKey());
+        $data2 = $this->processor->init($pack);
         $this->assertEquals(4, $data2->lastKnownPart);
         $this->assertNotEquals(8, $data2->lastKnownPart);
     }
@@ -94,11 +95,11 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
-        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->init($pack);
         $datacont = 'asdfghjklyxcvbnmqwertzuiop1234567890';
-        $this->processor->upload($this->mockSharedKey(), $datacont, 5); // pass, last is 4, wanted 5
+        $this->processor->upload($pack, $datacont, 5); // pass, last is 4, wanted 5
         $this->expectException(Exceptions\UploadException::class);
-        $this->processor->upload($this->mockSharedKey(), $datacont, 7); // fail, last is 5, wanted 6
+        $this->processor->upload($pack, $datacont, 7); // fail, last is 5, wanted 6
         $this->expectExceptionMessageMatches('READ TOO EARLY');
     }
 
@@ -113,9 +114,9 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
-        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->init($pack);
         $this->expectException(Exceptions\UploadException::class);
-        $this->processor->check($this->mockSharedKey(), -5); // fail, sub zero
+        $this->processor->check($pack, -5); // fail, sub zero
         $this->expectExceptionMessageMatches('SEGMENT OUT OF BOUNDS');
     }
 
@@ -130,9 +131,9 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
-        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->init($pack);
         $this->expectException(Exceptions\UploadException::class);
-        $this->processor->check($this->mockSharedKey(), 10); // fail, out of size
+        $this->processor->check($pack, 10); // fail, out of size
         $this->expectExceptionMessageMatches('SEGMENT OUT OF BOUNDS');
     }
 
@@ -147,9 +148,9 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
-        $this->processor->init($pack, $this->mockSharedKey());
+        $this->processor->init($pack);
         $this->expectException(Exceptions\UploadException::class);
-        $this->processor->check($this->mockSharedKey(), 6); // fail, outside upload
+        $this->processor->check($pack, 6); // fail, outside upload
         $this->expectExceptionMessageMatches('SEGMENT NOT UPLOADED YET');
     }
 
@@ -165,27 +166,27 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 4;
         $pack->partsCount = 8;
-        $data = $this->processor->init($pack, $this->mockSharedKey());
+        $data = $this->processor->init($pack);
         $dataCont = Support\Strings::substr($cont, 0, 30, '') . 'asdfghjklyxcvbnmqwer';
         // set problematic content
-        $this->processor->upload($this->mockSharedKey(), $dataCont);
+        $this->processor->upload($data, $dataCont);
         // now checks
         for ($i = 0; $i < $data->lastKnownPart; $i++) {
-            $remoteMd5 = $this->processor->check($this->mockSharedKey(), $i);
+            $remoteMd5 = $this->processor->check($data, $i);
             $localMd5 = md5(Support\Strings::substr($cont, $i * $data->bytesPerPart, $data->bytesPerPart, ''));
             if ($remoteMd5 != $localMd5) {
-                $this->processor->truncateFrom($this->mockSharedKey(), $i);
+                $this->processor->truncateFrom($data, $i);
                 break;
             }
         }
-        $data = $this->driveFile->read($this->mockSharedKey());
+        $data = $this->driveFile->read($data);
         $this->assertEquals(3, $data->lastKnownPart);
         // set rest
         for ($i = $data->lastKnownPart + 1; $i <= $data->partsCount; $i++) {
             $dataPack = Support\Strings::substr($cont, $i * $data->lastKnownPart, $data->bytesPerPart, '');
-            $this->processor->upload($this->mockSharedKey(), $dataPack);
+            $this->processor->upload($data, $dataPack);
         }
-        $this->processor->cancel($this->mockSharedKey()); // intended, because pass will be checked in upload itself
+        $this->processor->cancel($data); // intended, because pass will be checked in upload itself
     }
 
     /**
@@ -200,16 +201,18 @@ class ProcessorTest extends CommonTestClass
         $pack->bytesPerPart = 10;
         $pack->lastKnownPart = 7;
         $pack->partsCount = 8;
-        $this->processor->init($pack, $this->mockSharedKey());
-        $this->processor->upload($this->mockSharedKey(), $cont);
-        $data = $this->processor->done($this->mockSharedKey());
+        $this->processor->init($pack);
+        $this->processor->upload($pack, $cont);
+        $data = $this->processor->done($pack);
         $this->assertEquals(8, $data->lastKnownPart);
         $this->assertEquals(8, $data->partsCount);
     }
 
-    protected function mockKey(): string
+    protected function mockKey(): ServerData\Data
     {
-        return 'fghjkl' . Uploader\TargetSearch::FILE_DRIVER_SUFF;
+        $data = new ServerData\Data;
+        $data->sharedKey = 'fghjkl' . Uploader\TargetSearch::FILE_DRIVER_SUFF;
+        return $data;
     }
 
     protected function initProcessor(): void
@@ -217,8 +220,7 @@ class ProcessorTest extends CommonTestClass
         $lang = new Uploader\Translations();
         $this->infoStorage = new Support\InfoRam($lang);
         $this->dataStorage = new Support\DataRam($lang);
-        $target = new Uploader\TargetSearch($this->infoStorage, $this->dataStorage, $lang);
-        $key = new Support\Key($target, $lang);
+        $key = new Support\ServerKey();
         $format = new InfoFormat\Json();
         $hashed = new Uploader\Hashed();
         $this->driveFile = new Uploader\DriveFile($this->infoStorage, $format, $key, $lang);

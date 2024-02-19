@@ -1,19 +1,18 @@
 <?php
 
-namespace kalanis\UploadPerPartes\Keys;
+namespace kalanis\UploadPerPartes\ServerKeys;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Traits\TLang;
-use kalanis\UploadPerPartes\Uploader\TargetSearch;
 use ReflectionClass;
 use ReflectionException;
 
 
 /**
  * Class Factory
- * @package kalanis\UploadPerPartes\Keys
+ * @package kalanis\UploadPerPartes\ServerKeys
  * Select correct type of shared key
  */
 class Factory
@@ -21,13 +20,11 @@ class Factory
     use TLang;
 
     const VARIANT_VOLUME = 1;
-    const VARIANT_RANDOM = 2;
-    const VARIANT_REDIS = 3;
+    const VARIANT_REDIS = 2;
 
     /** @var array<int, class-string<AKey>> */
-    protected static $map = [
-        self::VARIANT_VOLUME => SimpleVolume::class,
-        self::VARIANT_RANDOM => Random::class,
+    protected $map = [
+        self::VARIANT_VOLUME => Volume::class,
         self::VARIANT_REDIS => Redis::class,
     ];
 
@@ -37,21 +34,20 @@ class Factory
     }
 
     /**
-     * @param TargetSearch $target
      * @param int $variant
      * @throws UploadException
      * @return AKey
      */
-    public function getVariant(TargetSearch $target, int $variant): AKey
+    public function getVariant(int $variant): AKey
     {
-        if (!isset(static::$map[$variant])) {
+        if (!isset($this->map[$variant])) {
             throw new UploadException($this->getUppLang()->uppKeyVariantNotSet());
         }
-        $class = static::$map[$variant];
+        $class = $this->map[$variant];
         try {
             $ref = new ReflectionClass($class);
             if ($ref->isInstantiable()) {
-                $lib = $ref->newInstance($target, $this->getUppLang());
+                $lib = $ref->newInstance();
                 if ($lib instanceof AKey) {
                     return $lib;
                 }

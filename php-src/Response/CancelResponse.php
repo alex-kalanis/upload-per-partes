@@ -16,40 +16,36 @@ class CancelResponse extends AResponse
 {
     public static function initCancel(
         ?IUPPTranslations $lang,
-        string $sharedKey,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $serverData,
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, static::STATUS_OK, static::STATUS_OK, $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, static::STATUS_OK, static::STATUS_OK, $roundaboutClient);
     }
 
     public static function initError(
         ?IUPPTranslations $lang,
-        string $sharedKey,
+        string $serverData,
         Exception $ex,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
         $l = new static($lang);
-        return $l->setData($sharedKey, static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient, $roundaboutServer);
+        return $l->setData($serverData, static::STATUS_FAIL, $ex->getMessage(), $roundaboutClient);
     }
 
     public function setData(
-        string $sharedKey,
+        string $serverData,
         string $status,
         string $errorMessage = self::STATUS_OK,
-        string $roundaboutClient = '',
-        string $roundaboutServer = ''
+        string $roundaboutClient = ''
     ): self
     {
-        $this->sharedKey = $sharedKey;
+        $this->serverData = $serverData;
         $this->status = $status;
         $this->errorMessage = $errorMessage;
         $this->roundaboutClient = $roundaboutClient;
-        $this->roundaboutServer = $roundaboutServer;
         return $this;
     }
 
@@ -57,10 +53,9 @@ class CancelResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'sharedKey' => strval($this->sharedKey),
+            'serverData' => strval($this->serverData),
             'status' => strval($this->status),
             'errorMessage' => strval($this->errorMessage),
-            'serverData' => strval($this->roundaboutServer),
             'clientData' => strval($this->roundaboutClient),
         ];
     }

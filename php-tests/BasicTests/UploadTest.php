@@ -7,6 +7,7 @@ use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions;
 use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Response;
+use kalanis\UploadPerPartes\ServerData;
 use kalanis\UploadPerPartes\Uploader;
 use Support;
 
@@ -26,7 +27,7 @@ class UploadTest extends CommonTestClass
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
         $bytesPerPart = $result1->jsonSerialize()['partSize'];
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
         $this->assertEquals(1024, $bytesPerPart);
 
         // step 2 - send data
@@ -38,7 +39,7 @@ class UploadTest extends CommonTestClass
 
         // step 3 - close upload
         /** @var Response\DoneResponse $result3 */
-        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
+        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
         $result3 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
@@ -61,7 +62,7 @@ class UploadTest extends CommonTestClass
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
         $bytesPerPart = $result1->jsonSerialize()['partSize'];
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
         $this->assertEquals(1024, $bytesPerPart);
         $this->assertEquals(631, $result1->jsonSerialize()['totalParts']);
 
@@ -78,7 +79,7 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result3->jsonSerialize()['status']);
         $bytesPerPart = $result3->jsonSerialize()['partSize'];
         $lastKnownPart = $result3->jsonSerialize()['lastKnownPart'];
-        $sharedKey = $result3->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result3->jsonSerialize()['serverData']; // for this test it's zero care
         $this->assertEquals(316, $lastKnownPart); // NOT ZERO
         $this->assertEquals(1024, $bytesPerPart);
 
@@ -112,7 +113,7 @@ class UploadTest extends CommonTestClass
 
         // step 7 - close upload
         /** @var Response\DoneResponse $result3 */
-        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
+        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
         $result7 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result7->jsonSerialize()['status']);
 
@@ -134,7 +135,7 @@ class UploadTest extends CommonTestClass
         // step 1 - init driver
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
 
         // step 2 - send data
         $result2 = $lib->upload($sharedKey, $content); // flush it all
@@ -142,7 +143,7 @@ class UploadTest extends CommonTestClass
 
         // step 3 - cancel upload
         /** @var Response\CancelResponse $result3 */
-        $target = $lib->getLibDriver()->read($sharedKey)->tempLocation;
+        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
         $result3 = $lib->cancel($sharedKey);
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
@@ -172,7 +173,7 @@ class UploadTest extends CommonTestClass
 
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
 
         // step 2 - check data - non existing segment
         $result2 = $lib->check($sharedKey, 35);
@@ -195,7 +196,7 @@ class UploadTest extends CommonTestClass
 
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
 
         // step 2 - truncate data - non existing segment
         $result2 = $lib->truncateFrom($sharedKey, 35);
@@ -218,7 +219,7 @@ class UploadTest extends CommonTestClass
 
         $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
-        $sharedKey = $result1->jsonSerialize()['sharedKey']; // for this test it's zero care
+        $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
 
         // step 2 - upload data - not continuous
         $result2 = $lib->upload($sharedKey, Support\Strings::substr($content, 23, 47564), 66);
@@ -285,5 +286,10 @@ class UploaderMock extends Uploader
     public function getLibDriver(): Uploader\DriveFile
     {
         return $this->driver;
+    }
+
+    public function getLibServerData(): ServerData\Processor
+    {
+        return $this->serverData;
     }
 }

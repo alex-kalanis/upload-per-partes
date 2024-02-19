@@ -25,16 +25,6 @@ class Translations implements IUPPTranslations
         return 'UPLOAD FILE NAME IS EMPTY';
     }
 
-    public function uppSharedKeyIsEmpty(): string
-    {
-        return 'SHARED KEY IS EMPTY';
-    }
-
-    public function uppSharedKeyIsInvalid(): string
-    {
-        return 'SHARED KEY IS INVALID';
-    }
-
     public function uppKeyVariantNotSet(): string
     {
         return 'KEY VARIANT NOT SET';
@@ -48,6 +38,11 @@ class Translations implements IUPPTranslations
     public function uppTargetDirIsEmpty(): string
     {
         return 'TARGET DIR IS NOT SET';
+    }
+
+    public function uppIncomingDataCannotDecode(): string
+    {
+        return 'CANNOT DECODE INCOMING DATA';
     }
 
     public function uppDriveFileAlreadyExists(string $driveFile): string
