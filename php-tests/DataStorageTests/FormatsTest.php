@@ -1,24 +1,23 @@
 <?php
 
-namespace InfoFormatTests;
+namespace DataStorageTests;
 
 
+use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\DataStorage;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
 
-class FormatsTest extends AFormats
+class FormatsTest extends CommonTestClass
 {
     /**
      * @throws UploadException
      */
     public function testInit(): void
     {
-        $factory = new InfoFormat\Factory(new Translations());
-        $this->assertInstanceOf(InfoFormat\Text::class, $factory->getFormat(InfoFormat\Factory::FORMAT_TEXT));
-        $this->assertInstanceOf(InfoFormat\Json::class, $factory->getFormat(InfoFormat\Factory::FORMAT_JSON));
-        $this->assertInstanceOf(InfoFormat\Line::class, $factory->getFormat(InfoFormat\Factory::FORMAT_LINE));
+        $factory = new DataStorage\Factory(new Translations());
+        $this->assertInstanceOf(DataStorage\VolumeBasic::class, $factory->getFormat(DataStorage\Factory::FORMAT_VOLUME));
     }
 
     /**
@@ -27,7 +26,7 @@ class FormatsTest extends AFormats
     public function testInitOwnClassString(): void
     {
         $factory = new XFactory(new Translations());
-        $this->assertInstanceOf(InfoFormat\Line::class, $factory->getFormat(InfoFormat\Line::class));
+        $this->assertInstanceOf(DataStorage\VolumeAdv::class, $factory->getFormat(DataStorage\VolumeAdv::class));
     }
 
     /**
@@ -36,7 +35,7 @@ class FormatsTest extends AFormats
     public function testInitOwnClassInstance(): void
     {
         $factory = new XFactory(new Translations());
-        $this->assertInstanceOf(InfoFormat\Line::class, $factory->getFormat(new InfoFormat\Line()));
+        $this->assertInstanceOf(DataStorage\VolumeObject::class, $factory->getFormat(new DataStorage\VolumeObject()));
     }
 
     /**
@@ -44,8 +43,8 @@ class FormatsTest extends AFormats
      */
     public function testInitFail(): void
     {
-        $factory = new InfoFormat\Factory(new Translations());
-        $this->expectExceptionMessage('DRIVEFILE VARIANT NOT SET');
+        $factory = new DataStorage\Factory(new Translations());
+        $this->expectExceptionMessage('TEMPORARY STORAGE NOT SET');
         $this->expectException(UploadException::class);
         $factory->getFormat(0);
     }
@@ -56,7 +55,7 @@ class FormatsTest extends AFormats
     public function testClassFail(): void
     {
         $factory = new XFactory();
-        $this->expectExceptionMessage('DRIVEFILE VARIANT IS WRONG');
+        $this->expectExceptionMessage('TEMPORARY STORAGE IS WRONG');
         $this->expectException(UploadException::class);
         $factory->getFormat(10);
     }
@@ -78,17 +77,17 @@ class FormatsTest extends AFormats
     public function testAbstractClassDie(): void
     {
         $factory = new XFactory();
-        $this->expectExceptionMessage('DRIVEFILE VARIANT IS WRONG');
+        $this->expectExceptionMessage('TEMPORARY STORAGE IS WRONG');
         $this->expectException(UploadException::class);
         $factory->getFormat(XstdClass::class);
     }
 }
 
 
-class XFactory extends InfoFormat\Factory
+class XFactory extends DataStorage\Factory
 {
     protected $map = [
-        10 => \stdClass::class,
+        10 => XPassClass::class,
         999 => 'this-class-does-not-exists',
     ];
 }
@@ -96,3 +95,12 @@ class XFactory extends InfoFormat\Factory
 
 abstract class XstdClass
 {}
+
+
+class XPassClass
+{
+    public function __construct($param)
+    {
+        // just for param
+    }
+}

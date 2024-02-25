@@ -27,19 +27,20 @@ class Uploader
     protected $processor = null;
 
     /**
+     * @param array<string, string|int|object> $params
      * @throws Exceptions\UploadException
      */
-    public function __construct()
+    public function __construct($params = [])
     {
         $this->lang = $this->getTranslations();
-        $infoStorage = $this->getInfoStorage();
-        $this->dataStorage = $this->getDataStorage();
+        $infoStorage = (new InfoStorage\Factory($this->lang))->getFormat($this->getInfoStorage($params));
+        $this->dataStorage = (new DataStorage\Factory($this->lang))->getFormat($this->getDataStorage($params));
         $this->findFreeEntry = $this->getFreeEntry(
             $this->getTarget($infoStorage, $this->dataStorage),
-            $this->getCalc(),
+            $this->getCalc($params),
             $this->getGenerateKeyFactory()->getVariant($this->getGenerateKeyVariant())
         );
-        $infoFormat = $this->getInfoFormatFactory()->getFormat($this->getInfoFormat());
+        $infoFormat = (new InfoFormat\Factory($this->lang))->getFormat($this->getInfoFormat($params));
         $this->driver = new Uploader\DriveFile(
             $infoStorage,
             $infoFormat,
@@ -58,13 +59,27 @@ class Uploader
         return new Uploader\Translations();
     }
 
-    protected function getInfoStorage(): Interfaces\IInfoStorage
+    /**
+     * @param array<string, string|int|object> $params
+     * @return string|int|object
+     */
+    protected function getInfoStorage($params)
     {
+        if (isset($params['info_storage'])) {
+            return $params['info_storage'];
+        }
         return new InfoStorage\Volume($this->lang);
     }
 
-    protected function getDataStorage(): Interfaces\IDataStorage
+    /**
+     * @param array<string, string|int|object> $params
+     * @return string|int|object
+     */
+    protected function getDataStorage($params)
     {
+        if (isset($params['data_storage'])) {
+            return $params['data_storage'];
+        }
         return new DataStorage\VolumeBasic($this->lang);
     }
 
@@ -77,8 +92,20 @@ class Uploader
         return new Uploader\TargetSearch($infoStorage, $dataStorage, $lang);
     }
 
-    protected function getCalc(): Uploader\Calculates
+    /**
+     * @param array<string, string|int|object> $params
+     * @return Uploader\Calculates
+     */
+    protected function getCalc($params): Uploader\Calculates
     {
+        if (isset($params['calculator'])) {
+            if ($params['calculator'] instanceof Uploader\Calculates) {
+                return $params['calculator'];
+            }
+            if (is_int($params['calculator'])) {
+                new Uploader\Calculates($params['calculator']);
+            }
+        }
         return new Uploader\Calculates(262144);
     }
 
@@ -97,13 +124,15 @@ class Uploader
         return new ServerData\Processor($lang);
     }
 
-    protected function getInfoFormatFactory(): InfoFormat\Factory
+    /**
+     * @param array<string, string|int|object> $params
+     * @return string|int|object
+     */
+    protected function getInfoFormat($params)
     {
-        return new InfoFormat\Factory($this->lang);
-    }
-
-    protected function getInfoFormat(): int
-    {
+        if (isset($params['format'])) {
+            return $params['format'];
+        }
         return InfoFormat\Factory::FORMAT_JSON;
     }
 

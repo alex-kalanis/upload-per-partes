@@ -75,6 +75,26 @@ class Translations implements IUPPTranslations
         return 'DRIVEFILE VARIANT IS WRONG';
     }
 
+    public function uppDriveFileStorageNotSet(): string
+    {
+        return 'DRIVEFILE STORAGE NOT SET';
+    }
+
+    public function uppDriveFileStorageIsWrong(string $className): string
+    {
+        return 'DRIVEFILE STORAGE IS WRONG';
+    }
+
+    public function uppTemporaryStorageNotSet(): string
+    {
+        return 'TEMPORARY STORAGE NOT SET';
+    }
+
+    public function uppTemporaryStorageIsWrong(string $className): string
+    {
+        return 'TEMPORARY STORAGE IS WRONG';
+    }
+
     public function uppDriveFileCannotRead(string $key): string
     {
         return 'CANNOT READ DRIVEFILE';

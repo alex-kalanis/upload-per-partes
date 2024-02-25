@@ -312,8 +312,9 @@ class UploadInit {
             function(responseData) {
                 if (typeof responseData == "object") {
                     if (uploadedFile.RESULT_OK === responseData.status) {
+                        uploadedFile.setInfoFromServer(responseData);
                         // start checking content
-                        self.upRenderer.renderReaded(uploadedFile.setInfoFromServer(responseData));
+                        self.upRenderer.renderReaded(uploadedFile);
                         self.upProcessor.checkParts(uploadedFile);
                     } else {
                         // uploadedFile.RESULT_FAIL
@@ -416,6 +417,7 @@ class UploaderChecker {
                 function(responseData) {
                     if (typeof responseData == "object") {
                         if (uploadedFile.RESULT_OK === responseData.status) {
+                            uploadedFile.setInfoFromServer(responseData);
                             // got known checksum on remote - check it against local file
                             self.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
                                 if (responseData.checksum == self.upChecksum.md5(result)) {
@@ -481,6 +483,7 @@ class UploaderChecker {
             function(responseData) {
                 if (typeof responseData == "object") {
                     if (uploadedFile.RESULT_OK === responseData.status) {
+                        uploadedFile.setInfoFromServer(responseData);
                         // Truncate came OK, time to upload the rest
                         self.upRenderer.updateBar(uploadedFile.setTruncatedFromServer(responseData));
                         self.nextStep(uploadedFile);
@@ -577,6 +580,7 @@ class UploaderRunner {
                 function(responseData) {
                     if (typeof responseData == "object") {
                         if (uploadedFile.RESULT_OK === responseData.status) {
+                            uploadedFile.setInfoFromServer(responseData);
                             // everything ok
                             self.upRenderer.updateBar(uploadedFile.nextCheckedPart());
                             self.continueRunning(uploadedFile);
@@ -612,6 +616,7 @@ class UploaderRunner {
             function(responseData) {
                 if (typeof responseData == "object") {
                     if (uploadedFile.RESULT_OK === responseData.status) {
+                        uploadedFile.setInfoFromServer(responseData);
                         // everything ok
                         uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
                         self.upRenderer.renderFinished(uploadedFile);
@@ -703,6 +708,7 @@ class UploaderFailure {
             function(responseData) {
                 if (typeof responseData == "object") {
                     if (uploadedFile.RESULT_OK === responseData.status) {
+                        uploadedFile.setInfoFromServer(responseData);
                         // everything done
                         self.checkContinue(uploadedFile);
                     } else {

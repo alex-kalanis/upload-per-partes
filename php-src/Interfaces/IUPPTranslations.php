@@ -36,6 +36,14 @@ interface IUPPTranslations
 
     public function uppDriveFileVariantIsWrong(string $className): string;
 
+    public function uppDriveFileStorageNotSet(): string;
+
+    public function uppDriveFileStorageIsWrong(string $className): string;
+
+    public function uppTemporaryStorageNotSet(): string;
+
+    public function uppTemporaryStorageIsWrong(string $className): string;
+
     public function uppDriveFileCannotRead(string $key): string;
 
     public function uppDriveFileCannotWrite(string $key): string;

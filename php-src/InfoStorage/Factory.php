@@ -1,10 +1,10 @@
 <?php
 
-namespace kalanis\UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\InfoStorage;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
+use kalanis\UploadPerPartes\Interfaces\IInfoStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Traits\TLang;
 use ReflectionClass;
@@ -13,22 +13,27 @@ use ReflectionException;
 
 /**
  * Class Factory
- * @package kalanis\UploadPerPartes\InfoFormat
- * Drive file format - Factory to get formats
+ * @package kalanis\UploadPerPartes\InfoStorage
+ * Key data storage - Factory to get where to store info data
  */
 class Factory
 {
     use TLang;
 
-    const FORMAT_TEXT = 1;
-    const FORMAT_JSON = 2;
-    const FORMAT_LINE = 3;
+    const FORMAT_VOLUME = 1;
+    // adapters - need to pass them
+//    const FORMAT_STORAGE = 2;
+//    const FORMAT_FILES = 3;
+//    const FORMAT_REDIS = 4;
+//    const FORMAT_PREDIS = 5;
 
     /** @var array<int, class-string<IInfoFormatting>> */
     protected $map = [
-        self::FORMAT_TEXT => Text::class,
-        self::FORMAT_JSON => Json::class,
-        self::FORMAT_LINE => Line::class,
+        self::FORMAT_VOLUME => Volume::class,
+//        self::FORMAT_STORAGE => Storage::class,
+//        self::FORMAT_FILES => Files::class,
+//        self::FORMAT_REDIS => Redis::class,
+//        self::FORMAT_PREDIS => Predis::class,
     ];
 
     public function __construct(?IUPPTranslations $lang = null)
@@ -39,9 +44,9 @@ class Factory
     /**
      * @param int|string|object $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IInfoStorage
      */
-    public function getFormat($variant): IInfoFormatting
+    public function getFormat($variant): IInfoStorage
     {
         if (is_object($variant)) {
             return $this->checkObject($variant);
@@ -52,35 +57,35 @@ class Factory
         if (is_string($variant)) {
             return $this->initDefined($variant);
         }
-        throw new UploadException($this->getUppLang()->uppDriveFileVariantNotSet());
+        throw new UploadException($this->getUppLang()->uppDriveFileStorageNotSet());
     }
 
     /**
      * @param object $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IInfoStorage
      */
-    protected function checkObject(object $variant): IInfoFormatting
+    protected function checkObject(object $variant): IInfoStorage
     {
-        if ($variant instanceof IInfoFormatting) {
+        if ($variant instanceof IInfoStorage) {
             return $variant;
         }
-        throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($variant)));
+        throw new UploadException($this->getUppLang()->uppDriveFileStorageIsWrong(get_class($variant)));
     }
 
     /**
      * @param string $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IInfoStorage
      */
-    protected function initDefined(string $variant): IInfoFormatting
+    protected function initDefined(string $variant): IInfoStorage
     {
         try {
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
-                return $this->checkObject($ref->newInstance());
+                return $this->checkObject($ref->newInstance($this->uppLang));
             }
-            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong($variant));
+            throw new UploadException($this->getUppLang()->uppDriveFileStorageIsWrong($variant));
         } catch (ReflectionException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }

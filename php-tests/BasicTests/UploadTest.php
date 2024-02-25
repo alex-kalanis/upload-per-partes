@@ -5,6 +5,7 @@ namespace BasicTests;
 
 use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions;
+use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Response;
 use kalanis\UploadPerPartes\ServerData;
@@ -19,7 +20,7 @@ class UploadTest extends CommonTestClass
      */
     public function testSimpleUpload(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock($this->params()); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -54,7 +55,9 @@ class UploadTest extends CommonTestClass
      */
     public function testStoppedUpload(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock([
+            'calculator' => 512,
+        ]); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -252,26 +255,36 @@ class UploadTest extends CommonTestClass
         $result2 = $lib->done('qwertzuiop');
         $this->assertEquals(Response\DoneResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
     }
+
+    protected function params(): array
+    {
+        return [
+            'format' => InfoFormat\Line::class,
+            'info_storage' => Support\InfoRam::class,
+            'data_storage' => Support\DataRam::class,
+            'calculator' => new Uploader\Calculates(1024),
+        ];
+    }
 }
 
 
 class UploaderMock extends Uploader
 {
-    protected function getInfoStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IInfoStorage
+    protected function getInfoStorage($params)
     {
-        parent::getInfoStorage();
-        return new Support\InfoRam($lang);
+        parent::getInfoStorage($params);
+        return new Support\InfoRam($this->lang);
     }
 
-    protected function getDataStorage(?Interfaces\IUPPTranslations $lang = null): Interfaces\IDataStorage
+    protected function getDataStorage($params)
     {
-        parent::getDataStorage();
-        return new Support\DataRam($lang);
+        parent::getDataStorage($params);
+        return new Support\DataRam($this->lang);
     }
 
-    protected function getCalc(): Uploader\Calculates
+    protected function getCalc($params): Uploader\Calculates
     {
-        parent::getCalc();
+        parent::getCalc($params);
         return new Uploader\Calculates(1024);
     }
 

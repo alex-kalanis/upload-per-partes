@@ -1,10 +1,10 @@
 <?php
 
-namespace kalanis\UploadPerPartes\InfoFormat;
+namespace kalanis\UploadPerPartes\DataStorage;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\Interfaces\IInfoFormatting;
+use kalanis\UploadPerPartes\Interfaces\IDataStorage;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 use kalanis\UploadPerPartes\Traits\TLang;
 use ReflectionClass;
@@ -13,22 +13,21 @@ use ReflectionException;
 
 /**
  * Class Factory
- * @package kalanis\UploadPerPartes\InfoFormat
- * Drive file format - Factory to get formats
+ * @package kalanis\UploadPerPartes\DataStorage
+ * Data data storage - Factory to get where to temporary store posted data
  */
 class Factory
 {
     use TLang;
 
-    const FORMAT_TEXT = 1;
-    const FORMAT_JSON = 2;
-    const FORMAT_LINE = 3;
+    const FORMAT_VOLUME = 1;
+    // adapters - need to pass them
+//    const FORMAT_FILES = 2;
 
     /** @var array<int, class-string<IInfoFormatting>> */
     protected $map = [
-        self::FORMAT_TEXT => Text::class,
-        self::FORMAT_JSON => Json::class,
-        self::FORMAT_LINE => Line::class,
+        self::FORMAT_VOLUME => VolumeBasic::class,
+//        self::FORMAT_FILES => Files::class,
     ];
 
     public function __construct(?IUPPTranslations $lang = null)
@@ -39,9 +38,9 @@ class Factory
     /**
      * @param int|string|object $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IDataStorage
      */
-    public function getFormat($variant): IInfoFormatting
+    public function getFormat($variant): IDataStorage
     {
         if (is_object($variant)) {
             return $this->checkObject($variant);
@@ -52,35 +51,35 @@ class Factory
         if (is_string($variant)) {
             return $this->initDefined($variant);
         }
-        throw new UploadException($this->getUppLang()->uppDriveFileVariantNotSet());
+        throw new UploadException($this->getUppLang()->uppTemporaryStorageNotSet());
     }
 
     /**
      * @param object $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IDataStorage
      */
-    protected function checkObject(object $variant): IInfoFormatting
+    protected function checkObject(object $variant): IDataStorage
     {
-        if ($variant instanceof IInfoFormatting) {
+        if ($variant instanceof IDataStorage) {
             return $variant;
         }
-        throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($variant)));
+        throw new UploadException($this->getUppLang()->uppTemporaryStorageIsWrong(get_class($variant)));
     }
 
     /**
      * @param string $variant
      * @throws UploadException
-     * @return IInfoFormatting
+     * @return IDataStorage
      */
-    protected function initDefined(string $variant): IInfoFormatting
+    protected function initDefined(string $variant): IDataStorage
     {
         try {
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
-                return $this->checkObject($ref->newInstance());
+                return $this->checkObject($ref->newInstance($this->uppLang));
             }
-            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong($variant));
+            throw new UploadException($this->getUppLang()->uppTemporaryStorageIsWrong($variant));
         } catch (ReflectionException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }

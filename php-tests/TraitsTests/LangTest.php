@@ -101,6 +101,26 @@ class XTrans implements IUPPTranslations
         return 'mock';
     }
 
+    public function uppDriveFileStorageNotSet(): string
+    {
+        return 'mock';
+    }
+
+    public function uppDriveFileStorageIsWrong(string $className): string
+    {
+        return 'mock';
+    }
+
+    public function uppTemporaryStorageNotSet(): string
+    {
+        return 'mock';
+    }
+
+    public function uppTemporaryStorageIsWrong(string $className): string
+    {
+        return 'mock';
+    }
+
     public function uppDriveFileCannotRead(string $key): string
     {
         return 'mock';
