@@ -15,11 +15,11 @@ class FilesTest extends AStorage
     {
         $file = $this->mockTestFile();
         $storage = (new \FilesTrait())->mockFilesDataPass();
-        $storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz');
+        $this->assertTrue($storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz'));
         $this->assertEquals('abcdefghijklmnopqrstuvwxyz', $storage->getPart($file, 0));
-        $storage->truncate($file, 16);
+        $this->assertTrue($storage->truncate($file, 16));
         $this->assertEquals('abcdefghijklmnop', $storage->getPart($file, 0));
-        $storage->remove($file);
+        $this->assertTrue($storage->remove($file));
     }
 
     /**
@@ -85,7 +85,7 @@ class FilesTest extends AStorage
         $file = $this->mockTestFile();
         $storage = (new \FilesTrait())->mockFilesDataPass();
         $this->assertTrue($storage->exists($file)); // because mocked
-        $storage->remove($file);
+        $this->assertTrue($storage->remove($file));
     }
 
     /**

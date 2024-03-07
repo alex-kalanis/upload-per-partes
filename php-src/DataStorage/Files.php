@@ -39,7 +39,7 @@ class Files extends AStorage
         }
     }
 
-    public function addPart(string $location, string $content, ?int $seek = null): void
+    public function addPart(string $location, string $content, ?int $seek = null): bool
     {
         try {
             $path = Stuff::pathToArray($location);
@@ -51,7 +51,7 @@ class Files extends AStorage
                     $seek = strlen($this->toString($location, $this->lib->readFile($path)));
                 }
             }
-            $this->lib->saveFile($path, $content, abs($seek));
+            return $this->lib->saveFile($path, $content, abs($seek));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
@@ -66,20 +66,20 @@ class Files extends AStorage
         }
     }
 
-    public function truncate(string $location, int $offset): void
+    public function truncate(string $location, int $offset): bool
     {
         try {
             $path = Stuff::pathToArray($location);
-            $this->lib->saveFile($path, $this->lib->readFile($path, 0, $offset));
+            return $this->lib->saveFile($path, $this->lib->readFile($path, 0, $offset));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location), $ex->getCode(), $ex);
         }
     }
 
-    public function remove(string $location): void
+    public function remove(string $location): bool
     {
         try {
-            $this->lib->deleteFile(Stuff::pathToArray($location));
+            return $this->lib->deleteFile(Stuff::pathToArray($location));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotRemoveData($location), $ex->getCode(), $ex);
         }

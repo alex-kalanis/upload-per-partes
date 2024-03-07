@@ -19,7 +19,7 @@ class ResponseTest extends CommonTestClass
         $lib = Response\InitResponse::initOk(new Translations(), $this->mockSharedKey(), $this->mockData());
 
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals('abcdef', $lib->jsonSerialize()['name']);
+        $this->assertEquals('fghjkl.partial', $lib->jsonSerialize()['name']);
         $this->assertEquals(Response\InitResponse::STATUS_OK, $lib->jsonSerialize()['status']);
         $this->assertEquals(12, $lib->jsonSerialize()['totalParts']);
         $this->assertEquals(64, $lib->jsonSerialize()['partSize']);
@@ -34,7 +34,7 @@ class ResponseTest extends CommonTestClass
         $ex = new Exceptions\UploadException('Testing one');
         $lib = Response\InitResponse::initError(null, $this->mockData(), $ex);
 
-        $this->assertEquals('abcdef', $lib->jsonSerialize()['name']);
+        $this->assertEquals('fghjkl.partial', $lib->jsonSerialize()['name']);
         $this->assertEquals(Response\InitResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
         $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
     }
@@ -117,8 +117,8 @@ class ResponseTest extends CommonTestClass
         $data = $this->mockData();
         $lib = Response\DoneResponse::initDone(new Translations(), $this->mockSharedKey(), $data);
 
-        $this->assertEquals($this->getTestDir() . $data->fileName, $lib->getTemporaryLocation());
-        $this->assertEquals('abcdef', $lib->getFileName());
+        $this->assertEquals('/tmp/', $lib->getTemporaryLocation());
+        $this->assertEquals('fghjkl.partial', $lib->getFileName());
         $this->assertEquals(123456, $lib->getSize());
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);

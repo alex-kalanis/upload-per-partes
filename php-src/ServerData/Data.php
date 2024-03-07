@@ -3,28 +3,84 @@
 namespace kalanis\UploadPerPartes\ServerData;
 
 
-use kalanis\UploadPerPartes\Interfaces\IDriverLocation;
-
-
 /**
  * Class Data
  * @package kalanis\UploadPerPartes\ServerData
- * Shared metadata passing there and back about upload itself
+ * Driver metadata about processed file
  */
-final class Data implements IDriverLocation
+final class Data
 {
-    /** @var string what path/prefix on storage to driver file */
-    public $pathPrefix = '';
-    /** @var string real driver file name on storage */
-    public $sharedKey = '';
+    /** @var string */
+    public $remoteName = '';
+    /** @var string */
+    public $tempDir = '';
+    /** @var string */
+    public $tempName = '';
+    /** @var string */
+    public $targetDir = '';
+    /** @var string */
+    public $finalName = '';
+    /** @var int<0, max> */
+    public $fileSize = 0;
+    /** @var int<0, max> */
+    public $partsCount = 0;
+    /** @var int<0, max> */
+    public $bytesPerPart = 0;
+    /** @var int<0, max> */
+    public $lastKnownPart = 0;
 
-    public function getDriverPrefix(): string
+    public static function init(): self
     {
-        return strval($this->pathPrefix);
+        return new static();
     }
 
-    public function getDriverKey(): string
+    /**
+     * @param string $remoteFileName
+     * @param string $tempDir
+     * @param string $tempName
+     * @param string $targetDir
+     * @param string $finalName
+     * @param int<0, max> $fileSize
+     * @param int<0, max> $partsCount
+     * @param int<0, max> $bytesPerPart
+     * @param int<0, max> $lastKnownPart
+     * @return $this
+     */
+    public function setData(
+        string $remoteFileName,
+        string $tempDir,
+        string $tempName,
+        string $targetDir,
+        string $finalName,
+        int $fileSize,
+        int $partsCount = 0,
+        int $bytesPerPart = 0,
+        int $lastKnownPart = 0
+    ): self
     {
-        return strval($this->sharedKey);
+        $this->remoteName = $remoteFileName; // what name is passed from client
+        $this->tempDir = $tempDir; // where it is during upload
+        $this->tempName = $tempName; // what it is during upload
+        $this->targetDir = $targetDir; // where it will be stored
+        $this->finalName = $finalName; // what name it will have after upload
+        $this->fileSize = $fileSize; // final size
+        $this->partsCount = $partsCount; // is on parts...
+        $this->bytesPerPart = $bytesPerPart; // how long is single part
+        $this->lastKnownPart = $lastKnownPart; // how many parts has been obtained
+        return $this;
+    }
+
+    public function sanitizeData(): self
+    {
+        $this->remoteName = strval($this->remoteName);
+        $this->tempDir = strval($this->tempDir);
+        $this->tempName = strval($this->tempName);
+        $this->targetDir = strval($this->targetDir);
+        $this->finalName = strval($this->finalName);
+        $this->fileSize = intval($this->fileSize);
+        $this->partsCount = intval($this->partsCount);
+        $this->bytesPerPart = intval($this->bytesPerPart);
+        $this->lastKnownPart = intval($this->lastKnownPart);
+        return $this;
     }
 }

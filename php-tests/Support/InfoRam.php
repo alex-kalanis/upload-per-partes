@@ -4,7 +4,7 @@ namespace Support;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoStorage\AStorage;
+use kalanis\UploadPerPartes\ServerData\InfoStorage\AStorage;
 
 
 /**
@@ -31,15 +31,22 @@ class InfoRam extends AStorage
         return $content;
     }
 
-    public function save(string $key, string $data): void
+    public function save(string $key, string $data): bool
     {
         $this->data[$key] = $data;
+        return true;
     }
 
-    public function remove(string $key): void
+    public function remove(string $key): bool
     {
         if ($this->exists($key)) {
             unset($this->data[$key]);
         }
+        return true;
+    }
+
+    public function checkKeyClasses(object $limitData, object $storageKeys, object $infoFormat): bool
+    {
+       return true;
     }
 }

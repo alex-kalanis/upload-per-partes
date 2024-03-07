@@ -27,9 +27,9 @@ interface IDataStorage
      * @param string $content binary content
      * @param int<0, max>|null $seek where it save
      * @throws UploadException
-     * @return void
+     * @return bool
      */
-    public function addPart(string $location, string $content, ?int $seek = null): void;
+    public function addPart(string $location, string $content, ?int $seek = null): bool;
 
     /**
      * Get part of file
@@ -46,14 +46,15 @@ interface IDataStorage
      * @param string $location
      * @param int<0, max> $offset
      * @throws UploadException
-     * @return void
+     * @return bool
      */
-    public function truncate(string $location, int $offset): void;
+    public function truncate(string $location, int $offset): bool;
 
     /**
      * Remove whole data file
      * @param string $location
      * @throws UploadException
+     * @return bool
      */
-    public function remove(string $location): void;
+    public function remove(string $location): bool;
 }

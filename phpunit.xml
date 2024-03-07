@@ -48,10 +48,7 @@
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
             <directory>php-tests/DataStorageTests</directory>
-            <directory>php-tests/InfoFormatTests</directory>
-            <directory>php-tests/InfoStorageTests</directory>
-            <directory>php-tests/GenerateKeysTests</directory>
-            <directory>php-tests/ServerKeysTests</directory>
+            <directory>php-tests/ServerDataTests</directory>
             <directory>php-tests/TraitsTests</directory>
         </testsuite>
         <testsuite name="Basics">
@@ -59,15 +56,6 @@
         </testsuite>
         <testsuite name="Data">
             <directory>php-tests/DataStorageTests</directory>
-        </testsuite>
-        <testsuite name="Formats">
-            <directory>php-tests/InfoFormatTests</directory>
-        </testsuite>
-        <testsuite name="Storage">
-            <directory>php-tests/InfoStorageTests</directory>
-        </testsuite>
-        <testsuite name="Keys">
-            <directory>php-tests/KeysTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -20,11 +20,6 @@ class Translations implements IUPPTranslations
         return 'SENT FILE NAME IS EMPTY';
     }
 
-    public function uppUploadNameIsEmpty(): string
-    {
-        return 'UPLOAD FILE NAME IS EMPTY';
-    }
-
     public function uppKeyVariantNotSet(): string
     {
         return 'KEY VARIANT NOT SET';
@@ -33,6 +28,16 @@ class Translations implements IUPPTranslations
     public function uppKeyVariantIsWrong(string $className): string
     {
         return 'KEY VARIANT IS WRONG';
+    }
+
+    public function uppKeyModifierNotSet(): string
+    {
+        return 'KEY MODIFIER NOT SET';
+    }
+
+    public function uppKeyModifierIsWrong(string $className): string
+    {
+        return 'KEY MODIFIER IS WRONG';
     }
 
     public function uppTargetDirIsEmpty(): string

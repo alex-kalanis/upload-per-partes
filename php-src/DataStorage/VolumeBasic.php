@@ -20,13 +20,7 @@ class VolumeBasic extends AStorage
         return is_file($location);
     }
 
-    /**
-     * @param string $location
-     * @param string $content
-     * @param int<0, max>|null $seek
-     * @throws UploadException
-     */
-    public function addPart(string $location, string $content, ?int $seek = null): void
+    public function addPart(string $location, string $content, ?int $seek = null): bool
     {
         if (is_null($seek)) {  // append to end
             $pointer = @fopen($location, 'ab');
@@ -60,15 +54,9 @@ class VolumeBasic extends AStorage
             /** @scrutinizer ignore-unhandled */@fclose($pointer);
             // @codeCoverageIgnoreEnd
         }
+        return true;
     }
 
-    /**
-     * @param string $location
-     * @param int $offset
-     * @param int|null $limit
-     * @throws UploadException
-     * @return string
-     */
     public function getPart(string $location, int $offset, ?int $limit = null): string
     {
         $pointer = @fopen($location, 'rb');
@@ -104,12 +92,7 @@ class VolumeBasic extends AStorage
         return $data;
     }
 
-    /**
-     * @param string $location
-     * @param int $offset
-     * @throws UploadException
-     */
-    public function truncate(string $location, int $offset): void
+    public function truncate(string $location, int $offset): bool
     {
         $pointer = @fopen($location, 'rb+');
         if (false !== $pointer) {
@@ -129,12 +112,14 @@ class VolumeBasic extends AStorage
             /** @scrutinizer ignore-unhandled */@rewind($pointer);
             /** @scrutinizer ignore-unhandled */@fclose($pointer);
         }
+        return true;
     }
 
-    public function remove(string $location): void
+    public function remove(string $location): bool
     {
         if (!@unlink($location)) {
             throw new UploadException($this->getUppLang()->uppCannotRemoveData($location));
         }
+        return true;
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
 use kalanis\kw_files\Access\CompositeAdapter;
-use kalanis\UploadPerPartes\Interfaces\IDataStorage;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
 
 class FilesTrait
 {
     // just for loading this file
-    public function mockFilesDataPass(): IDataStorage
+    public function mockFilesDataPass(): Interfaces\IDataStorage
     {
         return new \kalanis\UploadPerPartes\DataStorage\Files(new CompositeAdapter(
             new NodePass(),
@@ -17,7 +17,7 @@ class FilesTrait
         ), new Translations());
     }
 
-    public function mockFilesDataDie(): IDataStorage
+    public function mockFilesDataDie(): Interfaces\IDataStorage
     {
         return new \kalanis\UploadPerPartes\DataStorage\Files(new CompositeAdapter(
             new \NodeFail(),
@@ -26,18 +26,18 @@ class FilesTrait
         ), new Translations());
     }
 
-    public function mockFilesInfoPass(): \kalanis\UploadPerPartes\Interfaces\IInfoStorage
+    public function mockFilesInfoPass(): Interfaces\IInfoStorage
     {
-        return new \kalanis\UploadPerPartes\InfoStorage\Files(new CompositeAdapter(
+        return new \kalanis\UploadPerPartes\ServerData\InfoStorage\Files(new CompositeAdapter(
             new NodePass(),
             new DirPass(),
             new FilePass()
         ), new Translations());
     }
 
-    public function mockFilesInfoDie(): \kalanis\UploadPerPartes\Interfaces\IInfoStorage
+    public function mockFilesInfoDie(): Interfaces\IInfoStorage
     {
-        return new \kalanis\UploadPerPartes\InfoStorage\Files(new CompositeAdapter(
+        return new \kalanis\UploadPerPartes\ServerData\InfoStorage\Files(new CompositeAdapter(
             new \NodeFail(),
             new \DirFail(),
             new \FileFail()

@@ -20,16 +20,18 @@ class VolumeAdv extends VolumeBasic
      * @param string $content
      * @param int<0, max>|null $seek
      * @throws UploadException
+     * @return bool
      * @codeCoverageIgnore
      */
-    public function addPart(string $location, string $content, ?int $seek = null): void
+    public function addPart(string $location, string $content, ?int $seek = null): bool
     {
         if (is_null($seek)) {  // append to end
             if (false === @file_put_contents($location, $content, FILE_APPEND)) {
                 throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
             }
+            return true;
         } else { // append from position
-            parent::addPart($location, $content, $seek); // do not write another seek func
+            return parent::addPart($location, $content, $seek); // do not write another seek func
         }
     }
 

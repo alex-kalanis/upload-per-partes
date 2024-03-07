@@ -14,11 +14,12 @@ use kalanis\UploadPerPartes;
  */
 class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavouriteFrameworkControllerClass
 {
-    const ENCODING_UPLOAD_PATH = '/path-to-temp';
+    const TEMP_UPLOAD_PATH = '/temp/';
+    const ENCODING_UPLOAD_PATH = '/path-to-upload-target-dir/';
 
     public function ajaxUploadPartesInit()
     {
-        $lib = new UploadPerPartes\examples\Uploader(); // here temp path and init everytime with it
+        $lib = new UploadPerPartes\examples\Uploader($this->uploadParams()); // here temp path and init everytime with it
         $this->sendResponse($lib->init(
             static::ENCODING_UPLOAD_PATH,
             $this->getHttpRequest()->getPost()->__get('fileName'),
@@ -29,7 +30,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
 
     public function ajaxUploadPartesCheck()
     {
-        $lib = new UploadPerPartes\examples\Uploader();
+        $lib = new UploadPerPartes\examples\Uploader($this->uploadParams());
         $this->sendResponse($lib->check(
             $this->getHttpRequest()->getPost()->__get('serverData'),
             intval($this->getHttpRequest()->getPost()->__get('segment')),
@@ -39,7 +40,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
 
     public function ajaxUploadPartesPart()
     {
-        $lib = new UploadPerPartes\examples\Uploader();
+        $lib = new UploadPerPartes\examples\Uploader($this->uploadParams());
         $this->sendResponse($lib->upload(
             $this->getHttpRequest()->getPost()->__get('serverData'),
             base64_decode($this->getHttpRequest()->getPost()->__get('content')),
@@ -50,7 +51,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
 
     public function ajaxUploadPartesTruncate()
     {
-        $lib = new UploadPerPartes\examples\Uploader();
+        $lib = new UploadPerPartes\examples\Uploader($this->uploadParams());
         $this->sendResponse($lib->truncateFrom(
             $this->getHttpRequest()->getPost()->__get('serverData'),
             $this->getHttpRequest()->getPost()->__get('segment'),
@@ -60,7 +61,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
 
     public function ajaxUploadPartesCancel()
     {
-        $lib = new UploadPerPartes\examples\Uploader();
+        $lib = new UploadPerPartes\examples\Uploader($this->uploadParams());
         $this->sendResponse($lib->cancel(
             $this->getHttpRequest()->getPost()->__get('serverData'),
             $this->getHttpRequest()->getPost()->__get('clientData')
@@ -70,7 +71,7 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
     public function ajaxUploadPartesDone()
     {
         try {
-            $lib = new UploadPerPartes\examples\Uploader();
+            $lib = new UploadPerPartes\examples\Uploader($this->uploadParams());
             $result = $lib->done(
                 $this->getHttpRequest()->getPost()->__get('serverData'),
                 $this->getHttpRequest()->getPost()->__get('clientData')
@@ -79,21 +80,28 @@ class Uploader extends \Nette\Application\UI\Presenter //  extends \yourFavourit
             // check uploaded content and move it on drive
             $libMove = new Lib\Content\FileSave($this->getUser());
             $uploadedContent = $libMove->checkAndMove(
-                $result->getTemporaryLocation(), // temp name
-                $result->getFileName() // final name
+                $result->getInfoData()->tempDir . $result->getInfoData()->tempName, // temp name
+                $result->getInfoData()->targetDir . $result->getInfoData()->finalName // final name
             );
             $this->getSession()->getSection('uploader')->__set('uploadedContent', $uploadedContent->getPath()); // pass file between pages
             $this->sendResponse($result);
             // and user shall got Thanks
 
-        } catch (Lib\Content\UploadException $ex) {
+        } catch (Lib\Content\UploadException | UploadPerPartes\Exceptions\UploadException $ex) {
             $this->sendResponse(UploadPerPartes\Response\DoneResponse::initError(
                 null,
                 $this->getHttpRequest()->getPost()->__get('serverData'),
-                UploadPerPartes\InfoFormat\Data::init(),
+                UploadPerPartes\ServerData\Data::init(),
                 $ex,
                 $this->getHttpRequest()->getPost()->__get('clientData')
             ));
         }
+    }
+
+    protected function uploadParams(): array
+    {
+        return [
+            'temp_location' => static::TEMP_UPLOAD_PATH,
+        ];
     }
 }

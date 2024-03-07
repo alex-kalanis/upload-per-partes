@@ -14,11 +14,13 @@ interface IUPPTranslations
 {
     public function uppSentNameIsEmpty(): string;
 
-    public function uppUploadNameIsEmpty(): string;
-
     public function uppKeyVariantNotSet(): string;
 
     public function uppKeyVariantIsWrong(string $className): string;
+
+    public function uppKeyModifierNotSet(): string;
+
+    public function uppKeyModifierIsWrong(string $className): string;
 
     public function uppTargetDirIsEmpty(): string;
 

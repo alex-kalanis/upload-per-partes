@@ -24,7 +24,7 @@ class Factory
     // adapters - need to pass them
 //    const FORMAT_FILES = 2;
 
-    /** @var array<int, class-string<IInfoFormatting>> */
+    /** @var array<int, class-string<IDataStorage>> */
     protected $map = [
         self::FORMAT_VOLUME => VolumeBasic::class,
 //        self::FORMAT_FILES => Files::class,
@@ -36,7 +36,7 @@ class Factory
     }
 
     /**
-     * @param int|string|object $variant
+     * @param int|class-string<IDataStorage>|object|string $variant
      * @throws UploadException
      * @return IDataStorage
      */
@@ -68,7 +68,7 @@ class Factory
     }
 
     /**
-     * @param string $variant
+     * @param class-string<IDataStorage>|string $variant
      * @throws UploadException
      * @return IDataStorage
      */

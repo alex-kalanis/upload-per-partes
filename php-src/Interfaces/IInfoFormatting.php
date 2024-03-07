@@ -4,7 +4,7 @@ namespace kalanis\UploadPerPartes\Interfaces;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat\Data;
+use kalanis\UploadPerPartes\ServerData\Data;
 
 
 /**

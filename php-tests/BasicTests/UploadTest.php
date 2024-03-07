@@ -5,12 +5,12 @@ namespace BasicTests;
 
 use CommonTestClass;
 use kalanis\UploadPerPartes\Exceptions;
-use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Response;
 use kalanis\UploadPerPartes\ServerData;
 use kalanis\UploadPerPartes\Uploader;
 use Support;
+use TraitsTests\XTrans;
 
 
 class UploadTest extends CommonTestClass
@@ -40,12 +40,12 @@ class UploadTest extends CommonTestClass
 
         // step 3 - close upload
         /** @var Response\DoneResponse $result3 */
-        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
+        $target = $lib->getLibServerData()->get($sharedKey);
         $result3 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target);
+        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target->tempDir . $target->tempName);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
@@ -55,9 +55,9 @@ class UploadTest extends CommonTestClass
      */
     public function testStoppedUpload(): void
     {
-        $lib = new UploaderMock([
+        $lib = new UploaderMock(array_merge($this->params(), [
             'calculator' => 512,
-        ]); // must stay same, because it's only in the ram
+        ])); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -66,8 +66,9 @@ class UploadTest extends CommonTestClass
         $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
         $bytesPerPart = $result1->jsonSerialize()['partSize'];
         $sharedKey = $result1->jsonSerialize()['serverData']; // for this test it's zero care
-        $this->assertEquals(1024, $bytesPerPart);
-        $this->assertEquals(631, $result1->jsonSerialize()['totalParts']);
+        $this->assertEquals(512, $bytesPerPart);
+        $this->assertEquals(1261, $result1->jsonSerialize()['totalParts']);
+        $this->assertEquals('lorem-ipsum.txt', $result1->jsonSerialize()['name']);
 
         // step 2 - send first part of data
         $limited = floor($maxSize / 2);
@@ -83,8 +84,9 @@ class UploadTest extends CommonTestClass
         $bytesPerPart = $result3->jsonSerialize()['partSize'];
         $lastKnownPart = $result3->jsonSerialize()['lastKnownPart'];
         $sharedKey = $result3->jsonSerialize()['serverData']; // for this test it's zero care
-        $this->assertEquals(316, $lastKnownPart); // NOT ZERO
-        $this->assertEquals(1024, $bytesPerPart);
+        $this->assertEquals('lorem-ipsum.txt', $result3->jsonSerialize()['name']);
+        $this->assertEquals(631, $lastKnownPart); // NOT ZERO
+        $this->assertEquals(512, $bytesPerPart);
 
         // step 4 - check first part
         for ($i = 0; $i <= $lastKnownPart; $i++) {
@@ -105,7 +107,7 @@ class UploadTest extends CommonTestClass
             return;
         }
         $lastKnownPart = $result5->jsonSerialize()['lastKnownPart'];
-        $this->assertEquals(314, $lastKnownPart);
+        $this->assertEquals(629, $lastKnownPart);
 
         // step 6 - send second part
         for ($i = $lastKnownPart; $i * $bytesPerPart <= $maxSize; $i++) {
@@ -116,12 +118,12 @@ class UploadTest extends CommonTestClass
 
         // step 7 - close upload
         /** @var Response\DoneResponse $result3 */
-        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
+        $target = $lib->getLibServerData()->get($sharedKey);
         $result7 = $lib->done($sharedKey);
         $this->assertEquals(Response\DoneResponse::STATUS_OK, $result7->jsonSerialize()['status']);
 
         // check content
-        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target);
+        $uploaded = $lib->getStorage()->/** @scrutinizer ignore-call */getAll($target->tempDir . $target->tempName);
         $this->assertGreaterThan(0, strlen($uploaded));
         $this->assertTrue($content == $uploaded);
     }
@@ -131,7 +133,7 @@ class UploadTest extends CommonTestClass
      */
     public function testCancel(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock($this->params()); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -146,12 +148,63 @@ class UploadTest extends CommonTestClass
 
         // step 3 - cancel upload
         /** @var Response\CancelResponse $result3 */
-        $target = $lib->getLibDriver()->read($lib->getLibServerData()->readPack($sharedKey))->tempLocation;
+        $target = $lib->getLibServerData()->get($sharedKey);
         $result3 = $lib->cancel($sharedKey);
         $this->assertEquals(Response\CancelResponse::STATUS_OK, $result3->jsonSerialize()['status']);
 
         // check content
-        $this->assertEmpty($lib->getStorage()->/** @scrutinizer ignore-call */getAll($target));
+        $this->assertEmpty($lib->getStorage()->/** @scrutinizer ignore-call */getAll($target->tempDir . $target->tempName));
+    }
+
+    /**
+     * @throws Exceptions\UploadException
+     */
+    public function testCreateFailLocation(): void
+    {
+        $this->expectExceptionMessage('TEMPORARY STORAGE NOT SET');
+        $this->expectException(Exceptions\UploadException::class);
+        new UploaderMock([
+            // no temp path
+            'info_storage' => Support\InfoRam::class,
+            'upload_storage' => Support\DataRam::class,
+            'target_storage' => Support\DataRam::class,
+        ]);
+    }
+
+    /**
+     * @throws Exceptions\UploadException
+     */
+    public function testCreateOtherOptions(): void
+    {
+        $this->assertNotEmpty(new UploaderMock([
+            'temp_location' => '/tmp/',
+            'langs' => new XTrans(),
+            'calculator' => 1024,
+            'info_format' => 4, // line
+            'limit_data' => 1, // name
+            'storage_key' => 5, // hex
+            'encode_key' => 5, // hex
+            'can_continue' => false,
+        ]));
+    }
+
+    /**
+     * @throws Exceptions\UploadException
+     */
+    public function testInitRepeatDisabled(): void
+    {
+        $content = 'dummy_content';
+        $maxSize = strlen($content);
+
+        $lib = new UploaderMock(array_merge($this->params(), [
+            'can_continue' => false,
+            'limit_data' => 1, // name
+        ]));
+        $this->assertNotEmpty($lib);
+        $result1 = $lib->init('dummy_file', 'dummy_file', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_OK, $result1->jsonSerialize()['status']);
+        $result2 = $lib->init('dummy_file', 'dummy_file', $maxSize);
+        $this->assertEquals(Response\InitResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
     }
 
     /**
@@ -159,7 +212,7 @@ class UploadTest extends CommonTestClass
      */
     public function testInitFail(): void
     {
-        $lib = new UploaderMock();
+        $lib = new UploaderMock($this->params());
         // init data - but there is failure
         $result1 = $lib->init('', '', 123456);
         $this->assertEquals(Response\InitResponse::STATUS_FAIL, $result1->jsonSerialize()['status']);
@@ -170,7 +223,7 @@ class UploadTest extends CommonTestClass
      */
     public function testCheckFail(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock($this->params()); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -193,7 +246,7 @@ class UploadTest extends CommonTestClass
      */
     public function testTruncateFail(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock($this->params()); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -216,7 +269,7 @@ class UploadTest extends CommonTestClass
      */
     public function testUploadFail(): void
     {
-        $lib = new UploaderMock(); // must stay same, because it's only in the ram
+        $lib = new UploaderMock($this->params()); // must stay same, because it's only in the ram
         $content = file_get_contents($this->getTestFile()); // read test content into ram
         $maxSize = strlen($content);
 
@@ -239,9 +292,9 @@ class UploadTest extends CommonTestClass
      */
     public function testCancelFail(): void
     {
-        $lib = new UploaderMock();
+        $lib = new UploaderMock($this->params());
         // cancel data - but there is nothing
-        $result2 = $lib->cancel('qwertzuiop');
+        $result2 = $lib->cancel('1234567890abcdef');
         $this->assertEquals(Response\CancelResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
     }
 
@@ -250,19 +303,21 @@ class UploadTest extends CommonTestClass
      */
     public function testDoneFail(): void
     {
-        $lib = new UploaderMock();
+        $lib = new UploaderMock($this->params());
         // done data - but there is nothing
-        $result2 = $lib->done('qwertzuiop');
+        $result2 = $lib->done('1234567890abcdef');
         $this->assertEquals(Response\DoneResponse::STATUS_FAIL, $result2->jsonSerialize()['status']);
     }
 
     protected function params(): array
     {
         return [
-            'format' => InfoFormat\Line::class,
+            'temp_location' => '/tmp/',
+            'format' => ServerData\DataModifiers\Line::class,
             'info_storage' => Support\InfoRam::class,
-            'data_storage' => Support\DataRam::class,
-            'calculator' => new Uploader\Calculates(1024),
+            'upload_storage' => Support\DataRam::class,
+            'target_storage' => Support\DataRam::class,
+            'calculator' => new Uploader\CalculateSizes(1024),
         ];
     }
 }
@@ -270,35 +325,12 @@ class UploadTest extends CommonTestClass
 
 class UploaderMock extends Uploader
 {
-    protected function getInfoStorage($params)
-    {
-        parent::getInfoStorage($params);
-        return new Support\InfoRam($this->lang);
-    }
-
-    protected function getDataStorage($params)
-    {
-        parent::getDataStorage($params);
-        return new Support\DataRam($this->lang);
-    }
-
-    protected function getCalc($params): Uploader\Calculates
-    {
-        parent::getCalc($params);
-        return new Uploader\Calculates(1024);
-    }
-
     /**
      * @return Support\DataRam
      */
     public function getStorage(): Interfaces\IDataStorage
     {
-        return $this->dataStorage;
-    }
-
-    public function getLibDriver(): Uploader\DriveFile
-    {
-        return $this->driver;
+        return $this->uploadStorage;
     }
 
     public function getLibServerData(): ServerData\Processor

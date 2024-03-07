@@ -36,27 +36,22 @@ class XTrans implements IUPPTranslations
         return 'mock';
     }
 
-    public function uppUploadNameIsEmpty(): string
-    {
-        return 'mock';
-    }
-
-    public function uppSharedKeyIsEmpty(): string
-    {
-        return 'mock';
-    }
-
-    public function uppSharedKeyIsInvalid(): string
-    {
-        return 'mock';
-    }
-
     public function uppKeyVariantNotSet(): string
     {
         return 'mock';
     }
 
     public function uppKeyVariantIsWrong(string $className): string
+    {
+        return 'mock';
+    }
+
+    public function uppKeyModifierNotSet(): string
+    {
+        return 'mock';
+    }
+
+    public function uppKeyModifierIsWrong(string $className): string
     {
         return 'mock';
     }

@@ -4,7 +4,7 @@ namespace TraitsTests;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat\Data;
+use kalanis\UploadPerPartes\ServerData\Data;
 use kalanis\UploadPerPartes\Traits\TData;
 
 

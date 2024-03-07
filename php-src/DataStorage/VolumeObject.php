@@ -23,9 +23,10 @@ class VolumeObject extends VolumeBasic
      * @param string $content
      * @param int<0, max>|null $seek
      * @throws UploadException
+     * @return bool
      * @codeCoverageIgnore
      */
-    public function addPart(string $location, string $content, ?int $seek = null): void
+    public function addPart(string $location, string $content, ?int $seek = null): bool
     {
         $file = new SplFileObject($location, 'rb+');
         if (false === @$file->ftell()) {
@@ -42,6 +43,7 @@ class VolumeObject extends VolumeBasic
             throw new UploadException($this->getUppLang()->uppCannotWriteFile($location));
         }
         unset($file);
+        return true;
     }
 
     /**
@@ -89,9 +91,10 @@ class VolumeObject extends VolumeBasic
      * @param string $location
      * @param int<0, max> $offset
      * @throws UploadException
+     * @return bool
      * @codeCoverageIgnore
      */
-    public function truncate(string $location, int $offset): void
+    public function truncate(string $location, int $offset): bool
     {
         try {
             $file = new SplFileObject($location, 'rb+');
@@ -102,6 +105,7 @@ class VolumeObject extends VolumeBasic
             }
             $file->rewind();
             unset($file);
+            return true;
         } catch (RuntimeException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotTruncateFile($location), 0, $ex);
         }

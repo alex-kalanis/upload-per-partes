@@ -23,7 +23,7 @@ class Strings
      * @throws UploadException
      * @return string
      */
-    public static function substr(string $what, int $offset, ?int $limit, string $errorMessage = ''): string
+    public static function substr(string $what, int $offset, ?int $limit, string $errorMessage = 'Substring failed'): string
     {
         $length = strlen($what);
         if (!is_null($limit) && ($limit > $length)) { // not over

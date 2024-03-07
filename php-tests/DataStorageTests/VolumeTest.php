@@ -31,9 +31,9 @@ class VolumeTest extends AStorage
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
         mkdir($file);
+        $this->expectExceptionMessage('CANNOT OPEN FILE');
         $this->expectException(UploadException::class);
         $storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz'); // fail
-        $this->expectExceptionMessageMatches('CANNOT OPEN FILE');
         rmdir($file);
     }
 
@@ -45,9 +45,9 @@ class VolumeTest extends AStorage
         $file = $this->mockTestFile();
         $storage = $this->mockStorage();
         mkdir($file);
+        $this->expectExceptionMessage('CANNOT OPEN FILE');
         $this->expectException(UploadException::class);
         $storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz', 10); // fail
-        $this->expectExceptionMessageMatches('CANNOT OPEN FILE');
         rmdir($file);
     }
 
@@ -102,9 +102,9 @@ class VolumeTest extends AStorage
         $storage->addPart($file, 'abcdefghijklmnopqrstuvwxyz');
         $this->assertTrue($storage->exists($file));
         $storage->remove($file);
+        $this->expectExceptionMessage('CANNOT REMOVE DATA');
         $this->expectException(UploadException::class);
         $storage->remove($file); // dies here
-        $this->expectExceptionMessageMatches('CANNOT REMOVE DATA');
     }
 
     protected function getTestDir(): string

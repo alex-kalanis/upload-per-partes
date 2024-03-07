@@ -5,8 +5,8 @@ namespace kalanis\UploadPerPartes\Response;
 
 use Exception;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\ServerData;
 
 
 /**
@@ -19,7 +19,7 @@ class InitResponse extends AResponse
     public static function initOk(
         ?IUPPTranslations $lang,
         string $serverData,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         string $roundaboutClient = ''
     ): self
     {
@@ -29,7 +29,7 @@ class InitResponse extends AResponse
 
     public static function initError(
         ?IUPPTranslations $lang,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         Exception $ex,
         string $roundaboutClient = ''
     ): self
@@ -40,7 +40,7 @@ class InitResponse extends AResponse
 
     public function setData(
         string $serverData,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         string $status,
         string $errorMessage = self::STATUS_OK,
         string $roundaboutClient = ''
@@ -62,7 +62,7 @@ class InitResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'name' => strval($this->getInfoData()->fileName),
+            'name' => strval($this->getInfoData()->remoteName),
             'serverData' => strval($this->serverData),
             'totalParts' => intval($this->getInfoData()->partsCount),
             'lastKnownPart' => intval($this->getInfoData()->lastKnownPart),

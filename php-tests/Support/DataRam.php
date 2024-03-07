@@ -17,7 +17,7 @@ class DataRam extends AStorage
     /** @var string[] */
     protected $data = [];
 
-    public function addPart(string $location, string $content, ?int $seek = null): void
+    public function addPart(string $location, string $content, ?int $seek = null): bool
     {
         if (!$this->exists($location)) {
             $this->data[$location] = $content;
@@ -28,6 +28,7 @@ class DataRam extends AStorage
         } else {
             $this->data[$location] = substr($this->data[$location], 0, $seek) . $content;
         }
+        return true;
     }
 
     public function getPart(string $location, int $offset, ?int $limit = null): string
@@ -38,18 +39,20 @@ class DataRam extends AStorage
         return Strings::substr($this->data[$location], $offset, $limit, $this->getUppLang()->uppCannotReadFile($location));
     }
 
-    public function truncate(string $location, int $offset): void
+    public function truncate(string $location, int $offset): bool
     {
         if ($this->exists($location) && (strlen($this->data[$location]) > $offset)) {
             $this->data[$location] = Strings::substr($this->data[$location], 0, $offset, $this->getUppLang()->uppCannotTruncateFile($location));
         }
+        return true;
     }
 
-    public function remove(string $location): void
+    public function remove(string $location): bool
     {
         if ($this->exists($location)) {
             unset($this->data[$location]);
         }
+        return true;
     }
 
     public function exists(string $location): bool

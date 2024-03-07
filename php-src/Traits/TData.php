@@ -4,7 +4,7 @@ namespace kalanis\UploadPerPartes\Traits;
 
 
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\ServerData;
 
 
 /**
@@ -16,10 +16,10 @@ trait TData
 {
     use TLang;
 
-    /** @var null|InfoFormat\Data */
+    /** @var null|ServerData\Data */
     protected $data = null;
 
-    public function setInfoData(?InfoFormat\Data $data = null): self
+    public function setInfoData(?ServerData\Data $data = null): self
     {
         $this->data = $data;
         return $this;
@@ -27,9 +27,9 @@ trait TData
 
     /**
      * @throws UploadException
-     * @return InfoFormat\Data
+     * @return ServerData\Data
      */
-    public function getInfoData(): InfoFormat\Data
+    public function getInfoData(): ServerData\Data
     {
         if (empty($this->data)) {
             throw new UploadException($this->getUppLang()->uppDriveDataNotSet());

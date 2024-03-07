@@ -5,7 +5,7 @@ namespace kalanis\UploadPerPartes\Response;
 
 use Exception;
 use kalanis\UploadPerPartes\Exceptions\UploadException;
-use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\ServerData;
 use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
 
 
@@ -19,7 +19,7 @@ class DoneResponse extends AResponse
     public static function initDone(
         ?IUPPTranslations $lang,
         string $serverData,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         string $roundaboutClient = ''
     ): self
     {
@@ -30,7 +30,7 @@ class DoneResponse extends AResponse
     public static function initError(
         ?IUPPTranslations $lang,
         string $serverData,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         Exception $ex,
         string $roundaboutClient = ''
     ): self
@@ -41,7 +41,7 @@ class DoneResponse extends AResponse
 
     public function setData(
         string $serverData,
-        InfoFormat\Data $data,
+        ServerData\Data $data,
         string $status,
         string $errorMessage = self::STATUS_OK,
         string $roundaboutClient = ''
@@ -61,7 +61,7 @@ class DoneResponse extends AResponse
      */
     public function getTemporaryLocation(): string
     {
-        return $this->getInfoData()->tempLocation;
+        return $this->getInfoData()->tempDir;
     }
 
     /**
@@ -79,7 +79,7 @@ class DoneResponse extends AResponse
      */
     public function getFileName(): string
     {
-        return $this->getInfoData()->fileName;
+        return $this->getInfoData()->remoteName;
     }
 
     /**
@@ -90,7 +90,7 @@ class DoneResponse extends AResponse
     public function jsonSerialize()
     {
         return [
-            'name' => strval($this->getInfoData()->fileName),
+            'name' => strval($this->getInfoData()->remoteName),
             'serverData' => strval($this->serverData),
             'status' => strval($this->status),
             'errorMessage' => strval($this->errorMessage),

@@ -1,6 +1,6 @@
 <?php
 
-use kalanis\UploadPerPartes\InfoFormat;
+use kalanis\UploadPerPartes\ServerData;
 
 
 class CommonTestClass extends \PHPUnit\Framework\TestCase
@@ -33,17 +33,18 @@ class CommonTestClass extends \PHPUnit\Framework\TestCase
         return realpath(__DIR__ . '/testing-ipsum.txt');
     }
 
-    protected function mockData(): InfoFormat\Data
+    protected function mockData(): ServerData\Data
     {
-        return InfoFormat\Data::init()->setData(
-            'abcdef',
+        return ServerData\Data::init()->setData(
+            'fghjkl.partial',
+            '/tmp/',
+            'fghjkl.partial',
             $this->getTestDir() . 'abcdef',
+            'abcdef',
             123456,
             12,
             64,
-            7,
-            '/tmp/',
-            'fghjkl.partial'
+            7
         );
     }
 }

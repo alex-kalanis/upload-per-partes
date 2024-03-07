@@ -17,6 +17,8 @@ parameters:
 	ignoreErrors:
 		# file_get_contents has null as default value of maxlen - php7
 		- '#Parameter \#5 \$maxlen of function file_get_contents expects#'
+		# reflection constructors
+		- '#argument of class ReflectionClass constructor expects class-string#'
 		# strval, intval
 		- '#Parameter \#1 \$va[rl]u?e? of function [si][tn][rt]val expects#'
 		-

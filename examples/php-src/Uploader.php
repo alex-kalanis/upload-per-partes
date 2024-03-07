@@ -13,8 +13,8 @@ use kalanis\UploadPerPartes;
  */
 class Uploader extends UploadPerPartes\Uploader
 {
-    protected function getCalc(): UploadPerPartes\Uploader\Calculates
+    protected function getCalc($params): UploadPerPartes\Uploader\CalculateSizes
     {
-        return new UploadPerPartes\Uploader\Calculates(10485760); // segment size: 1024*1024*10 = 10MB
+        return parent::getCalc(['calculator' => 10485760]); // segment size: 1024*1024*10 = 10MB
     }
 }
