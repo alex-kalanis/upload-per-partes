@@ -26,7 +26,7 @@ class LimitDataFactory
     const VARIANT_SERIALIZE = 5;
     const VARIANT_JSON = 6;
 
-    /** @var array<int, class-string<Interfaces\ILimitPassedData>> */
+    /** @var array<int, class-string<Interfaces\ILimitDataInternalKey>> */
     protected $map = [
         self::VARIANT_NAME => Name::class,
         self::VARIANT_FULL_PATH => FullPath::class,
@@ -42,11 +42,11 @@ class LimitDataFactory
     }
 
     /**
-     * @param int|class-string<Interfaces\ILimitPassedData>|object|string $variant
+     * @param int|class-string<Interfaces\ILimitDataInternalKey>|object|string $variant
      * @throws UploadException
-     * @return Interfaces\ILimitPassedData
+     * @return Interfaces\ILimitDataInternalKey
      */
-    public function getVariant($variant): Interfaces\ILimitPassedData
+    public function getVariant($variant): Interfaces\ILimitDataInternalKey
     {
         if (is_object($variant)) {
             return $this->checkObject($variant);
@@ -63,22 +63,22 @@ class LimitDataFactory
     /**
      * @param object $variant
      * @throws UploadException
-     * @return Interfaces\ILimitPassedData
+     * @return Interfaces\ILimitDataInternalKey
      */
-    protected function checkObject(object $variant): Interfaces\ILimitPassedData
+    protected function checkObject(object $variant): Interfaces\ILimitDataInternalKey
     {
-        if ($variant instanceof Interfaces\ILimitPassedData) {
+        if ($variant instanceof Interfaces\ILimitDataInternalKey) {
             return $variant;
         }
         throw new UploadException($this->getUppLang()->uppKeyModifierIsWrong(get_class($variant)));
     }
 
     /**
-     * @param class-string<Interfaces\ILimitPassedData>|string $variant
+     * @param class-string<Interfaces\ILimitDataInternalKey>|string $variant
      * @throws UploadException
-     * @return Interfaces\ILimitPassedData
+     * @return Interfaces\ILimitDataInternalKey
      */
-    protected function initDefined(string $variant): Interfaces\ILimitPassedData
+    protected function initDefined(string $variant): Interfaces\ILimitDataInternalKey
     {
         try {
             $ref = new ReflectionClass($variant);

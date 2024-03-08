@@ -11,7 +11,7 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
  * @package kalanis\UploadPerPartes\Interfaces
  * How to pack/unpack key for passing through external part
  */
-interface IEncodeSharedKey
+interface IEncodeForExternalExchange
 {
     public function pack(string $data): string;
 

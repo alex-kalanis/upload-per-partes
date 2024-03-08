@@ -25,7 +25,7 @@ class EncodeFactory
     const VARIANT_MD5 = 4;
     const VARIANT_HEX = 5;
 
-    /** @var array<int, class-string<Interfaces\IEncodeSharedKey>> */
+    /** @var array<int, class-string<Interfaces\IEncodeForExternalExchange>> */
     protected $map = [
         self::VARIANT_CLEAR => Clear::class,
         self::VARIANT_RANDOM => Random::class,
@@ -40,11 +40,11 @@ class EncodeFactory
     }
 
     /**
-     * @param int|class-string<Interfaces\IEncodeSharedKey>|object|string $variant
+     * @param int|class-string<Interfaces\IEncodeForExternalExchange>|object|string $variant
      * @throws UploadException
-     * @return Interfaces\IEncodeSharedKey
+     * @return Interfaces\IEncodeForExternalExchange
      */
-    public function getVariant($variant): Interfaces\IEncodeSharedKey
+    public function getVariant($variant): Interfaces\IEncodeForExternalExchange
     {
         if (is_object($variant)) {
             return $this->checkObject($variant);
@@ -61,22 +61,22 @@ class EncodeFactory
     /**
      * @param object $variant
      * @throws UploadException
-     * @return Interfaces\IEncodeSharedKey
+     * @return Interfaces\IEncodeForExternalExchange
      */
-    protected function checkObject(object $variant): Interfaces\IEncodeSharedKey
+    protected function checkObject(object $variant): Interfaces\IEncodeForExternalExchange
     {
-        if ($variant instanceof Interfaces\IEncodeSharedKey) {
+        if ($variant instanceof Interfaces\IEncodeForExternalExchange) {
             return $variant;
         }
         throw new UploadException($this->getUppLang()->uppKeyVariantIsWrong(get_class($variant)));
     }
 
     /**
-     * @param class-string<Interfaces\IEncodeSharedKey>|string $variant
+     * @param class-string<Interfaces\IEncodeForExternalExchange>|string $variant
      * @throws UploadException
-     * @return Interfaces\IEncodeSharedKey
+     * @return Interfaces\IEncodeForExternalExchange
      */
-    protected function initDefined(string $variant): Interfaces\IEncodeSharedKey
+    protected function initDefined(string $variant): Interfaces\IEncodeForExternalExchange
     {
         try {
             $ref = new ReflectionClass($variant);

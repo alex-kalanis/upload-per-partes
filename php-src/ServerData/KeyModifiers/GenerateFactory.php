@@ -25,7 +25,7 @@ class GenerateFactory
     const VARIANT_MD5 = 4;
     const VARIANT_HEX = 5;
 
-    /** @var array<int, class-string<Interfaces\IStorageKey>> */
+    /** @var array<int, class-string<Interfaces\IEncodeForInternalStorage>> */
     protected $map = [
         self::VARIANT_CLEAR => Clear::class,
         self::VARIANT_RANDOM => Random::class,
@@ -40,11 +40,11 @@ class GenerateFactory
     }
 
     /**
-     * @param int|class-string<Interfaces\IStorageKey>|object|string $variant
+     * @param int|class-string<Interfaces\IEncodeForInternalStorage>|object|string $variant
      * @throws UploadException
-     * @return Interfaces\IStorageKey
+     * @return Interfaces\IEncodeForInternalStorage
      */
-    public function getVariant($variant): Interfaces\IStorageKey
+    public function getVariant($variant): Interfaces\IEncodeForInternalStorage
     {
         if (is_object($variant)) {
             return $this->checkObject($variant);
@@ -61,22 +61,22 @@ class GenerateFactory
     /**
      * @param object $variant
      * @throws UploadException
-     * @return Interfaces\IStorageKey
+     * @return Interfaces\IEncodeForInternalStorage
      */
-    protected function checkObject(object $variant): Interfaces\IStorageKey
+    protected function checkObject(object $variant): Interfaces\IEncodeForInternalStorage
     {
-        if ($variant instanceof Interfaces\IStorageKey) {
+        if ($variant instanceof Interfaces\IEncodeForInternalStorage) {
             return $variant;
         }
         throw new UploadException($this->getUppLang()->uppKeyVariantIsWrong(get_class($variant)));
     }
 
     /**
-     * @param class-string<Interfaces\IStorageKey>|string $variant
+     * @param class-string<Interfaces\IEncodeForInternalStorage>|string $variant
      * @throws UploadException
-     * @return Interfaces\IStorageKey
+     * @return Interfaces\IEncodeForInternalStorage
      */
-    protected function initDefined(string $variant): Interfaces\IStorageKey
+    protected function initDefined(string $variant): Interfaces\IEncodeForInternalStorage
     {
         try {
             $ref = new ReflectionClass($variant);

@@ -14,7 +14,7 @@ use kalanis\UploadPerPartes\Uploader\RandomStrings;
  * @package kalanis\UploadPerPartes\ServerData\DataModifiers
  */
 class SaltedFullPath extends AModifiers implements
-    Interfaces\ILimitPassedData,
+    Interfaces\ILimitDataInternalKey,
     Interfaces\InfoStorage\ForKV
 {
     public function getLimitedData(Data $data): string

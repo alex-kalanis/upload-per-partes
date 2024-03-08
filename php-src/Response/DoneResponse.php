@@ -66,6 +66,15 @@ class DoneResponse extends AResponse
 
     /**
      * @throws UploadException
+     * @return string
+     */
+    public function getTemporaryName(): string
+    {
+        return $this->getInfoData()->tempName;
+    }
+
+    /**
+     * @throws UploadException
      * @return int
      */
     public function getSize(): int
@@ -77,9 +86,27 @@ class DoneResponse extends AResponse
      * @throws UploadException
      * @return string
      */
-    public function getFileName(): string
+    public function getOriginalName(): string
     {
         return $this->getInfoData()->remoteName;
+    }
+
+    /**
+     * @throws UploadException
+     * @return string
+     */
+    public function getTargetLocation(): string
+    {
+        return $this->getInfoData()->targetDir;
+    }
+
+    /**
+     * @throws UploadException
+     * @return string
+     */
+    public function getTargetName(): string
+    {
+        return $this->getInfoData()->finalName;
     }
 
     /**

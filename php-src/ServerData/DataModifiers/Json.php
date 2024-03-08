@@ -14,7 +14,7 @@ use kalanis\UploadPerPartes\ServerData;
  */
 class Json extends ServerData\AModifiers implements
     Interfaces\IInfoFormatting,
-    Interfaces\ILimitPassedData,
+    Interfaces\ILimitDataInternalKey,
     Interfaces\InfoStorage\ForFiles,
     Interfaces\InfoStorage\ForKV,
     Interfaces\InfoStorage\ForPass,

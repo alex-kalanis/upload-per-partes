@@ -13,12 +13,12 @@ use kalanis\UploadPerPartes\ServerData\AModifiers;
  * @package kalanis\UploadPerPartes\ServerData\KeyModifiers
  */
 class Hex extends AModifiers implements
-    Interfaces\IEncodeSharedKey,
+    Interfaces\IEncodeForExternalExchange,
     Interfaces\InfoStorage\ForFiles,
     Interfaces\InfoStorage\ForKV,
     Interfaces\InfoStorage\ForStorage,
     Interfaces\InfoStorage\ForVolume,
-    Interfaces\IStorageKey
+    Interfaces\IEncodeForInternalStorage
 {
     public function getKeyForStorage(string $what): string
     {

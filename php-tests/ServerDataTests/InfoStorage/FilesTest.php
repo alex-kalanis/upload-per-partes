@@ -164,7 +164,7 @@ class FilesTest extends CommonTestClass
 }
 
 
-class XFilesModifyFail implements Interfaces\ILimitPassedData
+class XFilesModifyFail implements Interfaces\ILimitDataInternalKey
 {
     public function getLimitedData(ServerData\Data $data): string
     {
@@ -177,7 +177,7 @@ class XFilesModifyPass extends XFilesModifyFail implements Interfaces\InfoStorag
 {}
 
 
-class XFilesEncodeFail implements Interfaces\IEncodeSharedKey
+class XFilesEncodeFail implements Interfaces\IEncodeForExternalExchange
 {
     public function pack(string $data): string
     {

@@ -371,7 +371,7 @@ class XStoreInfoFormatting implements Interfaces\IInfoFormatting
 }
 
 
-class XStorageModifyFail implements Interfaces\ILimitPassedData
+class XStorageModifyFail implements Interfaces\ILimitDataInternalKey
 {
     public function getLimitedData(ServerData\Data $data): string
     {
@@ -384,7 +384,7 @@ class XStorageModifyPass extends XStorageModifyFail implements Interfaces\InfoSt
 {}
 
 
-class XStorageEncodeFail implements Interfaces\IEncodeSharedKey
+class XStorageEncodeFail implements Interfaces\IEncodeForExternalExchange
 {
     public function pack(string $data): string
     {

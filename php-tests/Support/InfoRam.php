@@ -45,7 +45,7 @@ class InfoRam extends AStorage
         return true;
     }
 
-    public function checkKeyClasses(object $limitData, object $storageKeys, object $infoFormat): bool
+    public function checkKeyClasses(object $limitDataForKey, object $storageKeys, object $storedInfoAs): bool
     {
        return true;
     }

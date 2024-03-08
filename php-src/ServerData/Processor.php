@@ -20,57 +20,57 @@ use kalanis\UploadPerPartes\Traits\TLang;
  * 1 storage which knows, what it can process without problems (not every storage can use any key)
  *
  * Pass style - no real info data storage, everything go to the client:
- * - $infoStorage is Pass class
- * - $infoFormat and $limitData is the same class (json, serialize)
- * - $storageKey is clear pass
- * - $encodeKey is hex or b64 (go outside)
+ * - $localInfoStorage is Pass class
+ * - $formatInfoInto and $limitDataForInternalKey is the same class (json, serialize)
+ * - $keyEncoderForInternalStorage is clear pass
+ * - $keyEncoderForExternalExchange is hex or b64 (go outside)
  *
  * Others with internal storage:
- * - $infoStorage is somewhere (not Pass)
- * - $infoFormat is something that pack/unpack info data for storage
- * - $limitData is something that say which data will be used for key
- * - $storageKey is something that generate the shared key itself
- * - $encodeKey is hex or b64 (go outside) - same as Pass
+ * - $localInfoStorage is somewhere (not Pass)
+ * - $formatInfoInto is something that pack/unpack info data for storage
+ * - $limitDataForInternalKey is something that say which data will be used for key
+ * - $keyEncoderForInternalStorage is something that generate the shared key itself
+ * - $keyEncoderForExternalExchange is hex or b64 (go outside) - same as Pass
  */
 class Processor
 {
     use TLang;
 
     /** @var Interfaces\IInfoFormatting how to format info pack in storage */
-    protected $infoFormat = null;
+    protected $formatInfoInto = null;
     /** @var Interfaces\IInfoStorage what storage will be used*/
-    protected $infoStorage = null;
-    /** @var Interfaces\ILimitPassedData how to modify data pack to be available for key creation */
-    protected $limitData = null;
-    /** @var Interfaces\IStorageKey how to hash data into key */
-    protected $storageKeys = null;
-    /** @var Interfaces\IEncodeSharedKey how to modify obtained key to share it without problems */
-    protected $encodedKey = null;
+    protected $localInfoStorage = null;
+    /** @var Interfaces\ILimitDataInternalKey how to modify data pack to be available for key creation */
+    protected $limitDataForInternalKey = null;
+    /** @var Interfaces\IEncodeForInternalStorage how to hash data into key */
+    protected $keyEncoderForInternalStorage = null;
+    /** @var Interfaces\IEncodeForExternalExchange how to modify obtained key to share it without problems */
+    protected $keyEncoderForExternalExchange = null;
 
     /**
-     * @param Interfaces\IInfoFormatting $infoFormat
-     * @param Interfaces\IInfoStorage $infoStorage
-     * @param Interfaces\ILimitPassedData $limitData
-     * @param Interfaces\IStorageKey $storageKeys
-     * @param Interfaces\IEncodeSharedKey $encodedKey
+     * @param Interfaces\IInfoFormatting $formatInfoInto
+     * @param Interfaces\IInfoStorage $localInfoStorage
+     * @param Interfaces\ILimitDataInternalKey $limitDataForInternalKey
+     * @param Interfaces\IEncodeForInternalStorage $keyEncoderForInternalStorage
+     * @param Interfaces\IEncodeForExternalExchange $keyEncoderForExternalExchange
      * @param Interfaces\IUPPTranslations|null $lang
      * @throws UploadException
      */
     public function __construct(
-        Interfaces\IInfoFormatting $infoFormat,
-        Interfaces\IInfoStorage $infoStorage,
-        Interfaces\ILimitPassedData $limitData,
-        Interfaces\IStorageKey $storageKeys,
-        Interfaces\IEncodeSharedKey $encodedKey,
+        Interfaces\IInfoFormatting $formatInfoInto,
+        Interfaces\IInfoStorage $localInfoStorage,
+        Interfaces\ILimitDataInternalKey $limitDataForInternalKey,
+        Interfaces\IEncodeForInternalStorage $keyEncoderForInternalStorage,
+        Interfaces\IEncodeForExternalExchange $keyEncoderForExternalExchange,
         ?Interfaces\IUPPTranslations $lang = null
     )
     {
-        $infoStorage->checkKeyClasses($limitData, $storageKeys, $infoFormat);
-        $this->infoStorage = $infoStorage;
-        $this->infoFormat = $infoFormat;
-        $this->limitData = $limitData;
-        $this->storageKeys = $storageKeys;
-        $this->encodedKey = $encodedKey;
+        $localInfoStorage->checkKeyClasses($limitDataForInternalKey, $keyEncoderForInternalStorage, $formatInfoInto);
+        $this->localInfoStorage = $localInfoStorage;
+        $this->formatInfoInto = $formatInfoInto;
+        $this->limitDataForInternalKey = $limitDataForInternalKey;
+        $this->keyEncoderForInternalStorage = $keyEncoderForInternalStorage;
+        $this->keyEncoderForExternalExchange = $keyEncoderForExternalExchange;
         $this->setUppLang($lang);
     }
 
@@ -84,14 +84,14 @@ class Processor
     {
         $key = $this->getKey($local);
         if ($saveToStorage) {
-            $this->infoStorage->save($key, $this->infoFormat->toFormat($local));
+            $this->localInfoStorage->save($key, $this->formatInfoInto->toFormat($local));
         }
-        return $this->encodedKey->pack($key);
+        return $this->keyEncoderForExternalExchange->pack($key);
     }
 
     public function getKey(Data $data): string
     {
-        return $this->storageKeys->getKeyForStorage($this->limitData->getLimitedData($data));
+        return $this->keyEncoderForInternalStorage->getKeyForStorage($this->limitDataForInternalKey->getLimitedData($data));
     }
 
     /**
@@ -101,7 +101,7 @@ class Processor
      */
     public function get(string $serverData): Data
     {
-        return $this->getByKey($this->encodedKey->unpack($serverData));
+        return $this->getByKey($this->keyEncoderForExternalExchange->unpack($serverData));
     }
 
     /**
@@ -112,7 +112,7 @@ class Processor
      */
     public function remove(string $serverData): bool
     {
-        $this->infoStorage->remove($this->encodedKey->unpack($serverData));
+        $this->localInfoStorage->remove($this->keyEncoderForExternalExchange->unpack($serverData));
         return true;
     }
 
@@ -124,7 +124,7 @@ class Processor
      */
     public function existsByKey(string $key): bool
     {
-        return $this->infoStorage->exists($key);
+        return $this->localInfoStorage->exists($key);
     }
 
     /**
@@ -134,6 +134,6 @@ class Processor
      */
     public function getByKey(string $key): Data
     {
-        return $this->infoFormat->fromFormat($this->infoStorage->load($key));
+        return $this->formatInfoInto->fromFormat($this->localInfoStorage->load($key));
     }
 }

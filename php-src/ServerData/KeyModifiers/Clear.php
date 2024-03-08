@@ -12,8 +12,8 @@ use kalanis\UploadPerPartes\ServerData\AModifiers;
  * @package kalanis\UploadPerPartes\ServerData\KeyModifiers
  */
 class Clear extends AModifiers implements
-    Interfaces\IEncodeSharedKey,
-    Interfaces\IStorageKey,
+    Interfaces\IEncodeForExternalExchange,
+    Interfaces\IEncodeForInternalStorage,
     Interfaces\InfoStorage\ForKV,
     Interfaces\InfoStorage\ForPass
 {

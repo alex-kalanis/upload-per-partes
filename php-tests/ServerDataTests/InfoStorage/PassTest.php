@@ -101,7 +101,7 @@ class PassTest extends CommonTestClass
 }
 
 
-class XPassModifyFail implements Interfaces\ILimitPassedData
+class XPassModifyFail implements Interfaces\ILimitDataInternalKey
 {
     public function getLimitedData(ServerData\Data $data): string
     {
@@ -114,7 +114,7 @@ class XPassModifyNotEnough extends XPassModifyFail implements Interfaces\InfoSto
 {}
 
 
-class XPassEncodeFail implements Interfaces\IEncodeSharedKey
+class XPassEncodeFail implements Interfaces\IEncodeForExternalExchange
 {
     public function pack(string $data): string
     {
@@ -151,7 +151,7 @@ class XPassFormatNotEnough extends XPassFormatFail implements Interfaces\InfoSto
 
 
 class XPassModifyFormatPass implements
-    Interfaces\ILimitPassedData,
+    Interfaces\ILimitDataInternalKey,
     Interfaces\IInfoFormatting,
     Interfaces\InfoStorage\ForPass
 {

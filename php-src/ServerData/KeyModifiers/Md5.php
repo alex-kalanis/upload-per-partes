@@ -12,12 +12,12 @@ use kalanis\UploadPerPartes\ServerData\AModifiers;
  * @package kalanis\UploadPerPartes\ServerData\KeyModifiers
  */
 class Md5 extends AModifiers implements
-    Interfaces\IEncodeSharedKey,
+    Interfaces\IEncodeForExternalExchange,
     Interfaces\InfoStorage\ForFiles,
     Interfaces\InfoStorage\ForKV,
     Interfaces\InfoStorage\ForStorage,
     Interfaces\InfoStorage\ForVolume,
-    Interfaces\IStorageKey
+    Interfaces\IEncodeForInternalStorage
 {
     public function getKeyForStorage(string $what): string
     {

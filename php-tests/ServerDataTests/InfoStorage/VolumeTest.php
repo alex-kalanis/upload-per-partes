@@ -123,7 +123,7 @@ class VolumeTest extends AStorage
 }
 
 
-class XVolumeModifyFail implements Interfaces\ILimitPassedData
+class XVolumeModifyFail implements Interfaces\ILimitDataInternalKey
 {
     public function getLimitedData(ServerData\Data $data): string
     {
@@ -136,7 +136,7 @@ class XVolumeModifyPass extends XVolumeModifyFail implements Interfaces\InfoStor
 {}
 
 
-class XVolumeEncodeFail implements Interfaces\IEncodeSharedKey
+class XVolumeEncodeFail implements Interfaces\IEncodeForExternalExchange
 {
     public function pack(string $data): string
     {

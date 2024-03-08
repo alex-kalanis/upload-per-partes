@@ -14,7 +14,7 @@ use kalanis\UploadPerPartes\Uploader\RandomStrings;
  * @package kalanis\UploadPerPartes\ServerData\DataModifiers
  */
 class SaltedName extends AModifiers implements
-    Interfaces\ILimitPassedData,
+    Interfaces\ILimitDataInternalKey,
     Interfaces\InfoStorage\ForVolume,
     Interfaces\InfoStorage\ForStorage,
     Interfaces\InfoStorage\ForKV,

@@ -13,7 +13,7 @@ use kalanis\UploadPerPartes\ServerData\Data;
  * @package kalanis\UploadPerPartes\ServerData\DataModifiers
  */
 class Name extends AModifiers implements
-    Interfaces\ILimitPassedData,
+    Interfaces\ILimitDataInternalKey,
     Interfaces\InfoStorage\ForFiles,
     Interfaces\InfoStorage\ForKV,
     Interfaces\InfoStorage\ForStorage,

@@ -11,7 +11,7 @@ use kalanis\UploadPerPartes\ServerData\Data;
  * @package kalanis\UploadPerPartes\Interfaces
  * How to modify data for usage as storage key
  */
-interface ILimitPassedData
+interface ILimitDataInternalKey
 {
     public function getLimitedData(Data $data): string;
 }

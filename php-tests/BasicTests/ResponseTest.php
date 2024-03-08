@@ -118,8 +118,11 @@ class ResponseTest extends CommonTestClass
         $lib = Response\DoneResponse::initDone(new Translations(), $this->mockSharedKey(), $data);
 
         $this->assertEquals('/tmp/', $lib->getTemporaryLocation());
-        $this->assertEquals('fghjkl.partial', $lib->getFileName());
+        $this->assertEquals('fghjkl.partial', $lib->getTemporaryName());
         $this->assertEquals(123456, $lib->getSize());
+        $this->assertEquals('fghjkl.partial', $lib->getOriginalName());
+        $this->assertEquals($this->getTestDir() . 'abcdef', $lib->getTargetLocation());
+        $this->assertEquals('abcdef', $lib->getTargetName());
         $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);
         $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);

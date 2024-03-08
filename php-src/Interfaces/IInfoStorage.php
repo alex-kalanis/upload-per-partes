@@ -45,11 +45,11 @@ interface IInfoStorage
     /**
      * The classes passed there must adhere 2 interfaces - about processing and about possible usage with storage
      * This check is about storage part
-     * @param object $limitData
+     * @param object $limitDataForKey
      * @param object $storageKeys
-     * @param object $infoFormat
+     * @param object $storedInfoAs
      * @throws UploadException
      * @return bool
      */
-    public function checkKeyClasses(object $limitData, object $storageKeys, object $infoFormat): bool;
+    public function checkKeyClasses(object $limitDataForKey, object $storageKeys, object $storedInfoAs): bool;
 }

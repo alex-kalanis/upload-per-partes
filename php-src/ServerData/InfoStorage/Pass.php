@@ -36,20 +36,20 @@ class Pass extends AStorage
         return true;
     }
 
-    public function checkKeyClasses(object $limitData, object $storageKeys, object $infoFormat): bool
+    public function checkKeyClasses(object $limitDataForKey, object $storageKeys, object $storedInfoAs): bool
     {
-        if (!$limitData instanceof Interfaces\InfoStorage\ForPass) {
-            throw new UploadException($this->getUppLang()->uppKeyModifierIsWrong(get_class($limitData)));
+        if (!$limitDataForKey instanceof Interfaces\InfoStorage\ForPass) {
+            throw new UploadException($this->getUppLang()->uppKeyModifierIsWrong(get_class($limitDataForKey)));
         }
         if (!$storageKeys instanceof Interfaces\InfoStorage\ForPass) {
             throw new UploadException($this->getUppLang()->uppKeyVariantIsWrong(get_class($storageKeys)));
         }
-        if (!$infoFormat instanceof Interfaces\InfoStorage\ForPass) {
-            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($infoFormat)));
+        if (!$storedInfoAs instanceof Interfaces\InfoStorage\ForPass) {
+            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($storedInfoAs)));
         }
-        if ($limitData != $infoFormat) {
+        if ($limitDataForKey != $storedInfoAs) {
             // for possibility of decoding these two variables must point to one class
-            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($infoFormat)));
+            throw new UploadException($this->getUppLang()->uppDriveFileVariantIsWrong(get_class($storedInfoAs)));
         }
         return true;
     }

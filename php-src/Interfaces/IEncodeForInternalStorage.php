@@ -8,7 +8,7 @@ namespace kalanis\UploadPerPartes\Interfaces;
  * @package kalanis\UploadPerPartes\Interfaces
  * How to generate key for usage as storage key from passed data
  */
-interface IStorageKey
+interface IEncodeForInternalStorage
 {
     public function getKeyForStorage(string $what): string;
 }
