@@ -1,0 +1,55 @@
+#uparea {
+    width: 640px;
+    height: 480px;
+    background-color: red;
+    background-image: url("no_upload2.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50px;
+}
+#uparea.can_upload {
+    background-color: greenyellow;
+    background-image: url("upload_here2.png");
+}
+#base_progress {
+    visibility: hidden;
+}
+.upload_buttons {
+    visibility: hidden;
+}
+.upload-progress-box {
+    /* upload box */
+    border: 1px solid #c0c0c0;
+    border-radius: 10px;
+    min-width: 150px;
+    max-width: 310px;
+    margin: 0;
+    padding: 0;
+}
+.upload-progress-box .progress_bar {
+    text-align: left;
+    min-width: 140px;
+    max-width: 300px;
+    height: 1.2em;
+    border: 1px solid #000;
+    margin: 0 25px;
+    padding: 0;
+}
+.upload-progress-box .checked {
+    background-color: #088a08;
+    float: left;
+    padding-left: 0;
+    width: 0;
+}
+.upload-progress-box .uploaded {
+    background-color: #a6ff80;
+    float: left;
+    padding-left: 0;
+    width: 0;
+}
+.upload-progress-box .pull-left {
+    float: left;
+}
+.upload-progress-box .pull-right {
+    float: right;
+}

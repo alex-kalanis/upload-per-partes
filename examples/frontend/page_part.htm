@@ -1,38 +1,66 @@
-<script type="text/javascript" href="md5.js"></script>
-<script type="text/javascript" href="uploader.js"></script>
-<script type="text/javascript">
-	// configs
-	if (jQuery && window.File && window.FileReader && window.FileList && window.Blob) {
-		var targetConfig = new UploadTargetConfig();
-		targetConfig.targetInitPath = '//upload-file/init/';
-		targetConfig.targetFilePath = '//upload-file/file/';
-		targetConfig.targetDonePath = '//upload-file/done/';
-		uploaderProcessor.init(uploaderQuery.init($), uploadTranslations, targetConfig, checkSumMD5);
-	}
+<!-- shared scripts -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- styles -->
+<link rel="stylesheet" type="text/css" href="into_page.css">
 
-	// runner
-	if (jQuery && uploaderReader.canRead(window) && uploaderProcessor) {
-		// Great success! All the File APIs are supported.
-		var dropZone = document.getElementById("uparea");
-		dropZone.style.backgroundColor = '#a6ff80';
-		// Setup the dnd listeners.
-		// dropZone.addEventListener('dragover', uploadedProcessor.getHandler().handleDragOver, false);
-		dropZone.addEventListener('drop', uploaderProcessor.getHandler().handleFileSelect, false);
-		$("#upfile").on('change', {}, uploaderProcessor.getHandler().handleFileInput);
-	}
-</script>
-
+<!-- area -->
 <div><div id="uparea"><noscript><hr><p>{SCRIPTING_DISABLED_CANNOT_USE}</p><hr></noscript> &nbsp; &nbsp; &nbsp; </div></div>
-<p style="text-align: left;"><input type="file" id="upfile" multiple>
-<button onclick="uploadedProcessor.getHandler().startRead();">Start read</button>
-<button onclick="uploadedProcessor.getHandler().abortRead();">Abort read</button>
-<button onclick="uploadedProcessor.getHandler().clearList();">Clear list</button><br>
-</p><div id="list"></div>
-<div class="progress" id="base_progress">
-<div>File: <span class="filename"></span></div>
-<div class="progressbar"><div class="single">&nbsp;</div></div>
-<div class="errorlog">&nbsp;</div>
-<button onclick="uploadedProcessor.getHandler().resumeRead(this.getAttribute('data-key'));" disabled>Resume read</button>
-<button onclick="uploadedProcessor.getHandler().retryRead(this.getAttribute('data-key'));" disabled>Retry from beginning</button>
-<button onclick="uploadedProcessor.getHandler().stopRead(this.getAttribute('data-key'));">Stop read</button><br>
+<p class="upload_buttons">
+    <button class="button_abort">{BUTTON_ABORT}</button>
+    <button class="button_clear">{BUTTON_CLEAR}</button><br>
+</p>
+<!-- list of uploads -->
+<div id="progress_list"></div>
+<!-- basic progress box - for system purposes (translate, style and copy) -->
+<div class="upload-progress-box" id="base_progress">
+    <div>{FILE_NAME}: <span class="filename"></span></div>
+    <div class="upload-progress-time">
+        <div class="pull-left">
+            {LANG_ELAPSED_TIME}: <span class="elapsed_time">{VALUE_ELAPSED_TIME}</span>
+        </div>
+        <div class="pull-right">
+            {LANG_ESTIMATED_TIME}: <span class="est_time_left">{VALUE_ESTIMATED_TIME}</span>
+        </div>
+    </div>
+    <div class="clearfix" ></div>
+    <div class="progressbar-wrapper" >
+        <div class="progress_bar"><div class="checked">&nbsp;</div><div class="uploaded">&nbsp;</div></div>
+    </div>
+    <div class="upload-progress-size">
+        <div class="pull-left">
+            <span class="percent_complete">0%</span> (<span class="current_position">{VALUE_CURRENT_POSITION}</span> / <span class="total_kbytes">{VALUE_TOTAL_LENGTH}</span>)
+        </div>
+        <div class="pull-right">
+            {LANG_ESTIMATED_SPEED}: <span class="est_speed">{VALUE_ESTIMATED_SPEED}</span>
+        </div>
+    </div>
+    <div class="clearfix" ></div>
+    <div>
+        <button class="button_retry" title="{BUTTON_RETRY}" disabled> &#x23EE; </button>
+        <button class="button_resume" title="{BUTTON_RESUME}" disabled> &#x23EF; </button>
+        <div class="error_log">&nbsp;</div>
+        <button class="button_stop" title="{BUTTON_STOP}"> &#x23F9; </button><br>
+    </div>
+    <div class="clearfix" ></div>
 </div>
+<!-- run scripts -->
+<script type="text/javascript" src="md5GregHolt.js"></script>
+<script type="text/javascript" src="../../frontend/uploader.js"></script>
+<script type="text/javascript">
+	/** Translations */
+	uploadTranslations.readFileCannotSlice = "{SCRIPT_READ_FILE_CANNOT_SLICE}";
+	uploadTranslations.initReturnsFollowingError = "{SCRIPT_INIT_RETURNS_ERROR}";
+	uploadTranslations.initReturnsSomethingFailed = "{SCRIPT_INIT_RETURNS_FAIL}";
+	uploadTranslations.checkerReturnsSomethingFailed = "{SCRIPT_CHECK_RETURNS_FAIL}";
+	uploadTranslations.dataUploadReturnsSomethingFailed = "{SCRIPT_DATA_RETURNS_FAIL}";
+	uploadTranslations.doneReturnsSomethingFailed = "{SCRIPT_DONE_RETURNS_FAIL}";
+	// Config
+	var targetConfig = new UploadTargetConfig();
+	targetConfig.targetInitPath = "{INIT_PATH}";
+	targetConfig.targetCheckPath = "{CHECK_PATH}";
+	targetConfig.targetCancelPath = "{CANCEL_PATH}";
+	targetConfig.targetTrimPath = "{TRIM_PATH}";
+	targetConfig.targetFilePath = "{FILE_PATH}";
+	targetConfig.targetDonePath = "{DONE_PATH}";
+</script>
+<script type="text/javascript" src="into_page.js"></script>
