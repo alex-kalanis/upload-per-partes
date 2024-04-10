@@ -14,8 +14,7 @@ use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
  */
 class CheckResponse extends AResponse
 {
-    /** @var string */
-    protected $checksum = '';
+    protected string $checksum = '';
 
     public static function initOk(
         ?IUPPTranslations $lang,

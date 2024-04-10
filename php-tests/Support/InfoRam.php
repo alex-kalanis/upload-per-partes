@@ -15,7 +15,7 @@ use kalanis\UploadPerPartes\ServerData\InfoStorage\AStorage;
 class InfoRam extends AStorage
 {
     /** @var string[] */
-    protected $data = [];
+    protected array $data = [];
 
     public function exists(string $key): bool
     {

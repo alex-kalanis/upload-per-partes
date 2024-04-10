@@ -71,7 +71,7 @@ class LimitDataTest extends CommonTestClass
     public function testClassDie(): void
     {
         $factory = new XLimFactory();
-        $this->expectExceptionMessage('Class this-class-does-not-exists does not exist');
+        $this->expectExceptionMessage('Class "this-class-does-not-exists" does not exist');
         $this->expectException(UploadException::class);
         $factory->getVariant(999);
     }
@@ -102,7 +102,7 @@ class LimitDataTest extends CommonTestClass
 
 class XLimFactory extends DataModifiers\LimitDataFactory
 {
-    protected $map = [
+    protected array $map = [
         10 => \stdClass::class,
         999 => 'this-class-does-not-exists',
     ];

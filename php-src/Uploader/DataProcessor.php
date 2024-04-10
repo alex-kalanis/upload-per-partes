@@ -18,10 +18,8 @@ class DataProcessor
 {
     use TLang;
 
-    /** @var Interfaces\IDataStorage */
-    protected $storage = null;
-    /** @var CheckByHash */
-    protected $checkHash = null;
+    protected Interfaces\IDataStorage $storage;
+    protected CheckByHash $checkHash;
 
     public function __construct(
         Interfaces\IDataStorage $storage,

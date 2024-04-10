@@ -103,7 +103,7 @@ class UploadedFile {
      * @return {string}
      */
     static parseLocalId(fileHandler) {
-        return "file_" + UploadedFile.parseBase(fileHandler.name);
+        return "file_" + UploadedFile.parseBase(fileHandler.name).replace( /\W/g , '');
     }
 
     /**
@@ -311,8 +311,8 @@ class UploadInit {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // start checking content
                         self.upRenderer.renderReaded(uploadedFile);
                         self.upProcessor.checkParts(uploadedFile);
@@ -381,7 +381,7 @@ class UploaderChecker {
         if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
             this.stillCheck(uploadedFile);
         } else {
-            this.upProcessor.failProcess(uploadedFile);
+            this.upProcessor.failProcess(uploadedFile, null);
         }
     }
 
@@ -397,7 +397,7 @@ class UploaderChecker {
         if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
             this.upProcessor.uploadParts(uploadedFile);
         } else {
-            this.upProcessor.failProcess(uploadedFile);
+            this.upProcessor.failProcess(uploadedFile, null);
         }
     }
 
@@ -416,8 +416,8 @@ class UploaderChecker {
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
+                        uploadedFile.setInfoFromServer(responseData);
                         if (uploadedFile.RESULT_OK === responseData.status) {
-                            uploadedFile.setInfoFromServer(responseData);
                             // got known checksum on remote - check it against local file
                             self.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
                                 if (responseData.checksum == self.upChecksum.md5(result)) {
@@ -432,7 +432,7 @@ class UploaderChecker {
                             });
                         } else {
                             // failed query
-                            self.upProcessor.failProcess(uploadedFile);
+                            self.upProcessor.failProcess(uploadedFile, null);
                         }
                     } else {
                         // Query dead, sent user info
@@ -482,14 +482,14 @@ class UploaderChecker {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // Truncate came OK, time to upload the rest
                         self.upRenderer.updateBar(uploadedFile.setTruncatedFromServer(responseData));
                         self.nextStep(uploadedFile);
                     } else {
                         // Truncate failed, time say something
-                        self.upProcessor.failProcess(uploadedFile);
+                        self.upProcessor.failProcess(uploadedFile, null);
                     }
                 } else {
                     // Query dead, sent user info
@@ -558,7 +558,7 @@ class UploaderRunner {
         if (uploadedFile.STATUS_RUN == uploadedFile.readStatus) {
             this.stillRunning(uploadedFile);
         } else {
-            this.upProcessor.failProcess(uploadedFile);
+            this.upProcessor.failProcess(uploadedFile, null);
         }
     }
 
@@ -579,14 +579,14 @@ class UploaderRunner {
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
+                        uploadedFile.setInfoFromServer(responseData);
                         if (uploadedFile.RESULT_OK === responseData.status) {
-                            uploadedFile.setInfoFromServer(responseData);
                             // everything ok
                             self.upRenderer.updateBar(uploadedFile.nextCheckedPart());
                             self.continueRunning(uploadedFile);
                         } else {
                             // dead file, user info
-                            self.upProcessor.failProcess(uploadedFile);
+                            self.upProcessor.failProcess(uploadedFile, null);
                         }
                     } else {
                         self.upRenderer.consoleError(uploadedFile, responseData);
@@ -615,14 +615,14 @@ class UploaderRunner {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // everything ok
                         uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
                         self.upRenderer.renderFinished(uploadedFile);
                     } else {
                         // dead file, user info
-                        self.upProcessor.failProcess(uploadedFile);
+                        self.upProcessor.failProcess(uploadedFile, null);
                     }
                 } else {
                     // dead query, user info
@@ -707,8 +707,8 @@ class UploaderFailure {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // everything done
                         self.checkContinue(uploadedFile);
                     } else {

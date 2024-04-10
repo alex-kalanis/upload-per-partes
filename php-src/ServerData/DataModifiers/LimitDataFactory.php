@@ -19,15 +19,15 @@ class LimitDataFactory
 {
     use TLang;
 
-    const VARIANT_NAME = 1;
-    const VARIANT_FULL_PATH = 2;
-    const VARIANT_SALTED_NAME = 3;
-    const VARIANT_SALTED_FULL = 4;
-    const VARIANT_SERIALIZE = 5;
-    const VARIANT_JSON = 6;
+    public const VARIANT_NAME = 1;
+    public const VARIANT_FULL_PATH = 2;
+    public const VARIANT_SALTED_NAME = 3;
+    public const VARIANT_SALTED_FULL = 4;
+    public const VARIANT_SERIALIZE = 5;
+    public const VARIANT_JSON = 6;
 
     /** @var array<int, class-string<Interfaces\ILimitDataInternalKey>> */
-    protected $map = [
+    protected array $map = [
         self::VARIANT_NAME => Name::class,
         self::VARIANT_FULL_PATH => FullPath::class,
         self::VARIANT_SALTED_NAME => SaltedName::class,
@@ -74,13 +74,14 @@ class LimitDataFactory
     }
 
     /**
-     * @param class-string<Interfaces\ILimitDataInternalKey>|string $variant
+     * @param string $variant
      * @throws UploadException
      * @return Interfaces\ILimitDataInternalKey
      */
     protected function initDefined(string $variant): Interfaces\ILimitDataInternalKey
     {
         try {
+            /** @var class-string<Interfaces\ILimitDataInternalKey> $variant */
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
                 return $this->checkObject($ref->newInstance($this->getUppLang()));

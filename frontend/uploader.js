@@ -103,7 +103,7 @@ var UploadedFile = function () {
      * @return {string}
      */
     this.parseLocalId = function(fileHandler) {
-        return "file_" + uploadedFile.parseBase(fileHandler.name);
+        return "file_" + uploadedFile.parseBase(fileHandler.name).replace( /\W/g , '');
     };
 
     /**
@@ -119,12 +119,50 @@ var UploadedFile = function () {
      * @param {*} serverResponse
      * @returns {UploadedFile}
      */
-    this.setInfoFromServer = function(serverResponse) {
+    this.setInitialInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_RUN;
         uploadedFile.serverData = serverResponse.serverData;
         uploadedFile.totalParts = parseInt(serverResponse.totalParts);
         uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         uploadedFile.partSize = parseInt(serverResponse.partSize);
+        uploadedFile.errorMessage = serverResponse.errorMessage;
+        uploadedFile.clientData = serverResponse.clientData;
+        return uploadedFile;
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    this.setRunnerInfoFromServer = function(serverResponse) {
+        uploadedFile.readStatus = this.STATUS_RUN;
+        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
+        uploadedFile.errorMessage = serverResponse.errorMessage;
+        uploadedFile.clientData = serverResponse.clientData;
+        return uploadedFile;
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    this.setDoneInfoFromServer = function(serverResponse) {
+        uploadedFile.readStatus = this.STATUS_FINISH;
+        uploadedFile.fileName = serverResponse.fileName;
+        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.errorMessage = serverResponse.errorMessage;
+        uploadedFile.clientData = serverResponse.clientData;
+        return uploadedFile;
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    this.setCancelInfoFromServer = function(serverResponse) {
+        uploadedFile.readStatus = this.STATUS_FINISH;
+        uploadedFile.serverData = serverResponse.serverData;
         uploadedFile.errorMessage = serverResponse.errorMessage;
         uploadedFile.clientData = serverResponse.clientData;
         return uploadedFile;
@@ -324,8 +362,8 @@ var UploadInit = function () {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setInitialInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // start checking content
                         uploadInit.upRenderer.renderReaded(uploadedFile);
                         uploadInit.upProcessor.checkParts(uploadedFile);
@@ -395,7 +433,7 @@ var UploaderChecker = function () {
         if (uploadedFile.STATUS_RUN === uploadedFile.readStatus) {
             uploaderChecker.stillCheck(uploadedFile);
         } else {
-            uploaderChecker.upProcessor.failProcess(uploadedFile);
+            uploaderChecker.upProcessor.failProcess(uploadedFile, null);
         }
     };
 
@@ -411,7 +449,7 @@ var UploaderChecker = function () {
         if (uploadedFile.STATUS_RUN === uploadedFile.readStatus) {
             uploaderChecker.upProcessor.uploadParts(uploadedFile);
         } else {
-            uploaderChecker.upProcessor.failProcess(uploadedFile);
+            uploaderChecker.upProcessor.failProcess(uploadedFile, null);
         }
     };
 
@@ -429,8 +467,8 @@ var UploaderChecker = function () {
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
+                        uploadedFile.setCancelInfoFromServer(responseData);
                         if (uploadedFile.RESULT_OK === responseData.status) {
-                            uploadedFile.setInfoFromServer(responseData);
                             // got known checksum on remote - check it against local file
                             uploaderChecker.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
                                 if (responseData.checksum === uploaderChecker.upChecksum.md5(result)) {
@@ -445,7 +483,7 @@ var UploaderChecker = function () {
                             });
                         } else {
                             // failed query
-                            uploaderChecker.upProcessor.failProcess(uploadedFile);
+                            uploaderChecker.upProcessor.failProcess(uploadedFile, null);
                         }
                     } else {
                         // Query dead, sent user info
@@ -494,14 +532,14 @@ var UploaderChecker = function () {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setRunnerInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // Truncate came OK, time to upload the rest
                         uploaderChecker.upRenderer.updateBar(uploadedFile.setTruncatedFromServer(responseData));
                         uploaderChecker.nextStep(uploadedFile);
                     } else {
                         // Truncate failed, time say something
-                        uploaderChecker.upProcessor.failProcess(uploadedFile);
+                        uploaderChecker.upProcessor.failProcess(uploadedFile, null);
                     }
                 } else {
                     // Query dead, sent user info
@@ -571,7 +609,7 @@ var UploaderRunner = function () {
         if (uploadedFile.STATUS_RUN === uploadedFile.readStatus) {
             uploaderRunner.stillRunning(uploadedFile);
         } else {
-            uploaderRunner.upProcessor.failProcess(uploadedFile);
+            uploaderRunner.upProcessor.failProcess(uploadedFile, null);
         }
     };
 
@@ -591,15 +629,15 @@ var UploaderRunner = function () {
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
+                        uploadedFile.setRunnerInfoFromServer(responseData);
                         if (uploadedFile.RESULT_OK === responseData.status) {
-                            uploadedFile.setInfoFromServer(responseData);
                             // everything ok
                             uploadedFile.nextFilePart();
                             uploaderRunner.upRenderer.updateBar(uploadedFile.nextCheckedPart());
                             uploaderRunner.continueRunning(uploadedFile);
                         } else {
                             // dead file, user info
-                            uploaderRunner.upProcessor.failProcess(uploadedFile);
+                            uploaderRunner.upProcessor.failProcess(uploadedFile, null);
                         }
                     } else {
                         uploaderRunner.upRenderer.consoleError(uploadedFile, responseData);
@@ -627,14 +665,14 @@ var UploaderRunner = function () {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setDoneInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // everything ok
                         uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
                         uploaderRunner.upRenderer.renderFinished(uploadedFile);
                     } else {
                         // dead file, user info
-                        uploaderRunner.upProcessor.failProcess(uploadedFile);
+                        uploaderRunner.upProcessor.failProcess(uploadedFile, null);
                     }
                 } else {
                     // dead query, user info
@@ -722,8 +760,8 @@ var UploaderFailure = function () {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
+                    uploadedFile.setCancelInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
-                        uploadedFile.setInfoFromServer(responseData);
                         // everything done
                         uploaderFailure.checkContinue(uploadedFile);
                     } else {

@@ -13,7 +13,7 @@ class CalculateSizes
     const DEFAULT_BYTES_PER_PART = 262144; // 1024*256
 
     /** @var int<0, max> */
-    protected $bytesPerPart = 0;
+    protected int $bytesPerPart = 0;
 
     /**
      * @param int<0, max>|null $bytesPerPart

@@ -15,7 +15,7 @@ use kalanis\UploadPerPartes\Exceptions\UploadException;
 class DataRam extends AStorage
 {
     /** @var string[] */
-    protected $data = [];
+    protected array $data = [];
 
     public function addPart(string $location, string $content, ?int $seek = null): bool
     {

@@ -203,12 +203,12 @@ class XRemStorage implements ITarget
         return isset($this->data[$key]);
     }
 
-    public function load(string $key)
+    public function load(string $key): string
     {
         return $this->exists($key) ? $this->data[$key] : null ;
     }
 
-    public function save(string $key, $data, ?int $timeout = null): bool
+    public function save(string $key, string $data, ?int $timeout = null): bool
     {
         $this->data[$key] = $data;
         return true;
@@ -229,13 +229,13 @@ class XRemStorage implements ITarget
 
     public function increment(string $key): bool
     {
-        $this->save($key, $this->exists($key) ? $this->load($key) + 1 : 1);
+        $this->save($key, strval($this->exists($key) ? intval($this->load($key)) + 1 : 1));
         return true;
     }
 
     public function decrement(string $key): bool
     {
-        $this->save($key, $this->exists($key) ? $this->load($key) - 1 : 0);
+        $this->save($key, strval($this->exists($key) ? intval($this->load($key)) - 1 : 0));
         return true;
     }
 
@@ -260,12 +260,12 @@ class XFailStorage implements ITarget
         return true;
     }
 
-    public function load(string $key)
+    public function load(string $key): string
     {
         throw new StorageException('not load');
     }
 
-    public function save(string $key, $data, ?int $timeout = null): bool
+    public function save(string $key, string $data, ?int $timeout = null): bool
     {
         return false;
     }
@@ -311,12 +311,12 @@ class XCrashStorage implements ITarget
         return true;
     }
 
-    public function load(string $key)
+    public function load(string $key): string
     {
         throw new StorageException('not load');
     }
 
-    public function save(string $key, $data, ?int $timeout = null): bool
+    public function save(string $key, string $data, ?int $timeout = null): bool
     {
         throw new StorageException('not save');
     }

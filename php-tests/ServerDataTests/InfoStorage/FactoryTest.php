@@ -66,7 +66,7 @@ class FactoryTest extends CommonTestClass
     public function testClassDie(): void
     {
         $factory = new XFactory();
-        $this->expectExceptionMessage('Class this-class-does-not-exists does not exist');
+        $this->expectExceptionMessage('Class "this-class-does-not-exists" does not exist');
         $this->expectException(UploadException::class);
         $factory->getFormat(999);
     }
@@ -86,7 +86,7 @@ class FactoryTest extends CommonTestClass
 
 class XFactory extends InfoStorage\Factory
 {
-    protected $map = [
+    protected array $map = [
         10 => XPassClass::class,
         999 => 'this-class-does-not-exists',
     ];

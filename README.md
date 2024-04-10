@@ -1,9 +1,9 @@
 # Upload Per-Partes
 
-[![Build Status](https://app.travis-ci.com/alex-kalanis/upload-per-partes.svg?branch=master)](https://app.travis-ci.com/github/alex-kalanis/upload-per-partes)
+![Build Status](https://github.com/alex-kalanis/upload-per-partes/actions/workflows/code_checks.yml/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/alex-kalanis/upload-per-partes/v/stable.svg?v=1)](https://packagist.org/packages/alex-kalanis/upload-per-partes)
-[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.3-8892BF.svg)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.4-8892BF.svg)](https://php.net/)
 [![Downloads](https://img.shields.io/packagist/dt/alex-kalanis/upload-per-partes.svg?v1)](https://packagist.org/packages/alex-kalanis/upload-per-partes)
 [![License](https://poser.pugx.org/alex-kalanis/upload-per-partes/license.svg?v=1)](https://packagist.org/packages/alex-kalanis/upload-per-partes)
 [![Code Coverage](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/badges/coverage.png?b=master&v=1)](https://scrutinizer-ci.com/g/alex-kalanis/upload-per-partes/?branch=master)
@@ -17,12 +17,8 @@ This is the mixed package - contains sever-side implementation in Python and PHP
 
 ## PHP Installation
 
-```
-{
-    "require": {
-        "alex-kalanis/upload-per-partes": "3.0"
-    }
-}
+```bash
+composer.phar require alex-kalanis/upload-per-partes
 ```
 
 (Refer to [Composer Documentation](https://github.com/composer/composer/blob/master/doc/00-intro.md#introduction) if you are not

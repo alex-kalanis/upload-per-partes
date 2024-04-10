@@ -13,17 +13,19 @@ class FilesTrait
         return new \kalanis\UploadPerPartes\DataStorage\Files(new CompositeAdapter(
             new NodePass(),
             new DirPass(),
-            new FilePass()
-        ), new Translations());
+            new FilePass(),
+            new StreamPass()
+        ), [], new Translations());
     }
 
     public function mockFilesDataDie(): Interfaces\IDataStorage
     {
         return new \kalanis\UploadPerPartes\DataStorage\Files(new CompositeAdapter(
-            new \NodeFail(),
-            new \DirFail(),
-            new \FileFail()
-        ), new Translations());
+            new NodeFail(),
+            new DirFail(),
+            new FileFail(),
+            new StreamFail()
+        ), [], new Translations());
     }
 
     public function mockFilesInfoPass(): Interfaces\IInfoStorage
@@ -31,17 +33,19 @@ class FilesTrait
         return new \kalanis\UploadPerPartes\ServerData\InfoStorage\Files(new CompositeAdapter(
             new NodePass(),
             new DirPass(),
-            new FilePass()
-        ), new Translations());
+            new FilePass(),
+            new StreamPass()
+        ), [], new Translations());
     }
 
     public function mockFilesInfoDie(): Interfaces\IInfoStorage
     {
         return new \kalanis\UploadPerPartes\ServerData\InfoStorage\Files(new CompositeAdapter(
-            new \NodeFail(),
-            new \DirFail(),
-            new \FileFail()
-        ), new Translations());
+            new NodeFail(),
+            new DirFail(),
+            new FileFail(),
+            new StreamFail()
+        ), [], new Translations());
     }
 }
 
@@ -102,7 +106,7 @@ class FilePass implements \kalanis\kw_files\Interfaces\IProcessFiles
 
     protected $data = [];
 
-    public function saveFile(array $entry, $content, ?int $offset = null): bool
+    public function saveFile(array $entry, string $content, ?int $offset = null, int $mode = 0): bool
     {
         if (is_null($offset)) {
             $this->data[$this->toStr($entry)] = $content;
@@ -113,7 +117,7 @@ class FilePass implements \kalanis\kw_files\Interfaces\IProcessFiles
         return true;
     }
 
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
         $data = isset($this->data[$this->toStr($entry)]) ? $this->data[$this->toStr($entry)] : '';
         if (!is_null($offset)) {
@@ -147,6 +151,51 @@ class FilePass implements \kalanis\kw_files\Interfaces\IProcessFiles
     public function deleteFile(array $entry): bool
     {
         unset($this->data[$this->toStr($entry)]);
+        return true;
+    }
+}
+
+
+class StreamPass implements \kalanis\kw_files\Interfaces\IProcessFileStreams
+{
+    use TNameToStr;
+
+    protected $data = [];
+
+    public function saveFileStream(array $entry, $content, int $mode = 0): bool
+    {
+        $this->data[$this->toStr($entry)] = $content;
+        return true;
+    }
+
+    public function readFileStream(array $entry)
+    {
+        $key = $this->toStr($entry);
+        if (!isset($this->data[$key])) {
+            throw new \kalanis\kw_files\FilesException('Not exists');
+        }
+        return $this->data[$key];
+    }
+
+    public function copyFileStream(array $source, array $dest): bool
+    {
+        return $this->saveFileStream($dest, $this->readFileStream($source));
+    }
+
+    public function moveFileStream(array $source, array $dest): bool
+    {
+        $v1 = $this->copyFileStream($source, $dest);
+        $v2 = $this->deleteFileStream($source);
+        return $v1 && $v2;
+    }
+
+    public function deleteFileStream(array $entry): bool
+    {
+        $key = $this->toStr($entry);
+        if (isset($this->data[$key])) {
+            @fclose($this->data[$key]);
+            unset($this->data[$key]);
+        }
         return true;
     }
 }
@@ -224,12 +273,12 @@ class NodeFail implements \kalanis\kw_files\Interfaces\IProcessNodes
 
 class FileFail implements \kalanis\kw_files\Interfaces\IProcessFiles
 {
-    public function saveFile(array $entry, $content, ?int $offset = null): bool
+    public function saveFile(array $entry, string $content, ?int $offset = null, int $mode = 0): bool
     {
         throw new \kalanis\kw_files\FilesException('mock');
     }
 
-    public function readFile(array $entry, ?int $offset = null, ?int $length = null)
+    public function readFile(array $entry, ?int $offset = null, ?int $length = null): string
     {
         throw new \kalanis\kw_files\FilesException('mock');
     }
@@ -245,6 +294,30 @@ class FileFail implements \kalanis\kw_files\Interfaces\IProcessFiles
     }
 
     public function deleteFile(array $entry): bool
+    {
+        throw new \kalanis\kw_files\FilesException('mock');
+    }
+}
+
+
+class StreamFail implements \kalanis\kw_files\Interfaces\IProcessFileStreams
+{
+    public function saveFileStream(array $entry, $content, int $mode = 0): bool
+    {
+        throw new \kalanis\kw_files\FilesException('mock');
+    }
+
+    public function readFileStream(array $entry)
+    {
+        throw new \kalanis\kw_files\FilesException('mock');
+    }
+
+    public function copyFileStream(array $source, array $dest): bool
+    {
+        throw new \kalanis\kw_files\FilesException('mock');
+    }
+
+    public function moveFileStream(array $source, array $dest): bool
     {
         throw new \kalanis\kw_files\FilesException('mock');
     }

@@ -17,11 +17,11 @@ class TargetFileName
 {
     use TLang;
 
-    const FILE_DRIVER_SUFF = '.partial';
-    const FILE_UPLOAD_SUFF = '.upload';
-    const FILE_EXT_SEP = '.';
-    const FILE_VER_SEP = '.';
-    const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
+    public const FILE_DRIVER_SUFF = '.partial';
+    public const FILE_UPLOAD_SUFF = '.upload';
+    protected const FILE_EXT_SEP = '.';
+    protected const FILE_VER_SEP = '.';
+    protected const WIN_NAME_LEN_LIMIT = 110; // minus dot, len upload and part for multiple file upload - win allows max 128 chars, rest is for path
 
     /** @var Interfaces\IDataStorage */
     protected $dataStorage = null;

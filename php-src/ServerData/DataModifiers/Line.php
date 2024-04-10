@@ -21,11 +21,11 @@ class Line extends ServerData\AModifiers implements
     Interfaces\InfoStorage\ForStorage,
     Interfaces\InfoStorage\ForVolume
 {
-    const DATA_SEPARATOR = '|';
+    private const DATA_SEPARATOR = '|';
 
     public function fromFormat(string $content): ServerData\Data
     {
-        $line = explode(static::DATA_SEPARATOR, $content);
+        $line = explode(self::DATA_SEPARATOR, $content);
         $libData = new ServerData\Data();
         $libData->remoteName = strval($line[1]); // final file path
         $libData->tempDir = strval($line[3]); // path to temp file
@@ -42,7 +42,7 @@ class Line extends ServerData\AModifiers implements
 
     public function toFormat(ServerData\Data $data): string
     {
-        return implode(static::DATA_SEPARATOR, [
+        return implode(self::DATA_SEPARATOR, [
             RandomStrings::randomLength(),
             $data->remoteName,
             RandomStrings::randomLength(),

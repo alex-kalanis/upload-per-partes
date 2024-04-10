@@ -16,8 +16,7 @@ trait TData
 {
     use TLang;
 
-    /** @var null|ServerData\Data */
-    protected $data = null;
+    protected ?ServerData\Data $data = null;
 
     public function setInfoData(?ServerData\Data $data = null): self
     {

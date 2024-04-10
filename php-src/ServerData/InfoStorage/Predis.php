@@ -19,10 +19,8 @@ class Predis implements Interfaces\IInfoStorage
 {
     use TLang;
 
-    /** @var lib\Client */
-    protected $redis = null;
-    /** @var int */
-    protected $timeout = 0;
+    protected lib\Client $redis;
+    protected int $timeout = 0;
 
     public function __construct(lib\Client $redis, int $timeout = 3600, ?Interfaces\IUPPTranslations $lang = null)
     {

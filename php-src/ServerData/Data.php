@@ -10,24 +10,19 @@ namespace kalanis\UploadPerPartes\ServerData;
  */
 final class Data
 {
-    /** @var string */
-    public $remoteName = '';
-    /** @var string */
-    public $tempDir = '';
-    /** @var string */
-    public $tempName = '';
-    /** @var string */
-    public $targetDir = '';
-    /** @var string */
-    public $finalName = '';
+    public string $remoteName = '';
+    public string $tempDir = '';
+    public string $tempName = '';
+    public string $targetDir = '';
+    public string $finalName = '';
     /** @var int<0, max> */
-    public $fileSize = 0;
+    public int $fileSize = 0;
     /** @var int<0, max> */
-    public $partsCount = 0;
+    public int $partsCount = 0;
     /** @var int<0, max> */
-    public $bytesPerPart = 0;
+    public int $bytesPerPart = 0;
     /** @var int<0, max> */
-    public $lastKnownPart = 0;
+    public int $lastKnownPart = 0;
 
     public static function init(): self
     {

@@ -73,9 +73,26 @@ uploaderRenderer.updateBar = function(uploadedFile) {
     percentChecked[0].style.paddingLeft = checkedPercent.toString() + "%";
 };
 uploaderRenderer.updateStatus = function(uploadedFile, status) {
+    if (status === undefined) {
+        status = uploadedFile.errorMessage;
+    }
+    if (status == null) {
+        status = uploadedFile.errorMessage;
+    }
     var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
-    var errLog = node.find(".upload-progress-box ." + uploaderRenderer.upIdent.errorLog).eq(1);
-    errLog.append(status);
+    var errLog = node.find("." + uploaderRenderer.upIdent.errorLog);
+    errLog[0].append(status);
+};
+uploaderFailure.process = function(uploadedFile, event) {
+    if (event === undefined) {
+        event = uploadedFile.errorMessage;
+    }
+    if (event == null) {
+        event = uploadedFile.errorMessage;
+    }
+    var node = uploaderRenderer.upQuery.getObjectById(uploadedFile.localId);
+    var errLog = node.find("." + uploaderRenderer.upIdent.errorLog);
+    errLog[0].append(event);
 };
 
 document.addEventListener('DOMContentLoaded', function () {

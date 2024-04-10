@@ -327,6 +327,7 @@ class UploaderMock extends Uploader
 {
     /**
      * @return Support\DataRam
+     * @todo: tohle rika, ze je to spatne - nemelo by to byt potreba
      */
     public function getStorage(): Interfaces\IDataStorage
     {

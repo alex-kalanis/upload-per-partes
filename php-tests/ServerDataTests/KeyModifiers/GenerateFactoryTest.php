@@ -55,7 +55,7 @@ class GenerateFactoryTest extends CommonTestClass
     public function testClassDie(): void
     {
         $lib = new XGenerateFactory(new Translations());
-        $this->expectExceptionMessage('Class this class does not exists does not exist');
+        $this->expectExceptionMessage('Class "this class does not exists" does not exist');
         $this->expectException(UploadException::class);
         $lib->getVariant(999);
     }
@@ -91,7 +91,7 @@ abstract class AGenerateithConstructParamsNoInterface
 
 class XGenerateFactory extends ServerData\KeyModifiers\GenerateFactory
 {
-    protected $map = [
+    protected array $map = [
         10 => '\stdClass',
         333 => GenerateWithConstructParamsNoInterface::class,
         999 => 'this class does not exists',

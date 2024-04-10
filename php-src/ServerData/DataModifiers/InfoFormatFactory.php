@@ -21,13 +21,13 @@ class InfoFormatFactory
 {
     use TLang;
 
-    const FORMAT_TEXT = 1;
-    const FORMAT_JSON = 2;
-    const FORMAT_LINE = 3;
-    const FORMAT_SERIAL = 4;
+    public const FORMAT_TEXT = 1;
+    public const FORMAT_JSON = 2;
+    public const FORMAT_LINE = 3;
+    public const FORMAT_SERIAL = 4;
 
     /** @var array<int, class-string<Interfaces\IInfoFormatting>> */
-    protected $map = [
+    protected array $map = [
         self::FORMAT_TEXT => Text::class,
         self::FORMAT_JSON => Json::class,
         self::FORMAT_LINE => Line::class,
@@ -72,13 +72,14 @@ class InfoFormatFactory
     }
 
     /**
-     * @param class-string<Interfaces\IInfoFormatting>|string $variant
+     * @param string $variant
      * @throws UploadException
      * @return Interfaces\IInfoFormatting
      */
     protected function initDefined(string $variant): Interfaces\IInfoFormatting
     {
         try {
+            /** @var class-string<Interfaces\IInfoFormatting> $variant */
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
                 return $this->checkObject($ref->newInstance($this->getUppLang()));

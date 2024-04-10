@@ -55,7 +55,7 @@ class EncodeFactoryTest extends CommonTestClass
     public function testClassDie(): void
     {
         $lib = new XEncodeFactory(new Translations());
-        $this->expectExceptionMessage('Class this class does not exists does not exist');
+        $this->expectExceptionMessage('Class "this class does not exists" does not exist');
         $this->expectException(UploadException::class);
         $lib->getVariant(999);
     }
@@ -91,7 +91,7 @@ abstract class AEncodeWithConstructParamsNoInterface
 
 class XEncodeFactory extends ServerData\KeyModifiers\EncodeFactory
 {
-    protected $map = [
+    protected array $map = [
         10 => '\stdClass',
         333 => EncodeWithConstructParamsNoInterface::class,
         999 => 'this class does not exists',

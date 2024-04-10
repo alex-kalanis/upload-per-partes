@@ -21,8 +21,7 @@ class Random extends AModifiers implements
     Interfaces\InfoStorage\ForVolume,
     Interfaces\IEncodeForInternalStorage
 {
-    /** @var int */
-    protected $keyLength = 64;
+    protected int $keyLength = 64;
 
     public function getKeyForStorage(string $what): string
     {

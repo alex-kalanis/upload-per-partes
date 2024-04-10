@@ -17,19 +17,14 @@ abstract class AResponse implements JsonSerializable
 {
     use TData;
 
-    const STATUS_OK = 'OK';
-    const STATUS_FAIL = 'FAIL';
+    public const STATUS_OK = 'OK';
+    public const STATUS_FAIL = 'FAIL';
 
-    /** @var string */
-    protected $serverData = '';
-    /** @var string */
-    protected $errorMessage = self::STATUS_OK;
-    /** @var string */
-    protected $status = self::STATUS_OK;
-    /** @var string */
-    protected $roundaboutServer = '';
-    /** @var string */
-    protected $roundaboutClient = '';
+    protected string $serverData = '';
+    protected string $errorMessage = self::STATUS_OK;
+    protected string $status = self::STATUS_OK;
+    protected string $roundaboutServer = '';
+    protected string $roundaboutClient = '';
 
     final public function __construct(?IUPPTranslations $lang = null)
     {

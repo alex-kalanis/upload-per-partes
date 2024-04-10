@@ -20,15 +20,15 @@ class Factory
 {
     use TLang;
 
-    const FORMAT_VOLUME = 1;
+    public const FORMAT_VOLUME = 1;
     // adapters - need to pass them
-//    const FORMAT_STORAGE = 2;
-//    const FORMAT_FILES = 3;
-//    const FORMAT_REDIS = 4;
-//    const FORMAT_PREDIS = 5;
+//    public const FORMAT_STORAGE = 2;
+//    public const FORMAT_FILES = 3;
+//    public const FORMAT_REDIS = 4;
+//    public const FORMAT_PREDIS = 5;
 
     /** @var array<int, class-string<IInfoStorage>> */
-    protected $map = [
+    protected array $map = [
         self::FORMAT_VOLUME => Volume::class,
 //        self::FORMAT_STORAGE => Storage::class,
 //        self::FORMAT_FILES => Files::class,
@@ -74,13 +74,14 @@ class Factory
     }
 
     /**
-     * @param class-string<IInfoStorage>|string $variant
+     * @param string $variant
      * @throws UploadException
      * @return IInfoStorage
      */
     protected function initDefined($variant): IInfoStorage
     {
         try {
+            /** @var class-string<IInfoStorage> $variant */
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
                 return $this->checkObject($ref->newInstance($this->uppLang));

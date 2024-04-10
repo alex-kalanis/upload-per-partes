@@ -19,10 +19,8 @@ class Redis implements Interfaces\IInfoStorage
 {
     use TLang;
 
-    /** @var lib */
-    protected $redis = null;
-    /** @var int */
-    protected $timeout = 0;
+    protected lib $redis;
+    protected int $timeout = 0;
 
     public function __construct(lib $redis, int $timeout = 3600, ?Interfaces\IUPPTranslations $lang = null)
     {

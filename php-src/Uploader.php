@@ -11,27 +11,55 @@ use kalanis\UploadPerPartes\Interfaces;
  * Class Uploader
  * @package kalanis\UploadPerPartes
  * Main server library for drive upload per-partes
+ *
+ * @todo: - prehodit vyhledavani volneho souboru v initu a kopirovani v done do extra tridy,
+ *          ktera bude tam a zpatky predavat data v objektu
+ *          - tim se vykopne nesoumernost, kdy lookup je vpaleny v Initu, ale save je mimo Done
+ *          - taky se bude snaze vracet datova polozka, protoze uz nebude potreba do ni hrabat ve volajici tride;
+ *            zustane obalena uvnitr tridy
+ *        - ono to v tomhle bordelu treba i nejde zretezit, tedy ze jeden upload to posila dalsimu uploadu
+ *          - variace "proxy", kdy dojde jen k prostemu predani dat dal
+ *          - variace "repack" kdy je ridici soubor reseny na jedne instanci a data se prebali pro dalsi;
+ *            ridici soubor pak nemusi byt na cilovem stroji, kam se to posila - funguje v rezimu "clear-pass"
+ *          - Uploader\DataProcessor tak dostane pristup k Init i Done, coz aktualne zamerne nema
+ *
+ * Stav:
+ *  internal - akce  - external
+ *  [lookup] : init  :
+ *           : check :
+ *           : trunc :
+ *           :  up   :
+ *           : done  : [save]
+ *
+ * Cil je vykopnout akce nad finalnim storage do extra tridy, takze je pujde mocknout
+ *  - chci retezit uploady, takhle to jeste nejde
+ *  -> myslenka je, ze upload pojede na webu v DMZ, ten to posle skrz FW a vzadu pojede druha stranka, ktera uz bude opecovavat skutecna uloziste
+ *
+ * todo: - kopnout do frontendu - OK
+ *       - init pretazenim jede rovnou -> OK
+ *       - init po vyberu jede taky rovnou - vyber je na kliknuti na dropzone -> OK
+ *       - oboji vola start zpracovani; potreba zjistit tahane soubory (muze jich byt v obou pripadech zakonite vic) -> je to pricetny
+ *       - font awesome je nepouzitelny, protoze potrebne ikony jsou za paywallem - udelat si vlastni -> mam
+ *         - ikona "X" kdyz upload nepujde a zaroven neukazovat vyber souboru
+ *         - ikona "sipka do kosiku" kdyz uploadovat lze a zaroven ukazat i vyber souboru
  */
 class Uploader
 {
-    /** @var Interfaces\IUPPTranslations */
-    protected $lang = null;
-    /** @var Interfaces\IDataStorage where to store data temporary */
-    protected $uploadStorage = null;
-    /** @var Interfaces\IDataStorage where to store data after end */
-    protected $targetStorage = null;
-    /** @var ServerData\TargetFileName what will be new file name */
-    protected $targetFileName = null;
-    /** @var string what will be new file name */
-    protected $tempLocation = '';
-    /** @var Uploader\CalculateSizes what will be size of segments */
-    protected $calculateSize = null;
-    /** @var ServerData\Processor processing with info data file */
-    protected $serverData = null;
-    /** @var Uploader\DataProcessor */
-    protected $processor = null;
-    /** @var bool */
-    protected $canContinue = true;
+    protected Interfaces\IUPPTranslations $lang;
+    /** where to store data temporary */
+    protected Interfaces\IDataStorage $uploadStorage;
+    /** where to store data after end */
+    protected Interfaces\IDataStorage $targetStorage;
+    /** what will be new file name */
+    protected ServerData\TargetFileName $targetFileName;
+    /** what will be new file name */
+    protected string $tempLocation = '';
+    /** what will be size of segments */
+    protected Uploader\CalculateSizes $calculateSize;
+    /** processing with info data file */
+    protected ServerData\Processor $serverData;
+    protected Uploader\DataProcessor $processor;
+    protected bool $canContinue = true;
 
     /**
      * @param array{
@@ -283,7 +311,7 @@ class Uploader
                 $this->calculateSize->getBytesPerPart(),
                 0
             );
-            $freeEntry->tempName = $this->serverData->getKey($freeEntry);
+            $freeEntry->tempName = $this->serverData->getKey($freeEntry) . ServerData\TargetFileName::FILE_UPLOAD_SUFF;
 
             $currentKey = $this->serverData->getKey($freeEntry);
             if ($this->serverData->existsByKey($currentKey)) {

@@ -21,19 +21,26 @@ class Files extends AStorage
 {
     use TToString;
 
-    /** @var CompositeAdapter */
-    protected $lib = null;
+    protected CompositeAdapter $lib;
+    /** @var string[] */
+    protected array $onPath = [];
 
-    public function __construct(CompositeAdapter $lib, ?Interfaces\IUPPTranslations $lang = null)
+    /**
+     * @param CompositeAdapter $lib
+     * @param string[] $onPath
+     * @param Interfaces\IUPPTranslations|null $lang
+     */
+    public function __construct(CompositeAdapter $lib, array $onPath = [], ?Interfaces\IUPPTranslations $lang = null)
     {
         $this->lib = $lib;
+        $this->onPath = $onPath;
         parent::__construct($lang);
     }
 
     public function exists(string $key): bool
     {
         try {
-            return $this->lib->exists(Stuff::pathToArray($key));
+            return $this->lib->exists(array_merge($this->onPath, Stuff::pathToArray($key)));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
@@ -42,7 +49,7 @@ class Files extends AStorage
     public function load(string $key): string
     {
         try {
-            return $this->toString($key, $this->lib->readFile(Stuff::pathToArray($key)));
+            return $this->toString($key, $this->lib->readFile(array_merge($this->onPath, Stuff::pathToArray($key))));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotReadFile($key), $ex->getCode(), $ex);
         }
@@ -51,7 +58,7 @@ class Files extends AStorage
     public function save(string $key, string $data): bool
     {
         try {
-            return $this->lib->saveFile(Stuff::pathToArray($key), $data);
+            return $this->lib->saveFile(array_merge($this->onPath, Stuff::pathToArray($key)), $data);
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppDriveFileCannotWrite($key), $ex->getCode(), $ex);
         }
@@ -60,7 +67,7 @@ class Files extends AStorage
     public function remove(string $key): bool
     {
         try {
-            return $this->lib->deleteFile(Stuff::pathToArray($key));
+            return $this->lib->deleteFile(array_merge($this->onPath, Stuff::pathToArray($key)));
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppDriveFileCannotRemove($key), $ex->getCode(), $ex);
         }

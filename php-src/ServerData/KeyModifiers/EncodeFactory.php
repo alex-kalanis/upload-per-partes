@@ -19,14 +19,14 @@ class EncodeFactory
 {
     use TLang;
 
-    const VARIANT_CLEAR = 1;
-    const VARIANT_RANDOM = 2;
-    const VARIANT_BASE64 = 3;
-    const VARIANT_MD5 = 4;
-    const VARIANT_HEX = 5;
+    public const VARIANT_CLEAR = 1;
+    public const VARIANT_RANDOM = 2;
+    public const VARIANT_BASE64 = 3;
+    public const VARIANT_MD5 = 4;
+    public const VARIANT_HEX = 5;
 
     /** @var array<int, class-string<Interfaces\IEncodeForExternalExchange>> */
-    protected $map = [
+    protected array $map = [
         self::VARIANT_CLEAR => Clear::class,
         self::VARIANT_RANDOM => Random::class,
         self::VARIANT_BASE64 => Base64::class,
@@ -72,13 +72,14 @@ class EncodeFactory
     }
 
     /**
-     * @param class-string<Interfaces\IEncodeForExternalExchange>|string $variant
+     * @param string $variant
      * @throws UploadException
      * @return Interfaces\IEncodeForExternalExchange
      */
     protected function initDefined(string $variant): Interfaces\IEncodeForExternalExchange
     {
         try {
+            /** @var class-string<Interfaces\IEncodeForExternalExchange> $variant */
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
                 return $this->checkObject($ref->newInstance($this->getUppLang()));

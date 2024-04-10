@@ -37,15 +37,15 @@ class Processor
     use TLang;
 
     /** @var Interfaces\IInfoFormatting how to format info pack in storage */
-    protected $formatInfoInto = null;
+    protected Interfaces\IInfoFormatting $formatInfoInto;
     /** @var Interfaces\IInfoStorage what storage will be used*/
-    protected $localInfoStorage = null;
+    protected Interfaces\IInfoStorage $localInfoStorage;
     /** @var Interfaces\ILimitDataInternalKey how to modify data pack to be available for key creation */
-    protected $limitDataForInternalKey = null;
+    protected Interfaces\ILimitDataInternalKey $limitDataForInternalKey;
     /** @var Interfaces\IEncodeForInternalStorage how to hash data into key */
-    protected $keyEncoderForInternalStorage = null;
+    protected Interfaces\IEncodeForInternalStorage $keyEncoderForInternalStorage;
     /** @var Interfaces\IEncodeForExternalExchange how to modify obtained key to share it without problems */
-    protected $keyEncoderForExternalExchange = null;
+    protected Interfaces\IEncodeForExternalExchange $keyEncoderForExternalExchange;
 
     /**
      * @param Interfaces\IInfoFormatting $formatInfoInto

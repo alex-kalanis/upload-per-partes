@@ -14,8 +14,7 @@ use kalanis\UploadPerPartes\Uploader\Translations;
  */
 trait TLang
 {
-    /** @var IUPPTranslations|null */
-    protected $uppLang = null;
+    protected ?IUPPTranslations $uppLang = null;
 
     public function setUppLang(?IUPPTranslations $lang = null): self
     {

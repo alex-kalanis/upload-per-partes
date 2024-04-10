@@ -19,10 +19,8 @@ class Storage implements Interfaces\IInfoStorage
 {
     use TLang;
 
-    /** @var IStorage */
-    protected $storage = null;
-    /** @var int */
-    protected $timeout = 0;
+    protected IStorage $storage;
+    protected int $timeout = 0;
 
     public function __construct(IStorage $storage, int $timeout = 3600, ?Interfaces\IUPPTranslations $lang = null)
     {
