@@ -15,31 +15,29 @@
 <div class="upload-progress-box" id="base_progress">
     <div>{FILE_NAME}: <span class="filename"></span></div>
     <div class="upload-progress-time">
-        <div class="pull-left">
+        <div class="">
             {LANG_ELAPSED_TIME}: <span class="elapsed_time">{VALUE_ELAPSED_TIME}</span>
         </div>
-        <div class="pull-right">
+        <div class="">
             {LANG_ESTIMATED_TIME}: <span class="est_time_left">{VALUE_ESTIMATED_TIME}</span>
         </div>
     </div>
-    <div class="clearfix" ></div>
     <div class="progressbar-wrapper" >
         <div class="progress_bar"><div class="checked">&nbsp;</div><div class="uploaded">&nbsp;</div></div>
     </div>
     <div class="upload-progress-size">
-        <div class="pull-left">
+        <div class="">
             <span class="percent_complete">0%</span> (<span class="current_position">{VALUE_CURRENT_POSITION}</span> / <span class="total_kbytes">{VALUE_TOTAL_LENGTH}</span>)
         </div>
-        <div class="pull-right">
+        <div class="">
             {LANG_ESTIMATED_SPEED}: <span class="est_speed">{VALUE_ESTIMATED_SPEED}</span>
         </div>
     </div>
-    <div class="clearfix" ></div>
     <div>
         <button class="button_retry" title="{BUTTON_RETRY}" disabled> &#x23EE; </button>
         <button class="button_resume" title="{BUTTON_RESUME}" disabled> &#x23EF; </button>
-        <div class="error_log">&nbsp;</div>
         <button class="button_stop" title="{BUTTON_STOP}"> &#x23F9; </button><br>
+        <div class="error_log">&nbsp;</div>
     </div>
     <div class="clearfix" ></div>
 </div>

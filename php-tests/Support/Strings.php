@@ -3,7 +3,7 @@
 namespace Support;
 
 
-use kalanis\UploadPerPartes\Exceptions\UploadException;
+use kalanis\UploadPerPartes\UploadException;
 
 
 /**

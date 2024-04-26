@@ -3,7 +3,7 @@
 namespace kalanis\UploadPerPartes\Traits;
 
 
-use kalanis\UploadPerPartes\Interfaces\IUPPTranslations;
+use kalanis\UploadPerPartes\Interfaces\IUppTranslations;
 use kalanis\UploadPerPartes\Uploader\Translations;
 
 
@@ -14,15 +14,15 @@ use kalanis\UploadPerPartes\Uploader\Translations;
  */
 trait TLang
 {
-    protected ?IUPPTranslations $uppLang = null;
+    protected ?IUppTranslations $uppLang = null;
 
-    public function setUppLang(?IUPPTranslations $lang = null): self
+    public function setUppLang(?IUppTranslations $lang = null): self
     {
         $this->uppLang = $lang;
         return $this;
     }
 
-    public function getUppLang(): IUPPTranslations
+    public function getUppLang(): IUppTranslations
     {
         if (empty($this->uppLang)) {
             $this->uppLang = new Translations();

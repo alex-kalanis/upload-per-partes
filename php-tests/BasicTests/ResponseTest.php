@@ -4,159 +4,245 @@ namespace BasicTests;
 
 
 use CommonTestClass;
-use kalanis\UploadPerPartes\Response;
-use kalanis\UploadPerPartes\Exceptions;
-use kalanis\UploadPerPartes\Uploader\Translations;
+use kalanis\UploadPerPartes\Responses;
+use kalanis\UploadPerPartes\UploadException;
 
 
 class ResponseTest extends CommonTestClass
 {
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testInitBegin(): void
+    public function testBasic(): void
     {
-        $lib = Response\InitResponse::initOk(new Translations(), $this->mockSharedKey(), $this->mockData());
+        $lib = new Responses\BasicResponse();
+        $lib->setBasics($this->mockSharedKey(), 'mock data');
 
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals('fghjkl.partial', $lib->jsonSerialize()['name']);
-        $this->assertEquals(Response\InitResponse::STATUS_OK, $lib->jsonSerialize()['status']);
-        $this->assertEquals(12, $lib->jsonSerialize()['totalParts']);
-        $this->assertEquals(64, $lib->jsonSerialize()['partSize']);
-        $this->assertEquals(7, $lib->jsonSerialize()['lastKnownPart']);
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('mock data', $lib->roundaboutClient);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'mock data',
+        ], (array) $lib);
     }
 
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testInitError(): void
+    public function testError1(): void
     {
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\InitResponse::initError(null, $this->mockData(), $ex);
+        $lib = new Responses\ErrorResponse();
+        $lib->setErrorMessage('Testing one')
+            ->setBasics('shared key', 'back to client');
 
-        $this->assertEquals('fghjkl.partial', $lib->jsonSerialize()['name']);
-        $this->assertEquals(Response\InitResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
+        $this->assertEquals('shared key', $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_FAIL, $lib->status);
+        $this->assertEquals('Testing one', $lib->errorMessage);
+        $this->assertEquals('back to client', $lib->roundaboutClient);
+
+        $this->assertEquals([
+            'serverKey' => 'shared key',
+            'status' => Responses\BasicResponse::STATUS_FAIL,
+            'errorMessage' => 'Testing one',
+            'roundaboutClient' => 'back to client',
+        ], (array) $lib);
     }
 
-    public function testCheckOk(): void
+    public function testError2(): void
     {
-        $lib = Response\CheckResponse::initOk(null, $this->mockSharedKey(), '123abc456def789');
+        $lib = new Responses\ErrorResponse();
+        $lib->setError(new UploadException('Testing two'))
+            ->setBasics('shared key', 'back to client');
 
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals('123abc456def789', $lib->jsonSerialize()['checksum']);
-        $this->assertEquals(Response\CheckResponse::STATUS_OK, $lib->jsonSerialize()['status']);
+        $this->assertEquals('shared key', $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_FAIL, $lib->status);
+        $this->assertEquals('Testing two', $lib->errorMessage);
+        $this->assertEquals('back to client', $lib->roundaboutClient);
+
+        $this->assertEquals([
+            'serverKey' => 'shared key',
+            'status' => Responses\BasicResponse::STATUS_FAIL,
+            'errorMessage' => 'Testing two',
+            'roundaboutClient' => 'back to client',
+        ], (array) $lib);
     }
 
-    public function testCheckError(): void
-    {
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\CheckResponse::initError(new Translations(), $this->mockSharedKey(), $ex);
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals('', $lib->jsonSerialize()['checksum']);
-        $this->assertEquals(Response\CheckResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
-    }
-
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testTruncateOk(): void
-    {
-        $lib = Response\TruncateResponse::initOk(new Translations(), $this->mockSharedKey(), $this->mockData());
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(7, $lib->jsonSerialize()['lastKnownPart']);
-        $this->assertEquals(Response\TruncateResponse::STATUS_OK, $lib->jsonSerialize()['status']);
-    }
-
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testTruncateError(): void
-    {
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\TruncateResponse::initError(null, $this->mockSharedKey(), $this->mockData(), $ex);
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\TruncateResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
-    }
-
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testUploadOk(): void
-    {
-        $lib = Response\UploadResponse::initOK(null, $this->mockSharedKey(), $this->mockData());
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);
-        $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
-    }
-
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testUploadFail(): void
-    {
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\UploadResponse::initError(new Translations(), $this->mockSharedKey(), $this->mockData(), $ex);
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
-    }
-
-    /**
-     * @throws Exceptions\UploadException
-     */
-    public function testDoneComplete(): void
+    public function testInit1(): void
     {
         $data = $this->mockData();
-        $lib = Response\DoneResponse::initDone(new Translations(), $this->mockSharedKey(), $data);
+        $data->clear();
 
-        $this->assertEquals('/tmp/', $lib->getTemporaryLocation());
-        $this->assertEquals('fghjkl.partial', $lib->getTemporaryName());
-        $this->assertEquals(123456, $lib->getSize());
-        $this->assertEquals('fghjkl.partial', $lib->getOriginalName());
-        $this->assertEquals($this->getTestDir() . 'abcdef', $lib->getTargetLocation());
-        $this->assertEquals('abcdef', $lib->getTargetName());
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['status']);
-        $this->assertEquals(Response\UploadResponse::STATUS_OK, $lib->jsonSerialize()['errorMessage']);
+        $lib = new Responses\InitResponse();
+        $lib->setInitData($data, 'packing', 'hashing')
+            ->setBasics($this->mockSharedKey(), 'back to client');
+
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('back to client', $lib->roundaboutClient);
+
+        $this->assertEquals('abcdef', $lib->name);
+        $this->assertEquals(12, $lib->totalParts);
+        $this->assertEquals(7, $lib->lastKnownPart);
+        $this->assertEquals(64, $lib->partSize);
+        $this->assertEquals('packing', $lib->encoders);
+        $this->assertEquals('hashing', $lib->checksum);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'back to client',
+            'name' => 'abcdef',
+            'totalParts' => 12,
+            'lastKnownPart' => 7,
+            'partSize' => 64,
+            'encoders' => 'packing',
+            'checksum' => 'hashing',
+        ], (array) $lib);
+    }
+
+    public function testInit2(): void
+    {
+        $lib = new Responses\InitResponse();
+        $lib->setPassedInitData(
+                'foo_bar_baz',
+                951,
+                357,
+                684,
+                'packing',
+                'hashing'
+            )
+            ->setBasics($this->mockSharedKey(), 'back to client');
+
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('back to client', $lib->roundaboutClient);
+
+        $this->assertEquals('foo_bar_baz', $lib->name);
+        $this->assertEquals(951, $lib->totalParts);
+        $this->assertEquals(357, $lib->lastKnownPart);
+        $this->assertEquals(684, $lib->partSize);
+        $this->assertEquals('packing', $lib->encoders);
+        $this->assertEquals('hashing', $lib->checksum);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'back to client',
+            'name' => 'foo_bar_baz',
+            'totalParts' => 951,
+            'lastKnownPart' => 357,
+            'partSize' => 684,
+            'encoders' => 'packing',
+            'checksum' => 'hashing',
+        ], (array) $lib);
+    }
+
+    public function testCheck(): void
+    {
+        $lib = new Responses\CheckResponse();
+        $lib->setChecksum('abcxyz')
+            ->setBasics($this->mockSharedKey(), 'mock data');
+
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('mock data', $lib->roundaboutClient);
+
+        $this->assertEquals('abcxyz', $lib->checksum);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'mock data',
+            'checksum' => 'abcxyz',
+        ], (array) $lib);
+    }
+
+    public function testLastKnown(): void
+    {
+        $lib = new Responses\LastKnownResponse();
+        $lib->setLastKnown(44455)
+            ->setBasics($this->mockSharedKey(), 'mock data');
+
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('mock data', $lib->roundaboutClient);
+
+        $this->assertEquals(44455, $lib->lastKnown);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'mock data',
+            'lastKnown' => 44455,
+        ], (array) $lib);
+    }
+
+    public function testDone(): void
+    {
+        $lib = new Responses\DoneResponse();
+        $lib->setFinalName('not yours data')
+            ->setBasics($this->mockSharedKey(), 'mock data');
+
+        $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->status);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
+        $this->assertEquals('mock data', $lib->roundaboutClient);
+
+        $this->assertEquals('not yours data', $lib->name);
+
+        $this->assertEquals([
+            'serverKey' => $this->mockSharedKey(),
+            'status' => Responses\BasicResponse::STATUS_OK,
+            'errorMessage' => Responses\BasicResponse::STATUS_OK,
+            'roundaboutClient' => 'mock data',
+            'name' => 'not yours data',
+        ], (array) $lib);
     }
 
     /**
-     * @throws Exceptions\UploadException
+     * @throws UploadException
      */
-    public function testDoneFail(): void
+    public function testFactoryPass(): void
     {
-        $data = $this->mockData();
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\DoneResponse::initError(null, $this->mockSharedKey(), $data, $ex);
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\UploadResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
+        $lib = new Responses\Factory();
+        $this->assertInstanceOf(Responses\CheckResponse::class, $lib->getResponse(Responses\Factory::RESPONSE_CHECK));
     }
 
-    public function testCancelOk(): void
+    /**
+     * @throws UploadException
+     */
+    public function testFactoryFailBadClass(): void
     {
-        $lib = Response\CancelResponse::initCancel(null, $this->mockSharedKey());
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\CancelResponse::STATUS_OK, $lib->jsonSerialize()['status']);
+        $lib = new XFFactory();
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Selected bad response type.');
+        $lib->getResponse('std');
     }
 
-    public function testCancelError(): void
+    /**
+     * @throws UploadException
+     */
+    public function testFactoryFailNotClass(): void
     {
-        $ex = new Exceptions\UploadException('Testing one');
-        $lib = Response\CancelResponse::initError(new Translations(), $this->mockSharedKey(), $ex);
-
-        $this->assertEquals($this->mockSharedKey(), $lib->jsonSerialize()['serverData']);
-        $this->assertEquals(Response\CancelResponse::STATUS_FAIL, $lib->jsonSerialize()['status']);
-        $this->assertEquals('Testing one', $lib->jsonSerialize()['errorMessage']);
+        $lib = new XFFactory();
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Class "not-a-class" does not exist');
+        $lib->getResponse('failed');
     }
+}
+
+
+class XFFactory extends Responses\Factory
+{
+    protected array $responses = [
+        'std' => \stdClass::class,
+        'failed' => 'not-a-class',
+    ];
 }

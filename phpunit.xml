@@ -47,15 +47,14 @@
     <testsuites>
         <testsuite name="ALL">
             <directory>php-tests/BasicTests</directory>
-            <directory>php-tests/DataStorageTests</directory>
-            <directory>php-tests/ServerDataTests</directory>
+            <directory>php-tests/TargetTests</directory>
             <directory>php-tests/TraitsTests</directory>
         </testsuite>
-        <testsuite name="Basics">
-            <directory>php-tests/BasicTests</directory>
+        <testsuite name="Local">
+            <directory>php-tests/TargetsTests/Local</directory>
         </testsuite>
-        <testsuite name="Data">
-            <directory>php-tests/DataStorageTests</directory>
+        <testsuite name="Remote">
+            <directory>php-tests/TargetsTests/Remote</directory>
         </testsuite>
     </testsuites>
 </phpunit>
