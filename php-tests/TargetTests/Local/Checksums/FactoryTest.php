@@ -84,8 +84,8 @@ class FactoryTest extends CommonTestClass
 class XFactory extends Checksums\Factory
 {
     protected array $map = [
-        10 => \stdClass::class,
-        999 => 'this-class-does-not-exists',
+        '10' => \stdClass::class,
+        '999' => 'this-class-does-not-exists',
     ];
 }
 

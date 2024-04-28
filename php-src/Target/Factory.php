@@ -75,15 +75,23 @@ class Factory
     protected function initRemote(string $url): Interfaces\IOperations
     {
         // now - have we PSR implementation or we shall use internals?
-        if ($this->container && $this->container->has('\Psr\Http\Client\ClientInterface')) { // MUST be as string!
+        if (
+            $this->container
+            && $this->container->has('\Psr\Http\Client\ClientInterface')
+            && $this->container->has('\Psr\Http\Message\RequestInterface')
+        ) { // MUST be as string!
             // use psr
+            /** @var \Psr\Http\Client\ClientInterface $client */
+            $client = $this->container->get('\Psr\Http\Client\ClientInterface');
+            /** @var \Psr\Http\Message\RequestInterface $request */
+            $request = $this->container->get('\Psr\Http\Message\RequestInterface');
             return new Remote\Psr(
-                $this->container->get('\Psr\Http\Client\ClientInterface'),
+                $client,
                 new Remote\Psr\Request(
-                    $this->container->get('\Psr\Http\Message\RequestInterface'),
+                    $request,
                     $this->remoteConfig($url)
                 ),
-                new Remote\Psr\Response(new Responses\Factory($this->getUppLang()))
+                new Remote\Psr\Response(new Responses\Factory($this->getUppLang()), $this->getUppLang())
             );
         } else {
             // use internals
@@ -93,7 +101,7 @@ class Factory
                     $this->remoteConfig($url),
                     new Remote\Internals\Data()
                 ),
-                new Remote\Internals\Response(new Responses\Factory($this->getUppLang()))
+                new Remote\Internals\Response(new Responses\Factory($this->getUppLang()), $this->getUppLang())
             );
         }
     }
@@ -114,7 +122,7 @@ class Factory
         // @codeCoverageIgnoreEnd
         $parsed = (array) $parsed;
         $conf->targetHost = empty($parsed['host']) ? $conf->targetHost : strval($parsed['host']);
-        $conf->targetPort = empty($parsed['port']) ? $conf->targetPort : strval($parsed['port']);
+        $conf->targetPort = empty($parsed['port']) ? $conf->targetPort : intval($parsed['port']);
         $conf->pathPrefix = empty($parsed['path']) ? $conf->pathPrefix : strval($parsed['path']);
         return $conf;
     }

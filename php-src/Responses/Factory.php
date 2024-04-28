@@ -3,8 +3,6 @@
 namespace kalanis\UploadPerPartes\Responses;
 
 
-use kalanis\UploadPerPartes\Interfaces\IUppTranslations;
-use kalanis\UploadPerPartes\Traits\TLang;
 use kalanis\UploadPerPartes\Traits\TLangInit;
 use kalanis\UploadPerPartes\UploadException;
 use ReflectionClass;
@@ -28,7 +26,7 @@ class Factory
     public const RESPONSE_CANCEL = 'cancel';
     public const RESPONSE_ERROR = 'error';
 
-    /** @var array<string, string> */
+    /** @var array<string, class-string<BasicResponse>> */
     protected array $responses = [
         self::RESPONSE_INIT => InitResponse::class,
         self::RESPONSE_CHECK => CheckResponse::class,

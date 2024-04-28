@@ -25,7 +25,7 @@ class Factory
     public const FORMAT_SALTED_FULL = '4';
     public const FORMAT_RANDOM = '5';
 
-    /** @var array<int, class-string<AModifier>> */
+    /** @var array<int|string, class-string<AEncoder>> */
     protected array $map = [
         self::FORMAT_NAME => Name::class,
         self::FORMAT_FULL => FullPath::class,
@@ -35,7 +35,7 @@ class Factory
     ];
 
     /**
-     * @param int|class-string<AModifier>|object|string $variant
+     * @param Config $config
      * @throws UploadException
      * @return AEncoder
      */
@@ -44,8 +44,8 @@ class Factory
         if (is_object($config->temporaryEncoder)) {
             return $this->checkObject($config->temporaryEncoder);
         }
-        if (isset($this->map[$config->temporaryEncoder])) {
-            return $this->initDefined($this->map[$config->temporaryEncoder]);
+        if (isset($this->map[strval($config->temporaryEncoder)])) {
+            return $this->initDefined($this->map[strval($config->temporaryEncoder)]);
         }
         if (is_string($config->temporaryEncoder)) {
             return $this->initDefined($config->temporaryEncoder);
@@ -74,7 +74,7 @@ class Factory
     protected function initDefined(string $variant): AEncoder
     {
         try {
-            /** @var class-string<AModifier> $variant */
+            /** @var class-string<AEncoder> $variant */
             $ref = new ReflectionClass($variant);
             if ($ref->isInstantiable()) {
                 return $this->checkObject($ref->newInstance($this->getUppLang()));

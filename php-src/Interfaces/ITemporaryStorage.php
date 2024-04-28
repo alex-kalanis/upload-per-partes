@@ -22,8 +22,8 @@ interface ITemporaryStorage
 
     /**
      * @param string $path
-     * @param int|null $fromByte
-     * @param int|null $length
+     * @param int<0, max>|null $fromByte
+     * @param int<0, max>|null $length
      * @throws UploadException
      * @return string
      */
@@ -31,7 +31,7 @@ interface ITemporaryStorage
 
     /**
      * @param string $path
-     * @param int $fromByte
+     * @param int<0, max> $fromByte
      * @throws UploadException
      * @return bool
      */

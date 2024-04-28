@@ -53,6 +53,11 @@ class Request
         return $this->processQuery($this->config->cancelPath, compact('serverData'));
     }
 
+    /**
+     * @param string $path
+     * @param array<string, string|int> $params
+     * @return RequestInterface
+     */
     protected function processQuery(string $path, array $params): RequestInterface
     {
         $request = clone $this->requestObject;

@@ -22,7 +22,7 @@ class Factory
     public const VARIANT_BASE64 = 2;
     public const VARIANT_HEX = 3;
 
-    /** @var array<int, class-string<AModifier>> */
+    /** @var array<string|int, class-string<AModifier>> */
     protected array $map = [
         self::VARIANT_CLEAR => Clear::class,
         self::VARIANT_BASE64 => Base64::class,
@@ -30,7 +30,7 @@ class Factory
     ];
 
     /**
-     * @param int|class-string<AModifier>|object|string $variant
+     * @param int|class-string<AModifier>|object|string|null $variant
      * @throws UploadException
      * @return AModifier
      */
@@ -39,8 +39,8 @@ class Factory
         if (is_object($variant)) {
             return $this->checkObject($variant);
         }
-        if (isset($this->map[$variant])) {
-            return $this->initDefined($this->map[$variant]);
+        if (isset($this->map[strval($variant)])) {
+            return $this->initDefined($this->map[strval($variant)]);
         }
         if (is_string($variant)) {
             return $this->initDefined($variant);

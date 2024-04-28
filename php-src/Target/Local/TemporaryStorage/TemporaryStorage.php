@@ -44,7 +44,7 @@ class TemporaryStorage
 
     /**
      * @param Data $data
-     * @param int $fromByte
+     * @param int<0, max> $fromByte
      * @throws UploadException
      * @return string
      */
@@ -59,7 +59,7 @@ class TemporaryStorage
 
     /**
      * @param Data $data
-     * @param int $fromByte
+     * @param int<0, max> $fromByte
      * @throws UploadException
      * @return bool
      */

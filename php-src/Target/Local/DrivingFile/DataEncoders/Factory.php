@@ -26,7 +26,7 @@ class Factory
     public const FORMAT_LINE = '3';
     public const FORMAT_SERIAL = '4';
 
-    /** @var array<int, class-string<AEncoder>> */
+    /** @var array<string|int, class-string<AEncoder>> */
     protected array $map = [
         self::FORMAT_TEXT => Text::class,
         self::FORMAT_JSON => Json::class,
@@ -35,7 +35,7 @@ class Factory
     ];
 
     /**
-     * @param int|class-string<AEncoder>|object|string $variant
+     * @param Config $config
      * @throws UploadException
      * @return AEncoder
      */

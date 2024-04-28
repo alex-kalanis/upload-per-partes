@@ -56,7 +56,7 @@ class Redis implements Interfaces\IDrivingFile
      * @param string $key
      * @param string $data
      * @throws UploadException
-     * @return bool
+     * @return string
      * @codeCoverageIgnore
      */
     public function store(string $key, string $data): string
@@ -75,7 +75,7 @@ class Redis implements Interfaces\IDrivingFile
      */
     public function remove(string $key): bool
     {
-        return $this->redis->del($key);
+        return boolval($this->redis->del($key));
     }
 
     public function checkKeyEncoder(DrivingFile\KeyEncoders\AEncoder $encoder): bool

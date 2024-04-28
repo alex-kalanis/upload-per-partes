@@ -41,8 +41,13 @@ class Calculates
         return (($length % $this->bytesPerPart) == 0) ? $partsCounter : $partsCounter + 1;
     }
 
+    /**
+     * @param Data $data
+     * @param int $segment
+     * @return int<0, max>
+     */
     public function bytesFromSegment(Data $data, int $segment): int
     {
-        return $data->bytesPerPart * $segment;
+        return max(0, $data->bytesPerPart * $segment);
     }
 }

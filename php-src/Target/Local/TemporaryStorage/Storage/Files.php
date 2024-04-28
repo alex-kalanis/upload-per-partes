@@ -68,6 +68,12 @@ class Files implements ITemporaryStorage
             $old = $this->files->readFileStream($tempFull);
             $b = rewind($old);
             $new = fopen('php://temp', 'rb+');
+            if (!is_resource($new)) {
+                // @codeCoverageIgnoreStart
+                // phpstan
+                throw new UploadException($this->getUppLang()->uppCannotReadFile('temp'));
+            }
+            // @codeCoverageIgnoreEnd
             $c = boolval(stream_copy_to_stream($old, $new, $fromByte));
             rewind($new);
             $d = $this->files->saveFileStream($nameFull, $new);

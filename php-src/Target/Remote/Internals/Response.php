@@ -4,7 +4,9 @@ namespace kalanis\UploadPerPartes\Target\Remote\Internals;
 
 
 use JsonException;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Responses;
+use kalanis\UploadPerPartes\Traits\TLang;
 use kalanis\UploadPerPartes\UploadException;
 use stdClass;
 
@@ -16,11 +18,14 @@ use stdClass;
  */
 class Response
 {
+    use TLang;
+
     protected Responses\Factory $responseFactory;
 
-    public function __construct(Responses\Factory $responseFactory)
+    public function __construct(Responses\Factory $responseFactory, ?Interfaces\IUppTranslations $lang = null)
     {
         $this->responseFactory = $responseFactory;
+        $this->setUppLang($lang);
     }
 
     /**
@@ -214,6 +219,12 @@ class Response
         } catch (JsonException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }
+        if (!$parsed instanceof stdClass) {
+            // @codeCoverageIgnoreStart
+            // this one is on phpstan
+            throw new UploadException($this->getUppLang()->uppBadResponse(''));
+        }
+        // @codeCoverageIgnoreEnd
         return $parsed;
     }
 }

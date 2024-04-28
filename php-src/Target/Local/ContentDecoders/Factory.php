@@ -24,7 +24,7 @@ class Factory
     public const FORMAT_HEX = '2';
     public const FORMAT_RAW = '3';
 
-    /** @var array<int, class-string<Interfaces\IContentDecoder>> */
+    /** @var array<string|int, class-string<Interfaces\IContentDecoder>> */
     protected array $map = [
         self::FORMAT_BASE64 => Base64::class,
         self::FORMAT_HEX => Hex::class,
@@ -47,10 +47,10 @@ class Factory
         if (is_object($variant)) {
             return $this->checkObject($variant);
         }
-        if (isset($this->map[$variant])) {
-            return $this->initDefined($this->map[$variant]);
+        if (isset($this->map[strval($variant)])) {
+            return $this->initDefined($this->map[strval($variant)]);
         }
-        return $this->initDefined($variant);
+        return $this->initDefined(strval($variant));
     }
 
     /**

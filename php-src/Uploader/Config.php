@@ -31,13 +31,13 @@ final class Config
     public $keyEncoder = null;
     /** @var string|DrivingFile\KeyModifiers\AModifier|null */
     public $keyModifier = null;
-    /** @var string|object|null */
+    /** @var int|string|object|null */
     public $drivingFileStorage = null;
-    /** @var string|object|null */
+    /** @var int|string|object|null */
     public $temporaryStorage = null;
     /** @var string|Local\TemporaryStorage\KeyEncoders\AEncoder|null */
     public $temporaryEncoder = null;
-    /** @var string|object|null */
+    /** @var int|string|object|null */
     public $finalStorage = null;
     /** @var string|Local\FinalStorage\KeyEncoders\AEncoder|null */
     public $finalEncoder = null;
@@ -47,7 +47,7 @@ final class Config
     public $decoder = null;
 
     /**
-     * @param array<string, string|int|bool|object|array<string|int|bool|object>> $params
+     * @param array<string, string|int|bool|object|array<string|int|bool|object>|null> $params
      */
     public function __construct(array $params)
     {
@@ -112,10 +112,14 @@ final class Config
             }
         }
         if (isset($params['driving_file'])) {
-            $this->drivingFileStorage = $params['driving_file'];
+            if (!is_array($params['driving_file']) && !is_bool($params['driving_file'])) {
+                $this->drivingFileStorage = $params['driving_file'];
+            }
         }
         if (isset($params['temp_storage'])) {
-            $this->temporaryStorage = $params['temp_storage'];
+            if (!is_array($params['temp_storage']) && !is_bool($params['temp_storage'])) {
+                $this->temporaryStorage = $params['temp_storage'];
+            }
         }
         if (isset($params['temp_encoder'])) {
             if (is_object($params['temp_encoder'])) {
@@ -127,7 +131,9 @@ final class Config
             }
         }
         if (isset($params['final_storage'])) {
-            $this->finalStorage = $params['final_storage'];
+            if (!is_array($params['final_storage']) && !is_bool($params['final_storage'])) {
+                $this->finalStorage = $params['final_storage'];
+            }
         }
         if (isset($params['final_encoder'])) {
             if (is_object($params['final_encoder'])) {

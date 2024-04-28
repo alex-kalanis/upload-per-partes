@@ -49,7 +49,7 @@ class DataPack
 
     public function lastKnown(Data $data, int $segment): Data
     {
-        $data->lastKnownPart = $segment;
+        $data->lastKnownPart = max(0, $segment);
         return $data;
     }
 

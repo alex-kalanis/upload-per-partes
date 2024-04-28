@@ -52,6 +52,11 @@ class Request
         return $this->processQuery($this->config->cancelPath, compact('serverData'));
     }
 
+    /**
+     * @param string $path
+     * @param array<string, string|int> $params
+     * @return Data
+     */
     protected function processQuery(string $path, array $params): Data
     {
         $data = clone $this->data;

@@ -26,7 +26,7 @@ class Factory
     public const VARIANT_SERIALIZE = '5';
     public const VARIANT_JSON = '6';
 
-    /** @var array<int, class-string<AEncoder>> */
+    /** @var array<string|int, class-string<AEncoder>> */
     protected array $map = [
         self::VARIANT_NAME => Name::class,
         self::VARIANT_FULL_PATH => FullPath::class,

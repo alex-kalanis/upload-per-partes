@@ -54,7 +54,7 @@ class Predis implements Interfaces\IDrivingFile
     /**
      * @param string $key
      * @param string $data
-     * @return bool
+     * @return string
      * @codeCoverageIgnore
      */
     public function store(string $key, string $data): string
@@ -75,7 +75,7 @@ class Predis implements Interfaces\IDrivingFile
      */
     public function remove(string $key): bool
     {
-        return $this->redis->del($key);
+        return boolval($this->redis->del($key));
     }
 
     public function checkKeyEncoder(DrivingFile\KeyEncoders\AEncoder $encoder): bool

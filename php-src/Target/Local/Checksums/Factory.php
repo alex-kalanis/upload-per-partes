@@ -23,7 +23,7 @@ class Factory
     public const FORMAT_MD5 = '1';
     public const FORMAT_SHA1 = '2';
 
-    /** @var array<int, class-string<Interfaces\IChecksum>> */
+    /** @var array<string|int, class-string<Interfaces\IChecksum>> */
     protected array $map = [
         self::FORMAT_MD5 => Md5::class,
         self::FORMAT_SHA1 => Sha1::class,
@@ -40,10 +40,10 @@ class Factory
         if (is_object($variant)) {
             return $this->checkObject($variant);
         }
-        if (isset($this->map[$variant])) {
-            return $this->initDefined($this->map[$variant]);
+        if (isset($this->map[strval($variant)])) {
+            return $this->initDefined($this->map[strval($variant)]);
         }
-        return $this->initDefined($variant);
+        return $this->initDefined(strval($variant));
     }
 
     /**
