@@ -109,7 +109,7 @@ class XOper implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function check(string $serverData, int $segment, string $clientData = ''): BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): BasicResponse
     {
         throw new UploadException('mock');
     }
@@ -119,7 +119,7 @@ class XOper implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function upload(string $serverData, string $content, string $clientData = ''): BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): BasicResponse
     {
         throw new UploadException('mock');
     }

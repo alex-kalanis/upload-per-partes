@@ -27,9 +27,9 @@ class Request
         return $this->processQuery($this->config->initPath, compact('targetPath', 'fileName', 'fileSize'));
     }
 
-    public function check(string $serverData, int $segment): Data
+    public function check(string $serverData, int $segment, string $method): Data
     {
-        return $this->processQuery($this->config->checkPath, compact('serverData', 'segment'));
+        return $this->processQuery($this->config->checkPath, compact('serverData', 'segment', 'method'));
     }
 
     public function truncate(string $serverData, int $segment): Data
@@ -37,9 +37,9 @@ class Request
         return $this->processQuery($this->config->truncatePath, compact('serverData', 'segment'));
     }
 
-    public function upload(string $serverData, string $content): Data
+    public function upload(string $serverData, string $content, string $method): Data
     {
-        return $this->processQuery($this->config->uploadPath, compact('serverData', 'content'));
+        return $this->processQuery($this->config->uploadPath, compact('serverData', 'content', 'method'));
     }
 
     public function done(string $serverData): Data

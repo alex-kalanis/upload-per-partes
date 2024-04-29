@@ -66,7 +66,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Property(property="totalParts", type="integer", description="How many parts will be wanted")
      *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous try")
      *             @OA\Property(property="partSize", type="integer", description="How big will be datain single part before encoding")
-     *             @OA\Property(property="encoders", type="string", description="Which encoder will be used to pack data"),
+     *             @OA\Property(property="encoder", type="string", description="Which encoder will be used to pack data"),
      *             @OA\Property(property="check", type="string", description="Which method will be used to calculate checksum")
      *         )
      *     ),
@@ -96,6 +96,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Schema(
      *                 @OA\Property(property="serverData", type="string", description="Shared key"),
      *                 @OA\Property(property="segment", type="integer", description="Which segment will be calculated"),
+     *                 @OA\Property(property="method", type="string", description="How the segment checksum will be calculated"),
      *                 @OA\Property(property="clientData", type="string", description="Roundabout info package")
      *             ),
      *         ),
@@ -106,6 +107,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
      *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
+     *             @OA\Property(property="method", type="string", description="How the segment checksum was calculated"),
      *             @OA\Property(property="checksum", type="string", description="Checksum of part"),
      *         )
      *     ),
@@ -119,6 +121,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
         return new JsonResponse($this->uploader->check(
             strval($request->post('serverData')),
             intval($request->post('segment')),
+            strval($request->post('method')),
             strval($request->post('clientData'))
         ));
     }
@@ -171,6 +174,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Schema(
      *                 @OA\Property(property="serverData", type="string", description="Shared key"),
      *                 @OA\Property(property="content", type="string", format="byte", description="The data itself"),
+     *                 @OA\Property(property="method", type="string", description="How the segment has been encoded"),
      *                 @OA\Property(property="clientData", type="string", description="Roundabout info package")
      *             ),
      *         ),
@@ -194,6 +198,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
         return new JsonResponse($this->uploader->upload(
             strval($request->post('serverData')),
             strval($request->post('content')),
+            strval($request->post('method')),
             strval($request->post('clientData'))
         ));
     }

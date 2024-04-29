@@ -216,7 +216,7 @@ class XFailOper implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function check(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): Responses\BasicResponse
     {
         throw new UploadException('mock');
     }
@@ -226,7 +226,7 @@ class XFailOper implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function upload(string $serverData, string $content, string $clientData = ''): Responses\BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): Responses\BasicResponse
     {
         throw new UploadException('mock');
     }

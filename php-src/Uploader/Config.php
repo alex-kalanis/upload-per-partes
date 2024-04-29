@@ -41,10 +41,10 @@ final class Config
     public $finalStorage = null;
     /** @var string|Local\FinalStorage\KeyEncoders\AEncoder|null */
     public $finalEncoder = null;
-    /** @var string|Interfaces\IChecksum|null */
-    public $checksum = null;
-    /** @var string|Interfaces\IContentDecoder|null */
-    public $decoder = null;
+    /** @var string|null */
+    public ?string $checksum = null;
+    /** @var string|null */
+    public ?string $decoder = null;
 
     /**
      * @param array<string, string|int|bool|object|array<string|int|bool|object>|null> $params
@@ -145,22 +145,10 @@ final class Config
             }
         }
         if (isset($params['checksum'])) {
-            if (is_object($params['checksum'])) {
-                if ($params['checksum'] instanceof Interfaces\IChecksum) {
-                    $this->checksum = $params['checksum'];
-                }
-            } else {
-                $this->checksum = strval($params['checksum']);
-            }
+            $this->checksum = strval($params['checksum']);
         }
         if (isset($params['decoder'])) {
-            if (is_object($params['decoder'])) {
-                if ($params['decoder'] instanceof Interfaces\IContentDecoder) {
-                    $this->decoder = $params['decoder'];
-                }
-            } else {
-                $this->decoder = strval($params['decoder']);
-            }
+            $this->decoder = strval($params['decoder']);
         }
         $this->canContinue = isset($params['can_continue']) ? boolval(intval(strval($params['can_continue']))) : true;
     }

@@ -39,7 +39,7 @@ class ProcessingTest extends CommonTestClass
         // step 2 - send data
         for ($i = 0; $i * $bytesPerPart <= $maxSize; $i++) {
             $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
-            $result2 = $lib->upload($sharedKey, $part);
+            $result2 = $lib->upload($sharedKey, $part, Local\ContentDecoders\Factory::FORMAT_RAW);
             $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result2->status);
         }
 
@@ -83,7 +83,7 @@ class ProcessingTest extends CommonTestClass
         $limited = floor($maxSize / 2);
         for ($i = 0; $i * $bytesPerPart < $limited; $i++) {
             $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
-            $result2 = $lib->upload($sharedKey, $part);
+            $result2 = $lib->upload($sharedKey, $part, Local\ContentDecoders\Factory::FORMAT_RAW);
             $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result2->status);
         }
 
@@ -103,7 +103,7 @@ class ProcessingTest extends CommonTestClass
             $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
             try {
                 /** @var Responses\CheckResponse $result4 */
-                $result4 = $lib->check($sharedKey, $i);
+                $result4 = $lib->check($sharedKey, $i, 'md5');
                 $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result4->status);
             } catch (UploadException $ex) {
                 if (md5($part) != $result4->checksum) {
@@ -127,7 +127,7 @@ class ProcessingTest extends CommonTestClass
         // step 6 - send second part
         for ($i = $lastKnownPart; $i * $bytesPerPart <= $maxSize; $i++) {
             $part = substr($content, $i * $bytesPerPart, $bytesPerPart);
-            $result6 = $lib->upload($sharedKey, $part);
+            $result6 = $lib->upload($sharedKey, $part, Local\ContentDecoders\Factory::FORMAT_RAW);
             $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result6->status);
         }
 
@@ -162,7 +162,7 @@ class ProcessingTest extends CommonTestClass
         $sharedKey = $result1->serverKey; // for this test it's zero care
 
         // step 2 - send data
-        $result2 = $lib->upload($sharedKey, $content); // flush it all
+        $result2 = $lib->upload($sharedKey, $content, Local\ContentDecoders\Factory::FORMAT_RAW); // flush it all
         $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result2->status);
 
         // step 3 - cancel upload
@@ -242,7 +242,7 @@ class ProcessingTest extends CommonTestClass
 
         try {
             // step 2 - check data - non existing segment
-            $lib->check($sharedKey, 9999999);
+            $lib->check($sharedKey, 9999999, 'md5');
             $this->assertTrue(false, 'Segment found out-of-bounds');
         } catch (UploadException $ex) {
             // intentionally failed
@@ -324,7 +324,7 @@ class ProcessingTest extends CommonTestClass
         // step 2 - send data
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Cannot write file *lorem-ipsum.txt*');
-        $lib->upload($sharedKey, $content); // flush it all
+        $lib->upload($sharedKey, $content, Local\ContentDecoders\Factory::FORMAT_RAW); // flush it all
     }
 
     /**

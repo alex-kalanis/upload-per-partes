@@ -46,7 +46,7 @@ class Response
                 intval(max(0, $parsed->totalParts ?? 0)),
                 intval(max(0,$parsed->lastKnownPart ?? 0)),
                 intval(max(0, $parsed->partSize ?? 0)),
-                strval($parsed->encoders ?? 'base64'),
+                strval($parsed->encoder ?? 'base64'),
                 strval($parsed->check ?? 'md5')
             )->setBasics(
                 strval($parsed->serverKey ?? ''),
@@ -74,6 +74,7 @@ class Response
             $data = $this->responseFactory->getResponse(Responses\Factory::RESPONSE_CHECK);
             /** @var Responses\CheckResponse $data */
             return $data->setChecksum(
+                strval($parsed->method ?? ''),
                 strval($parsed->checksum ?? '')
             )->setBasics(
                 strval($parsed->serverKey ?? ''),

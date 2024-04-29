@@ -29,7 +29,7 @@ class UploaderTest extends CommonTestClass
         $this->assertEquals(999, $data->totalParts);
         $this->assertEquals(666, $data->lastKnownPart);
         $this->assertEquals(555, $data->partSize);
-        $this->assertEquals('clear', $data->encoders);
+        $this->assertEquals('clear', $data->encoder);
         $this->assertEquals('clear', $data->check);
     }
 
@@ -53,13 +53,14 @@ class UploaderTest extends CommonTestClass
     public function testCheckOk(): void
     {
         $lib = $this->getLib();
-        $data = $lib->check('foo', 456, 'roundabout');
+        $data = $lib->check('foo', 456, 'clear', 'roundabout');
         /** @var Responses\CheckResponse $data */
         $this->assertEquals('OK', $data->status);
         $this->assertEquals('OK', $data->errorMessage);
         $this->assertEquals('foo', $data->serverKey);
         $this->assertEquals('roundabout', $data->roundaboutClient);
 
+        $this->assertEquals('any', $data->method);
         $this->assertEquals('something', $data->checksum);
     }
 
@@ -69,7 +70,7 @@ class UploaderTest extends CommonTestClass
     public function testCheckFail(): void
     {
         $lib = $this->getLibFail();
-        $data = $lib->check('foo', 456, 'roundabout');
+        $data = $lib->check('foo', 456, 'clear', 'roundabout');
         /** @var Responses\ErrorResponse $data */
         $this->assertEquals('FAIL', $data->status);
         $this->assertEquals('mock', $data->errorMessage);
@@ -113,7 +114,7 @@ class UploaderTest extends CommonTestClass
     public function testUploadOk(): void
     {
         $lib = $this->getLib();
-        $data = $lib->upload('foo', 'abcdefghijklmnopqrstuvwxyz', 'roundabout');
+        $data = $lib->upload('foo', 'abcdefghijklmnopqrstuvwxyz', 'some', 'roundabout');
         /** @var Responses\LastKnownResponse $data */
         $this->assertEquals('OK', $data->status);
         $this->assertEquals('OK', $data->errorMessage);
@@ -129,7 +130,7 @@ class UploaderTest extends CommonTestClass
     public function testUploadFail(): void
     {
         $lib = $this->getLibFail();
-        $data = $lib->upload('foo', 'abcdefghijklmnopqrstuvwxyz', 'roundabout');
+        $data = $lib->upload('foo', 'abcdefghijklmnopqrstuvwxyz', 'some', 'roundabout');
         /** @var Responses\ErrorResponse $data */
         $this->assertEquals('FAIL', $data->status);
         $this->assertEquals('mock', $data->errorMessage);
@@ -226,9 +227,9 @@ class XOper implements Interfaces\IOperations
         return (new Responses\InitResponse())->setPassedInitData($targetFileName, 999, 666, 555, 'clear', 'clear')->setBasics('foo', $clientData);
     }
 
-    public function check(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): Responses\BasicResponse
     {
-        return (new Responses\CheckResponse())->setChecksum('something')->setBasics($serverData, $clientData);
+        return (new Responses\CheckResponse())->setChecksum('any', 'something')->setBasics($serverData, $clientData);
     }
 
     public function truncate(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
@@ -236,7 +237,7 @@ class XOper implements Interfaces\IOperations
         return (new Responses\LastKnownResponse())->setLastKnown(777)->setBasics($serverData, $clientData);
     }
 
-    public function upload(string $serverData, string $content, string $clientData = ''): Responses\BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): Responses\BasicResponse
     {
         return (new Responses\LastKnownResponse())->setLastKnown(888)->setBasics($serverData, $clientData);
     }
@@ -260,7 +261,7 @@ class XOperFail implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function check(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): Responses\BasicResponse
     {
         throw new UploadException('mock');
     }
@@ -270,7 +271,7 @@ class XOperFail implements Interfaces\IOperations
         throw new UploadException('mock');
     }
 
-    public function upload(string $serverData, string $content, string $clientData = ''): Responses\BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): Responses\BasicResponse
     {
         throw new UploadException('mock');
     }

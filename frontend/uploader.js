@@ -83,6 +83,10 @@ var UploadedFile = function () {
     this.errorMessage = "";
     /** @var {number} when the upload starts */
     this.startTime = 0;
+    /** @var {string} what method will be used to encode data */
+    this.encode = "";
+    /** @var {string} what method will be used to check segments */
+    this.check = "";
     /** @var {string} what passed back to this client */
     this.clientData = "";
 
@@ -127,6 +131,8 @@ var UploadedFile = function () {
         uploadedFile.partSize = parseInt(serverResponse.partSize);
         uploadedFile.errorMessage = serverResponse.errorMessage;
         uploadedFile.clientData = serverResponse.clientData;
+        uploadedFile.encode = serverResponse.method;
+        uploadedFile.check = serverResponse.checksum;
         return uploadedFile;
     };
 
@@ -239,17 +245,13 @@ var UploaderProcessor = function () {
      * @param {UploaderQuery} upQuery
      * @param {UploadTranslations} translations
      * @param {UploadTargetConfig} targetConfig
-     * @param {CheckSumMD5} checksum
      */
-    this.init = function(upQuery, translations, targetConfig, checksum) {
-        if (checksum === undefined) {
-            checksum = null;
-        }
+    this.init = function(upQuery, translations, targetConfig) {
         var remoteQuery = uploaderRemoteQuery.init(upQuery, targetConfig);
         var upRenderer = uploaderRenderer.init(upQuery, uploadIdentification);
         var upReader = uploaderReader.init(translations);
         uploaderProcessor.upInit = uploadInit.init(uploaderProcessor, upRenderer, remoteQuery, translations);
-        uploaderProcessor.upCheck = uploaderChecker.init(uploaderProcessor, uploaderChecksum.init(checksum), upReader, upRenderer, remoteQuery, translations);
+        uploaderProcessor.upCheck = uploaderChecker.init(uploaderProcessor, uploaderChecksum, upReader, upRenderer, remoteQuery, translations);
         uploaderProcessor.upRunner = uploaderRunner.init(uploaderProcessor, upReader, uploaderEncoder, upRenderer, remoteQuery, translations);
         uploaderProcessor.upFailure = uploaderFailure.init(uploaderProcessor, upRenderer, remoteQuery, translations);
         uploaderProcessor.upHandler = uploaderHandler.init(uploaderProcessor, upRenderer);
@@ -458,11 +460,13 @@ var UploaderChecker = function () {
      * @param {UploadedFile} uploadedFile
      */
     this.checkPart = function(uploadedFile) {
-        if (uploaderChecker.upChecksum.can()) {
+        var encoder = uploaderChecker.upChecksum.getChecksum(uploadedFile.check);
+        if (uploaderChecker.upChecksum.can(encoder)) {
             uploaderChecker.upQuery.check(
                 {
                     serverData: uploadedFile.serverData,
                     segment: uploadedFile.lastCheckedPart,
+                    method: uploaderChecker.upChecksum.method(),
                     clientData: uploadedFile.clientData
                 },
                 function(responseData) {
@@ -471,7 +475,7 @@ var UploaderChecker = function () {
                         if (uploadedFile.RESULT_OK === responseData.status) {
                             // got known checksum on remote - check it against local file
                             uploaderChecker.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
-                                if (responseData.checksum === uploaderChecker.upChecksum.md5(result)) {
+                                if (responseData.checksum === uploaderChecker.upChecksum.calculate(result)) {
                                     // this part is OK, move to the next one
                                     uploaderChecker.processNext(uploadedFile);
                                 } else {
@@ -620,34 +624,40 @@ var UploaderRunner = function () {
     this.uploadPart = function(uploadedFile) {
         uploaderRunner.upRenderer.updateBar(uploadedFile);
         uploaderRunner.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
-            uploaderRunner.upQuery.upload(
-                {
-                    serverData: uploadedFile.serverData,
-                    content: uploaderRunner.upEncoder.base64(result),
-                    // lastKnownPart: uploadedFile.lastKnownPart,
-                    clientData: uploadedFile.clientData
-                },
-                function(responseData) {
-                    if (typeof responseData == "object") {
-                        uploadedFile.setRunnerInfoFromServer(responseData);
-                        if (uploadedFile.RESULT_OK === responseData.status) {
-                            // everything ok
-                            uploadedFile.nextFilePart();
-                            uploaderRunner.upRenderer.updateBar(uploadedFile.nextCheckedPart());
-                            uploaderRunner.continueRunning(uploadedFile);
+            var encoder = uploaderRunner.upEncoder.getEncoder(uploadedFile.encode);
+            if (uploaderRunner.upEncoder.can(encoder)) {
+                uploaderRunner.upQuery.upload(
+                    {
+                        serverData: uploadedFile.serverData,
+                        content: encoder.encode(result),
+                        method: encoder.method(),
+                        clientData: uploadedFile.clientData
+                    },
+                    function(responseData) {
+                        if (typeof responseData == "object") {
+                            uploadedFile.setRunnerInfoFromServer(responseData);
+                            if (uploadedFile.RESULT_OK === responseData.status) {
+                                // everything ok
+                                uploadedFile.nextFilePart();
+                                uploaderRunner.upRenderer.updateBar(uploadedFile.nextCheckedPart());
+                                uploaderRunner.continueRunning(uploadedFile);
+                            } else {
+                                // dead file, user info
+                                uploaderRunner.upProcessor.failProcess(uploadedFile, null);
+                            }
                         } else {
-                            // dead file, user info
-                            uploaderRunner.upProcessor.failProcess(uploadedFile, null);
+                            uploaderRunner.upRenderer.consoleError(uploadedFile, responseData);
+                            uploadedFile.setError(uploaderRunner.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                         }
-                    } else {
-                        uploaderRunner.upRenderer.consoleError(uploadedFile, responseData);
-                        uploadedFile.setError(uploaderRunner.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
+                    },
+                    function(err) {
+                        uploaderRunner.upRenderer.consoleError(uploadedFile, err);
                     }
-                },
-                function(err) {
-                    uploaderRunner.upRenderer.consoleError(uploadedFile, err);
-                }
-            );
+                );
+            } else {
+                self.upRenderer.consoleError(uploadedFile, encoder);
+                uploadedFile.setError(self.upLang.dataUploadEncoderFailed, uploadedFile.RESULT_FAIL);
+            }
         }, function (event) {
             uploaderRunner.upProcessor.failProcess(uploadedFile, event);
         });
@@ -867,86 +877,54 @@ var UploaderReader = function () {
 };
 
 /**
- * Encode binary file chunk into base64 to prevent problems with text-based transportation
+ * Encode binary file chunk into something else to prevent problems with text-based transportation
  */
 var UploaderEncoder = function () {
-
     /**
-     * Encode data into Base64
-     * @param {string} data
-     * @return {string}
+     * @param {string} encoder
+     * @return {null|EncoderBase64|EncoderRaw|EncoderHex2}
      */
-    this.base64 = function(data) {
-        // phpjs.org
-        // http://kevin.vanzonneveld.net
-        // *     example 1: base64_encode('Kevin van Zonneveld');
-        // *     returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
-        // mozilla has this native
-        // - but breaks in 2.0.0.12!
-        var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        var o1,
-            o2,
-            o3,
-            h1,
-            h2,
-            h3,
-            h4,
-            bits,
-            i = 0,
-            ac = 0,
-            tmp_arr = [];
-        if (!data) {
-            return data;
+    this.getEncoder = function(encoder) {
+        switch (encoder) {
+            case 'raw':
+                return new EncoderRaw();
+            case 'hex':
+                return new EncoderHex2();
+            case 'base64':
+                return new EncoderBase64();
+            default:
+                return null;
         }
-        do {
-            // pack three octets into four hexets
-            o1 = data.charCodeAt(i++);
-            o2 = data.charCodeAt(i++);
-            o3 = data.charCodeAt(i++);
-            bits = (o1 << 16) | (o2 << 8) | o3;
-            h1 = (bits >> 18) & 0x3f;
-            h2 = (bits >> 12) & 0x3f;
-            h3 = (bits >> 6) & 0x3f;
-            h4 = bits & 0x3f;
-            // use hexets to index into b64, and append result to encoded string
-            tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
-        } while (i < data.length);
-        var enc = tmp_arr.join("");
-        var r = data.length % 3;
-        return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
-    }
+    };
+
+    this.can = function(encoder) {
+        return (null != encoder);
+    };
 };
 
 /**
  * Class for making checksum of segments, usually use MD5
  */
 var UploaderChecksum = function () {
-    /** @var {CheckSumMD5} */
-    this.checksum = null;
 
     /**
-     * @param {CheckSumMD5} checksum
+     * @param {string} checksum
+     * @return {null|CheckSumMD5|CheckSumSha1}
      */
-    this.init = function(checksum) {
-        if (checksum === undefined) {
-            checksum = null;
+    this.getChecksum = function(checksum) {
+        switch (checksum) {
+            case 'md5':
+                return new CheckSumMD5();
+            // case 'sha1':
+            //     return new CheckSumSha1();
+            default:
+                return null;
         }
-        uploaderChecksum.checksum = checksum;
-        return uploaderChecksum;
     };
 
-    this.can = function() {
-        return (null != uploaderChecksum.checksum);
+    this.can = function(checksum) {
+        return (null != checksum);
     };
-
-    /**
-     * Create file checksum
-     * @param {Blob} file
-     * @return {string}
-     */
-    this.md5 = function(file) {
-        return (uploaderChecksum.checksum) ? uploaderChecksum.checksum.calcMD5(file) : '';
-    }
 };
 
 /**

@@ -26,7 +26,7 @@ class RequestTest extends CommonTestClass
 
     public function testCheck(): void
     {
-        $lib = $this->getLib()->check('key', 381);
+        $lib = $this->getLib()->check('key', 381, 'any');
         $this->assertEquals('//testing-machine:9999/nop/tell', strval($lib->getUri()));
         $this->assertEquals([
             'Host' => ['testing-machine:9999'],
@@ -35,7 +35,7 @@ class RequestTest extends CommonTestClass
 
         $body = $lib->getBody();
         $body->rewind();
-        $this->assertEquals('serverData=key&segment=381', $body->getContents());
+        $this->assertEquals('serverData=key&segment=381&method=any', $body->getContents());
     }
 
     public function testTruncate(): void
@@ -54,7 +54,7 @@ class RequestTest extends CommonTestClass
 
     public function testUpload(): void
     {
-        $lib = $this->getLib()->upload('key', 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $lib = $this->getLib()->upload('key', 'abcdefghijklmnopqrstuvwxyz0123456789', 'nop');
         $this->assertEquals('//testing-machine:9999/nop/push', strval($lib->getUri()));
         $this->assertEquals([
             'Host' => ['testing-machine:9999'],
@@ -63,7 +63,7 @@ class RequestTest extends CommonTestClass
 
         $body = $lib->getBody();
         $body->rewind();
-        $this->assertEquals('serverData=key&content=abcdefghijklmnopqrstuvwxyz0123456789', $body->getContents());
+        $this->assertEquals('serverData=key&content=abcdefghijklmnopqrstuvwxyz0123456789&method=nop', $body->getContents());
     }
 
     public function testDone(): void

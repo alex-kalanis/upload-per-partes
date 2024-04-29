@@ -84,7 +84,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(12, $lib->totalParts);
         $this->assertEquals(7, $lib->lastKnownPart);
         $this->assertEquals(64, $lib->partSize);
-        $this->assertEquals('packing', $lib->encoders);
+        $this->assertEquals('packing', $lib->encoder);
         $this->assertEquals('hashing', $lib->check);
 
         $this->assertEquals([
@@ -96,8 +96,8 @@ class ResponseTest extends CommonTestClass
             'totalParts' => 12,
             'lastKnownPart' => 7,
             'partSize' => 64,
-            'encoders' => 'packing',
             'check' => 'hashing',
+            'encoder' => 'packing',
         ], (array) $lib);
     }
 
@@ -123,7 +123,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(951, $lib->totalParts);
         $this->assertEquals(357, $lib->lastKnownPart);
         $this->assertEquals(684, $lib->partSize);
-        $this->assertEquals('packing', $lib->encoders);
+        $this->assertEquals('packing', $lib->encoder);
         $this->assertEquals('hashing', $lib->check);
 
         $this->assertEquals([
@@ -135,15 +135,15 @@ class ResponseTest extends CommonTestClass
             'totalParts' => 951,
             'lastKnownPart' => 357,
             'partSize' => 684,
-            'encoders' => 'packing',
             'check' => 'hashing',
+            'encoder' => 'packing',
         ], (array) $lib);
     }
 
     public function testCheck(): void
     {
         $lib = new Responses\CheckResponse();
-        $lib->setChecksum('abcxyz')
+        $lib->setChecksum('grsd', 'abcxyz')
             ->setBasics($this->mockSharedKey(), 'mock data');
 
         $this->assertEquals($this->mockSharedKey(), $lib->serverKey);
@@ -151,6 +151,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
         $this->assertEquals('mock data', $lib->roundaboutClient);
 
+        $this->assertEquals('grsd', $lib->method);
         $this->assertEquals('abcxyz', $lib->checksum);
 
         $this->assertEquals([
@@ -159,6 +160,7 @@ class ResponseTest extends CommonTestClass
             'errorMessage' => Responses\BasicResponse::STATUS_OK,
             'roundaboutClient' => 'mock data',
             'checksum' => 'abcxyz',
+            'method' => 'grsd',
         ], (array) $lib);
     }
 

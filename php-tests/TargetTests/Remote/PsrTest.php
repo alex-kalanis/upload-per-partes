@@ -44,7 +44,7 @@ class PsrTest extends CommonTestClass
      */
     public function testCheckOk(): void
     {
-        $response = $this->getLib()->check('whatever', 1453, 'my roundabout 2');
+        $response = $this->getLib()->check('whatever', 1453, 'oof', 'my roundabout 2');
         $this->assertEquals('my_server', $response->serverKey);
         $this->assertEquals('OK', $response->status);
         $this->assertEquals('my roundabout 2', $response->roundaboutClient);
@@ -57,7 +57,7 @@ class PsrTest extends CommonTestClass
     {
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('mock');
-        $this->getLibFail()->check('whatever', 1453, 'my roundabout 2');
+        $this->getLibFail()->check('whatever', 1453, 'oof', 'my roundabout 2');
     }
 
     /**
@@ -86,7 +86,7 @@ class PsrTest extends CommonTestClass
      */
     public function testUploadOk(): void
     {
-        $response = $this->getLib()->upload('whatever', 'abcdef159ghijkl357mnopqr183stuvwx0yz', 'my roundabout 4');
+        $response = $this->getLib()->upload('whatever', 'abcdef159ghijkl357mnopqr183stuvwx0yz', 'raw', 'my roundabout 4');
         $this->assertEquals('my_server', $response->serverKey);
         $this->assertEquals('OK', $response->status);
         $this->assertEquals('my roundabout 4', $response->roundaboutClient);
@@ -99,7 +99,7 @@ class PsrTest extends CommonTestClass
     {
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('mock');
-        $this->getLibFail()->upload('whatever', 'abcdef159ghijkl357mnopqr183stuvwx0yz', 'my roundabout 4');
+        $this->getLibFail()->upload('whatever', 'abcdef159ghijkl357mnopqr183stuvwx0yz', 'raw', 'my roundabout 4');
     }
 
     /**
@@ -211,7 +211,7 @@ class XPsrClient implements ClientInterface
             case 'start':
                 return '{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoders":"code","checksum":"sum"}';
             case 'tell':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","checksum":"blablablabla"}';
+                return '{"serverKey":"my_server","status":"OK","message":"OK","method":"test","checksum":"blablablabla"}';
             case 'cut':
                 return '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}';
             case 'run':

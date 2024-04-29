@@ -38,7 +38,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(0, $lib->totalParts);
         $this->assertEquals(0, $lib->lastKnownPart);
         $this->assertEquals(0, $lib->partSize);
-        $this->assertEquals('base64', $lib->encoders);
+        $this->assertEquals('base64', $lib->encoder);
         $this->assertEquals('md5', $lib->check);
     }
 
@@ -47,7 +47,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testInitOkFilledData(): void
     {
-        $lib = $this->getLib()->init($this->getDataResponse('{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoders":"code","check":"sum"}'), 'pass back');
+        $lib = $this->getLib()->init($this->getDataResponse('{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoder":"code","check":"sum"}'), 'pass back');
         /** @var Responses\InitResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -58,7 +58,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(813143, $lib->totalParts);
         $this->assertEquals(54531, $lib->lastKnownPart);
         $this->assertEquals(1853, $lib->partSize);
-        $this->assertEquals('code', $lib->encoders);
+        $this->assertEquals('code', $lib->encoder);
         $this->assertEquals('sum', $lib->check);
     }
 

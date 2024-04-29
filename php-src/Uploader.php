@@ -33,8 +33,8 @@ class Uploader
      *              "temp_encoder"?: string|int|object|null,
      *              "final_storage"?: string|int|object|null,
      *              "final_encoder"?: string|int|object|null,
-     *              "checksum"?: string|int|object|null,
-     *              "decoder"?: string|int|object|null,
+     *              "checksum"?: string|null,
+     *              "decoder"?: string|null,
      *              "can_continue"?: bool|null,
      *             } $params
      * @throws UploadException
@@ -82,13 +82,14 @@ class Uploader
      * Upload file by parts, use driving file
      * @param string $serverData stored string for server
      * @param string $content binary content
+     * @param string $method how is content encoded
      * @param string $clientData stored string from client
      * @return Responses\BasicResponse
      */
-    public function upload(string $serverData, string $content, string $clientData = ''): Responses\BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): Responses\BasicResponse
     {
         try {
-            return $this->target->upload($serverData, $content, $clientData);
+            return $this->target->upload($serverData, $content, $method, $clientData);
         } catch (UploadException $ex) {
             return $this->errorResponse->setError($ex)->setBasics($serverData, $clientData);
         }
@@ -114,13 +115,14 @@ class Uploader
      * Check already uploaded parts
      * @param string $serverData
      * @param int<0, max> $segment
+     * @param string $method
      * @param string $clientData stored string from client
      * @return Responses\BasicResponse
      */
-    public function check(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): Responses\BasicResponse
     {
         try {
-            return $this->target->check($serverData, $segment, $clientData);
+            return $this->target->check($serverData, $segment, $method, $clientData);
         } catch (UploadException $ex) {
             return $this->errorResponse->setError($ex)->setBasics($serverData, $clientData);
         }

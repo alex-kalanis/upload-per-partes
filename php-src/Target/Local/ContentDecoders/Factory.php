@@ -3,10 +3,9 @@
 namespace kalanis\UploadPerPartes\Target\Local\ContentDecoders;
 
 
-use kalanis\UploadPerPartes\Uploader\Config;
+use kalanis\UploadPerPartes\Traits\TLangInit;
 use kalanis\UploadPerPartes\UploadException;
 use kalanis\UploadPerPartes\Interfaces;
-use kalanis\UploadPerPartes\Traits\TLang;
 use ReflectionClass;
 use ReflectionException;
 
@@ -18,11 +17,11 @@ use ReflectionException;
  */
 class Factory
 {
-    use TLang;
+    use TLangInit;
 
-    public const FORMAT_BASE64 = '1';
-    public const FORMAT_HEX = '2';
-    public const FORMAT_RAW = '3';
+    public const FORMAT_BASE64 = 'base64';
+    public const FORMAT_HEX = 'hex';
+    public const FORMAT_RAW = 'raw';
 
     /** @var array<string|int, class-string<Interfaces\IContentDecoder>> */
     protected array $map = [
@@ -31,22 +30,14 @@ class Factory
         self::FORMAT_RAW => Raw::class,
     ];
 
-    public function __construct(?Interfaces\IUppTranslations $lang = null)
-    {
-        $this->setUppLang($lang);
-    }
-
     /**
-     * @param Config $config
+     * @param string $method
      * @throws UploadException
      * @return Interfaces\IContentDecoder
      */
-    public function getDecoder(Config $config): Interfaces\IContentDecoder
+    public function getDecoder(string $method): Interfaces\IContentDecoder
     {
-        $variant = $config->decoder ?? self::FORMAT_BASE64;
-        if (is_object($variant)) {
-            return $this->checkObject($variant);
-        }
+        $variant = empty($method) ? self::FORMAT_BASE64 : $method;
         if (isset($this->map[strval($variant)])) {
             return $this->initDefined($this->map[strval($variant)]);
         }

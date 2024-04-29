@@ -7,6 +7,14 @@ var CheckSumMD5 = function () {
      * See http://pajhome.org.uk/site/legal.html for details.
      */
 
+    this.type = function() {
+        return 'md5';
+    };
+
+    this.calculate = function(data) {
+        return checkSumMD5.calcMD5(data);
+    };
+
     /*
      * Convert a 32-bit number to a hex string with ls-byte first
      */

@@ -27,16 +27,16 @@ class RequestTest extends CommonTestClass
 
     public function testCheck(): void
     {
-        $lib = $this->getLib()->check('key', 381);
+        $lib = $this->getLib()->check('key', 381, 'any');
         $this->assertEquals('testing-machine:999999/nop/tell', $lib->path);
         $this->assertEquals([
             'ssl' => [
             ],
             'http' => [
                 'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n" . 'Content-length: 26',
+                'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n" . 'Content-length: 37',
                 'timeout' => 30,
-                'content' => 'serverData=key&segment=381',
+                'content' => 'serverData=key&segment=381&method=any',
             ],
         ], $lib->context);
     }
@@ -59,16 +59,16 @@ class RequestTest extends CommonTestClass
 
     public function testUpload(): void
     {
-        $lib = $this->getLib()->upload('key', 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $lib = $this->getLib()->upload('key', 'abcdefghijklmnopqrstuvwxyz0123456789', 'nop');
         $this->assertEquals('testing-machine:999999/nop/push', $lib->path);
         $this->assertEquals([
             'ssl' => [
             ],
             'http' => [
                 'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n" . 'Content-length: 59',
+                'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n" . 'Content-length: 70',
                 'timeout' => 30,
-                'content' => 'serverData=key&content=abcdefghijklmnopqrstuvwxyz0123456789',
+                'content' => 'serverData=key&content=abcdefghijklmnopqrstuvwxyz0123456789&method=nop',
             ],
         ], $lib->context);
     }

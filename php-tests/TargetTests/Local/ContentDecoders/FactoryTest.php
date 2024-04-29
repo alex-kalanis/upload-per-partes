@@ -19,8 +19,8 @@ class FactoryTest extends CommonTestClass
     public function testInit(): void
     {
         $factory = new ContentDecoders\Factory();
-        $this->assertInstanceOf(ContentDecoders\Base64::class, $factory->getDecoder(new Config(['decoder' => ContentDecoders\Factory::FORMAT_BASE64])));
-        $this->assertInstanceOf(ContentDecoders\Hex::class, $factory->getDecoder(new Config(['decoder' => ContentDecoders\Factory::FORMAT_HEX])));
+        $this->assertInstanceOf(ContentDecoders\Base64::class, $factory->getDecoder(ContentDecoders\Factory::FORMAT_BASE64));
+        $this->assertInstanceOf(ContentDecoders\Hex::class, $factory->getDecoder(ContentDecoders\Factory::FORMAT_HEX));
     }
 
     /**
@@ -29,16 +29,7 @@ class FactoryTest extends CommonTestClass
     public function testInitOwnClassString(): void
     {
         $factory = new XFactory();
-        $this->assertInstanceOf(ContentDecoders\Base64::class, $factory->getDecoder(new Config(['decoder' => ContentDecoders\Base64::class])));
-    }
-
-    /**
-     * @throws UploadException
-     */
-    public function testInitOwnClassInstance(): void
-    {
-        $factory = new XFactory();
-        $this->assertInstanceOf(ContentDecoders\Hex::class, $factory->getDecoder(new Config(['decoder' => new ContentDecoders\Hex()])));
+        $this->assertInstanceOf(ContentDecoders\Base64::class, $factory->getDecoder(ContentDecoders\Base64::class));
     }
 
     /**
@@ -47,11 +38,9 @@ class FactoryTest extends CommonTestClass
     public function testInitFail(): void
     {
         $factory = new ContentDecoders\Factory();
-        $conf = new Config([]);
-        $conf->decoder = new XstdClass();
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('The decoder is set in a wrong way. Cannot determine it. *TargetTests\Local\ContentDecoders\XstdClass*');
-        $factory->getDecoder($conf);
+        $factory->getDecoder(XstdClass::class);
     }
 
     /**
@@ -60,11 +49,9 @@ class FactoryTest extends CommonTestClass
     public function testClassAbstractFail(): void
     {
         $factory = new XFactory();
-        $conf = new Config([]);
-        $conf->decoder = AXstdClass::class;
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('The decoder is set in a wrong way. Cannot determine it. *TargetTests\Local\ContentDecoders\AXstdClass*');
-        $factory->getDecoder($conf);
+        $factory->getDecoder(AXstdClass::class);
     }
 
     /**
@@ -73,11 +60,9 @@ class FactoryTest extends CommonTestClass
     public function testClassNotExistsFail(): void
     {
         $factory = new XFactory();
-        $conf = new Config([]);
-        $conf->decoder = 999;
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Class "this-class-does-not-exists" does not exist');
-        $factory->getDecoder($conf);
+        $factory->getDecoder(999);
     }
 }
 

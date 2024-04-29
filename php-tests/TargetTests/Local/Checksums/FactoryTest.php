@@ -18,8 +18,8 @@ class FactoryTest extends CommonTestClass
     public function testInit(): void
     {
         $factory = new Checksums\Factory();
-        $this->assertInstanceOf(Checksums\Md5::class, $factory->getChecksum(new Config(['checksum' => Checksums\Factory::FORMAT_MD5])));
-        $this->assertInstanceOf(Checksums\Sha1::class, $factory->getChecksum(new Config(['checksum' => Checksums\Factory::FORMAT_SHA1])));
+        $this->assertInstanceOf(Checksums\Md5::class, $factory->getChecksum(Checksums\Factory::FORMAT_MD5));
+        $this->assertInstanceOf(Checksums\Sha1::class, $factory->getChecksum(Checksums\Factory::FORMAT_SHA1));
     }
 
     /**
@@ -28,16 +28,7 @@ class FactoryTest extends CommonTestClass
     public function testInitOwnClassString(): void
     {
         $factory = new XFactory();
-        $this->assertInstanceOf(Checksums\Md5::class, $factory->getChecksum(new Config(['checksum' => Checksums\Md5::class])));
-    }
-
-    /**
-     * @throws UploadException
-     */
-    public function testInitOwnClassInstance(): void
-    {
-        $factory = new XFactory();
-        $this->assertInstanceOf(Checksums\Sha1::class, $factory->getChecksum(new Config(['checksum' => new Checksums\Sha1()])));
+        $this->assertInstanceOf(Checksums\Md5::class, $factory->getChecksum(Checksums\Md5::class));
     }
 
     /**
@@ -46,11 +37,9 @@ class FactoryTest extends CommonTestClass
     public function testInitFail(): void
     {
         $factory = new Checksums\Factory();
-        $conf = new Config([]);
-        $conf->checksum = new \stdClass();
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('The checksum is set in a wrong way. Cannot determine it. *stdClass*');
-        $factory->getChecksum($conf);
+        $factory->getChecksum(\stdClass::class);
     }
 
     /**
@@ -59,11 +48,9 @@ class FactoryTest extends CommonTestClass
     public function testClassAbstractFail(): void
     {
         $factory = new XFactory();
-        $conf = new Config([]);
-        $conf->checksum = AXstdClass::class;
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('The checksum is set in a wrong way. Cannot determine it. *TargetTests\Local\Checksums\AXstdClass*');
-        $factory->getChecksum($conf);
+        $factory->getChecksum(AXstdClass::class);
     }
 
     /**
@@ -72,11 +59,9 @@ class FactoryTest extends CommonTestClass
     public function testClassNotExistsFail(): void
     {
         $factory = new XFactory();
-        $conf = new Config([]);
-        $conf->checksum = 999;
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Class "this-class-does-not-exists" does not exist');
-        $factory->getChecksum($conf);
+        $factory->getChecksum(999);
     }
 }
 

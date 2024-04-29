@@ -42,12 +42,12 @@ class Psr implements IOperations
         }
     }
 
-    public function check(string $serverData, int $segment, string $clientData = ''): BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): BasicResponse
     {
         try {
             return $this->response->check(
                 $this->client->sendRequest(
-                    $this->request->check($serverData, $segment)
+                    $this->request->check($serverData, $segment, $method)
                 ),
                 $clientData
             );
@@ -70,12 +70,12 @@ class Psr implements IOperations
         }
     }
 
-    public function upload(string $serverData, string $content, string $clientData = ''): BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): BasicResponse
     {
         try {
             return $this->response->upload(
                 $this->client->sendRequest(
-                    $this->request->upload($serverData, $content)
+                    $this->request->upload($serverData, $content, $method)
                 ),
                 $clientData
             );

@@ -27,11 +27,12 @@ interface IOperations
     /**
      * @param string $serverData
      * @param int $segment
+     * @param string $method
      * @param string $clientData
      * @throws UploadException
      * @return BasicResponse
      */
-    public function check(string $serverData, int $segment, string $clientData = ''): BasicResponse;
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): BasicResponse;
 
     /**
      * @param string $serverData
@@ -45,11 +46,12 @@ interface IOperations
     /**
      * @param string $serverData
      * @param string $content
+     * @param string $method
      * @param string $clientData
      * @throws UploadException
      * @return BasicResponse
      */
-    public function upload(string $serverData, string $content, string $clientData = ''): BasicResponse;
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): BasicResponse;
 
     /**
      * @param string $serverData

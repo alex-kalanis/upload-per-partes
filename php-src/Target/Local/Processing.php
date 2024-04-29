@@ -33,10 +33,10 @@ class Processing implements Interfaces\IOperations
     protected FinalStorage\FinalStorage $finalStorage;
     /** @var Responses\Factory */
     protected Responses\Factory $responseFactory;
-    /** @var Interfaces\IChecksum */
-    protected Interfaces\IChecksum $checksum;
-    /** @var Interfaces\IContentDecoder */
-    protected Interfaces\IContentDecoder $decoder;
+    /** @var Checksums\Factory */
+    protected Checksums\Factory $checksumFactory;
+    /** @var ContentDecoders\Factory */
+    protected ContentDecoders\Factory $decoderFactory;
 
     /**
      * @param Uploader\Config $config
@@ -55,8 +55,8 @@ class Processing implements Interfaces\IOperations
         $this->tempStorage = (new TemporaryStorage\Factory($lang))->getTemporaryStorage($config);
         $this->finalStorage = (new FinalStorage\Factory($lang))->getFinalStorage($config);
         $this->responseFactory = new Responses\Factory($lang);
-        $this->checksum = (new Checksums\Factory($lang))->getChecksum($config);
-        $this->decoder = (new ContentDecoders\Factory($lang))->getDecoder($config);
+        $this->checksumFactory = new Checksums\Factory($lang);
+        $this->decoderFactory = new ContentDecoders\Factory($lang);
     }
 
     /**
@@ -108,8 +108,8 @@ class Processing implements Interfaces\IOperations
         return $response
             ->setInitData(
                 $data,
-                $this->decoder->getMethod(),
-                $this->checksum->getMethod()
+                $this->uploadConfig->decoder ? strval($this->uploadConfig->decoder) : 'base64',
+                $this->uploadConfig->checksum ? strval($this->uploadConfig->checksum) : 'md5'
             )
             ->setBasics(
                 $this->drivingFile->storeByData($data),
@@ -122,18 +122,21 @@ class Processing implements Interfaces\IOperations
      * Check already uploaded parts
      * @param string $serverData
      * @param int<0, max> $segment
+     * @param string $method
      * @param string $clientData stored string from client
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function check(string $serverData, int $segment, string $clientData = ''): Responses\BasicResponse
+    public function check(string $serverData, int $segment, string $method, string $clientData = ''): Responses\BasicResponse
     {
         $data = $this->drivingFile->get($serverData);
+        $checksumClass = $this->checksumFactory->getChecksum($method);
         $response = $this->responseFactory->getResponse(Responses\Factory::RESPONSE_CHECK);
         /** @var Responses\CheckResponse $response */
         return $response
             ->setChecksum(
-                $this->checksum->checksum(
+                $checksumClass->getMethod(),
+                $checksumClass->checksum(
                     $this->tempStorage->checksumData(
                         $data,
                         $this->calculates->bytesFromSegment($data, $segment)
@@ -173,14 +176,15 @@ class Processing implements Interfaces\IOperations
      * Upload file by parts, use driving file
      * @param string $serverData stored string for server
      * @param string $content binary content
+     * @param string $method how the content is encoded
      * @param string $clientData stored string from client
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function upload(string $serverData, string $content, string $clientData = ''): Responses\BasicResponse
+    public function upload(string $serverData, string $content, string $method, string $clientData = ''): Responses\BasicResponse
     {
         $data = $this->drivingFile->get($serverData);
-        if (!$this->tempStorage->upload($data, $this->decoder->decode($content))) {
+        if (!$this->tempStorage->upload($data, $this->decoderFactory->getDecoder($method)->decode($content))) {
             throw new UploadException($this->getUppLang()->uppCannotWriteFile($data->targetName));
         }
         $segment = $this->dataPack->nextSegment($data);

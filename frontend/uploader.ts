@@ -19,6 +19,7 @@ class UploadTranslations {
     initReturnsSomethingFailed = "Init does not return a JSON data. More at console.";
     checkerReturnsSomethingFailed = "Data check does not return a JSON data. More at console.";
     dataUploadReturnsSomethingFailed = "Data upload does not return a JSON. More at console.";
+    dataUploadEncoderFailed = "Data encoder does not return an object. More at console.";
     doneReturnsSomethingFailed = "Done does not return a JSON data. More at console.";
 }
 
@@ -83,6 +84,10 @@ class UploadedFile {
     errorMessage = "";
     /** @var {numeric} when the upload starts */
     startTime = 0;
+    /** @var {string} what method will be used to encode data */
+    encode = "";
+    /** @var {string} what method will be used to check segments */
+    check = "";
     /** @var {string} what passed back to this client */
     clientData = "";
 
@@ -119,7 +124,7 @@ class UploadedFile {
      * @param {*} serverResponse
      * @returns {UploadedFile}
      */
-    setInfoFromServer(serverResponse) {
+    setInitialInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_RUN;
         this.serverData = serverResponse.serverData;
         this.totalParts = parseInt(serverResponse.totalParts);
@@ -127,8 +132,48 @@ class UploadedFile {
         this.partSize = parseInt(serverResponse.partSize);
         this.errorMessage = serverResponse.errorMessage;
         this.clientData = serverResponse.clientData;
+        this.encode = serverResponse.encoder;
+        this.check = serverResponse.check;
         return this;
-    }
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    setRunnerInfoFromServer(serverResponse) {
+        this.readStatus = this.STATUS_RUN;
+        this.serverData = serverResponse.serverData;
+        this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
+        this.errorMessage = serverResponse.errorMessage;
+        this.clientData = serverResponse.clientData;
+        return this;
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    setDoneInfoFromServer(serverResponse) {
+        this.readStatus = this.STATUS_FINISH;
+        this.fileName = serverResponse.fileName;
+        this.serverData = serverResponse.serverData;
+        this.errorMessage = serverResponse.errorMessage;
+        this.clientData = serverResponse.clientData;
+        return this;
+    };
+
+    /**
+     * @param {*} serverResponse
+     * @returns {UploadedFile}
+     */
+    setCancelInfoFromServer(serverResponse) {
+        this.readStatus = this.STATUS_FINISH;
+        this.serverData = serverResponse.serverData;
+        this.errorMessage = serverResponse.errorMessage;
+        this.clientData = serverResponse.clientData;
+        return this;
+    };
 
     /**
      * @returns {UploadedFile}
@@ -198,14 +243,13 @@ class UploaderProcessor {
      * @param {UploaderQuery} upQuery
      * @param {UploadTranslations} translations
      * @param {UploadTargetConfig} targetConfig
-     * @param {CheckSumMD5} checksum
      */
-    constructor(upQuery, translations, targetConfig, checksum = null) {
+    constructor(upQuery, translations, targetConfig) {
         let remoteQuery = new UploaderRemoteQuery(upQuery, targetConfig);
         let upRenderer = new UploaderRenderer(upQuery, new UploadIdentification());
         let upReader = new UploaderReader(translations);
         this.upInit = new UploadInit(this, upRenderer, remoteQuery, translations);
-        this.upCheck = new UploaderChecker(this, new UploaderChecksum(checksum), upReader, upRenderer, remoteQuery, translations);
+        this.upCheck = new UploaderChecker(this, new UploaderChecksum(), upReader, upRenderer, remoteQuery, translations);
         this.upRunner = new UploaderRunner(this, upReader, new UploaderEncoder(), upRenderer, remoteQuery, translations);
         this.upFailure = new UploaderFailure(this, upRenderer, remoteQuery, translations);
         this.upHandler = new UploaderHandler(this, upRenderer);
@@ -311,7 +355,7 @@ class UploadInit {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
-                    uploadedFile.setInfoFromServer(responseData);
+                    uploadedFile.setInitialInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
                         // start checking content
                         self.upRenderer.renderReaded(uploadedFile);
@@ -407,20 +451,22 @@ class UploaderChecker {
      */
     checkPart(uploadedFile) {
         let self = this;
-        if (this.upChecksum.can()) {
+        let encoder = self.upChecksum.getChecksum(uploadedFile.check);
+        if (self.upChecksum.can(encoder)) {
             this.upQuery.check(
                 {
                     serverData: uploadedFile.serverData,
                     segment: uploadedFile.lastCheckedPart,
+                    method: encoder.type(),
                     clientData: uploadedFile.clientData,
                 },
                 function(responseData) {
                     if (typeof responseData == "object") {
-                        uploadedFile.setInfoFromServer(responseData);
+                        uploadedFile.setCancelInfoFromServer(responseData);
                         if (uploadedFile.RESULT_OK === responseData.status) {
                             // got known checksum on remote - check it against local file
                             self.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
-                                if (responseData.checksum == self.upChecksum.md5(result)) {
+                                if (responseData.checksum == encoder.calculate(result)) {
                                     // this part is OK, move to the next one
                                     self.processNext(uploadedFile);
                                 } else {
@@ -482,7 +528,7 @@ class UploaderChecker {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
-                    uploadedFile.setInfoFromServer(responseData);
+                    uploadedFile.setRunnerInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
                         // Truncate came OK, time to upload the rest
                         self.upRenderer.updateBar(uploadedFile.setTruncatedFromServer(responseData));
@@ -570,33 +616,39 @@ class UploaderRunner {
         let self = this;
         this.upRenderer.updateBar(uploadedFile.nextFilePart());
         this.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
-            self.upQuery.upload(
-                {
-                    serverData: uploadedFile.serverData,
-                    content: self.upEncoder.base64(result),
-                    // lastKnownPart: uploadedFile.lastKnownPart,
-                    clientData: uploadedFile.clientData,
-                },
-                function(responseData) {
-                    if (typeof responseData == "object") {
-                        uploadedFile.setInfoFromServer(responseData);
-                        if (uploadedFile.RESULT_OK === responseData.status) {
-                            // everything ok
-                            self.upRenderer.updateBar(uploadedFile.nextCheckedPart());
-                            self.continueRunning(uploadedFile);
+            let encoder = self.upEncoder.getEncoder(uploadedFile.encode);
+            if (self.upEncoder.can(encoder)) {
+                self.upQuery.upload(
+                    {
+                        serverData: uploadedFile.serverData,
+                        content: encoder.encode(result),
+                        method: encoder.type(),
+                        clientData: uploadedFile.clientData,
+                    },
+                    function(responseData) {
+                        if (typeof responseData == "object") {
+                            uploadedFile.setRunnerInfoFromServer(responseData);
+                            if (uploadedFile.RESULT_OK === responseData.status) {
+                                // everything ok
+                                self.upRenderer.updateBar(uploadedFile.nextCheckedPart());
+                                self.continueRunning(uploadedFile);
+                            } else {
+                                // dead file, user info
+                                self.upProcessor.failProcess(uploadedFile, null);
+                            }
                         } else {
-                            // dead file, user info
-                            self.upProcessor.failProcess(uploadedFile, null);
+                            self.upRenderer.consoleError(uploadedFile, responseData);
+                            uploadedFile.setError(self.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
                         }
-                    } else {
-                        self.upRenderer.consoleError(uploadedFile, responseData);
-                        uploadedFile.setError(self.upLang.dataUploadReturnsSomethingFailed, uploadedFile.RESULT_FAIL);
+                    },
+                    function(err) {
+                        self.upRenderer.consoleError(uploadedFile, err);
                     }
-                },
-                function(err) {
-                    self.upRenderer.consoleError(uploadedFile, err);
-                }
-            );
+                );
+            } else {
+                self.upRenderer.consoleError(uploadedFile, encoder);
+                uploadedFile.setError(self.upLang.dataUploadEncoderFailed, uploadedFile.RESULT_FAIL);
+            }
         }, function (event) {
             self.upProcessor.failProcess(uploadedFile, event);
         });
@@ -615,7 +667,7 @@ class UploaderRunner {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
-                    uploadedFile.setInfoFromServer(responseData);
+                    uploadedFile.setDoneInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
                         // everything ok
                         uploadedFile.readStatus = uploadedFile.STATUS_FINISH;
@@ -707,7 +759,7 @@ class UploaderFailure {
             },
             function(responseData) {
                 if (typeof responseData == "object") {
-                    uploadedFile.setInfoFromServer(responseData);
+                    uploadedFile.setCancelInfoFromServer(responseData);
                     if (uploadedFile.RESULT_OK === responseData.status) {
                         // everything done
                         self.checkContinue(uploadedFile);
@@ -810,53 +862,29 @@ class UploaderReader {
 }
 
 /**
- * Encode binary file chunk into base64 to prevent problems with text-based transportation
+ * Encode binary file chunk into something else to prevent problems with text-based transportation
  */
 class UploaderEncoder {
 
     /**
-     * Encode data into Base64
-     * @param {string} data
-     * @return {string}
+     * @param {string} encoder
+     * @return {null|EncoderBase64|EncoderHex2|EncoderRaw}
      */
-    base64(data) {
-        // phpjs.org
-        // http://kevin.vanzonneveld.net
-        // *     example 1: base64_encode('Kevin van Zonneveld');
-        // *     returns 1: 'S2V2aW4gdmFuIFpvbm5ldmVsZA=='
-        // mozilla has this native
-        // - but breaks in 2.0.0.12!
-        let b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        let o1,
-            o2,
-            o3,
-            h1,
-            h2,
-            h3,
-            h4,
-            bits,
-            i = 0,
-            ac = 0,
-            tmp_arr = [];
-        if (!data) {
-            return data;
+    getEncoder(encoder) {
+        switch (encoder) {
+            case 'raw':
+                return new EncoderRaw();
+            case 'hex':
+                return new EncoderHex2();
+            case 'base64':
+                return new EncoderBase64();
+            default:
+                return null;
         }
-        do {
-            // pack three octets into four hexets
-            o1 = data.charCodeAt(i++);
-            o2 = data.charCodeAt(i++);
-            o3 = data.charCodeAt(i++);
-            bits = (o1 << 16) | (o2 << 8) | o3;
-            h1 = (bits >> 18) & 0x3f;
-            h2 = (bits >> 12) & 0x3f;
-            h3 = (bits >> 6) & 0x3f;
-            h4 = bits & 0x3f;
-            // use hexets to index into b64, and append result to encoded string
-            tmp_arr[ac++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
-        } while (i < data.length);
-        let enc = tmp_arr.join("");
-        let r = data.length % 3;
-        return (r ? enc.slice(0, r - 3) : enc) + "===".slice(r || 3);
+    }
+
+    can(encoder) {
+        return (null != encoder);
     }
 }
 
@@ -864,28 +892,25 @@ class UploaderEncoder {
  * Class for making checksum of segments, usually use MD5
  */
 class UploaderChecksum {
-    /** @var {CheckSumMD5} */
-    checksum = null;
 
     /**
-     * @param {CheckSumMD5} checksum
+     * @param {string} checksum
+     * @return {null|CheckSumMD5|CheckSumSha1}
      */
-    constructor(checksum = null) {
-        this.checksum = checksum;
-    }
+    getChecksum(checksum) {
+        switch (checksum) {
+            case 'md5':
+                return new CheckSumMD5();
+            case 'sha1':
+                return new CheckSumSha1();
+            default:
+                return null;
+        }
+    };
 
-    can() {
-        return (null != this.checksum);
-    }
-
-    /**
-     * Create file checksum
-     * @param {Blob} file
-     * @return {string}
-     */
-    md5 (file) {
-        return (this.checksum) ? this.checksum.calcMD5(file) : '';
-    }
+    can(checksum) {
+        return (null != checksum);
+    };
 }
 
 /**

@@ -8,6 +8,14 @@ class CheckSumMD5
      * See http://pajhome.org.uk/site/legal.html for details.
      */
 
+    type() {
+        return 'md5';
+    }
+
+    calculate(data) {
+        return this.calcMD5(data);
+    }
+
     /*
      * Convert a 32-bit number to a hex string with ls-byte first
      */

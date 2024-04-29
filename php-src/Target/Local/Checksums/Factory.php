@@ -4,7 +4,6 @@ namespace kalanis\UploadPerPartes\Target\Local\Checksums;
 
 
 use kalanis\UploadPerPartes\Traits\TLangInit;
-use kalanis\UploadPerPartes\Uploader\Config;
 use kalanis\UploadPerPartes\UploadException;
 use kalanis\UploadPerPartes\Interfaces;
 use ReflectionClass;
@@ -20,8 +19,8 @@ class Factory
 {
     use TLangInit;
 
-    public const FORMAT_MD5 = '1';
-    public const FORMAT_SHA1 = '2';
+    public const FORMAT_MD5 = 'md5';
+    public const FORMAT_SHA1 = 'sha1';
 
     /** @var array<string|int, class-string<Interfaces\IChecksum>> */
     protected array $map = [
@@ -30,16 +29,13 @@ class Factory
     ];
 
     /**
-     * @param Config $config
+     * @param string $method
      * @throws UploadException
      * @return Interfaces\IChecksum
      */
-    public function getChecksum(Config $config): Interfaces\IChecksum
+    public function getChecksum(string $method): Interfaces\IChecksum
     {
-        $variant = $config->checksum ?? self::FORMAT_MD5;
-        if (is_object($variant)) {
-            return $this->checkObject($variant);
-        }
+        $variant = empty($method) ? self::FORMAT_MD5 : $method;
         if (isset($this->map[strval($variant)])) {
             return $this->initDefined($this->map[strval($variant)]);
         }

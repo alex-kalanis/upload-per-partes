@@ -324,8 +324,8 @@ class ConfigTest extends CommonTestClass
 
     public function testChecksum2(): void
     {
-        $lib = new Uploader\Config(['checksum' => new \XFailChecksum()]);
-        $this->assertInstanceOf(Interfaces\IChecksum::class, $lib->checksum);
+        $lib = new Uploader\Config(['checksum' => \XFailChecksum::class]);
+        $this->assertEquals(\XFailChecksum::class, $lib->checksum);
     }
 
     public function testChecksum3(): void
@@ -336,8 +336,8 @@ class ConfigTest extends CommonTestClass
 
     public function testChecksum4(): void
     {
-        $lib = new Uploader\Config(['checksum' => new \stdClass()]);
-        $this->assertEquals(null, $lib->checksum);
+        $lib = new Uploader\Config(['checksum' => \stdClass::class]);
+        $this->assertEquals(\stdClass::class, $lib->checksum);
     }
 
     public function testDecoder1(): void
@@ -348,8 +348,8 @@ class ConfigTest extends CommonTestClass
 
     public function testDecoder2(): void
     {
-        $lib = new Uploader\Config(['decoder' => new \XFailDecoder()]);
-        $this->assertInstanceOf(Interfaces\IContentDecoder::class, $lib->decoder);
+        $lib = new Uploader\Config(['decoder' => \XFailDecoder::class]);
+        $this->assertEquals(\XFailDecoder::class, $lib->decoder);
     }
 
     public function testDecoder3(): void
@@ -360,8 +360,8 @@ class ConfigTest extends CommonTestClass
 
     public function testDecoder4(): void
     {
-        $lib = new Uploader\Config(['decoder' => new \stdClass()]);
-        $this->assertEquals(null, $lib->decoder);
+        $lib = new Uploader\Config(['decoder' => \stdClass::class]);
+        $this->assertEquals(\stdClass::class, $lib->decoder);
     }
 
     public function testContinue1(): void
