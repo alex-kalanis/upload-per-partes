@@ -197,6 +197,25 @@ class ProcessingTest extends CommonTestClass
     }
 
     /**
+     * @throws StorageException
+     * @throws UploadException
+     */
+    public function testInitFileAlreadyExists(): void
+    {
+        $tempStorage = new Storage\Storage(new Storage\Key\DefaultKey(), new Storage\Target\Memory());
+
+        $lib = new Local\Processing($this->params([
+            'temp_storage' => $tempStorage,
+        ]));
+        $this->assertNotEmpty($lib);
+
+        $tempStorage->write('dummy_file.upload', 'something');
+
+        $result1 = $lib->init('dummy_file', 'dummy_file', 9999);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+    }
+
+    /**
      * @throws UploadException
      */
     public function testInitFail(): void
@@ -264,6 +283,53 @@ class ProcessingTest extends CommonTestClass
     /**
      * @throws UploadException
      */
+    public function testTruncateFailStorage(): void
+    {
+        $tempStorage = new Storage\Storage(new Storage\Key\DefaultKey(), new Storage\Target\Memory());
+
+        $lib = new Local\Processing($this->params([
+            'temp_storage' => new XStorageTruncateFail($tempStorage),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - truncate data - non existing segment
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot truncate file *lorem-ipsum.txt*');
+        $lib->truncate($sharedKey, 0);
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testUploadFailStorage(): void
+    {
+        $tempStorage = new Storage\Storage(new Storage\Key\DefaultKey(), new Storage\Target\Memory());
+
+        $lib = new Local\Processing($this->params([
+            'temp_storage' => new XStorageUploadFail($tempStorage),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot write file *lorem-ipsum.txt*');
+        $lib->upload($sharedKey, $content); // flush it all
+    }
+
+    /**
+     * @throws UploadException
+     */
     public function testCancelFail(): void
     {
         $lib = new Local\Processing($this->params());
@@ -276,6 +342,50 @@ class ProcessingTest extends CommonTestClass
     /**
      * @throws UploadException
      */
+    public function testCancelFailTempStorage(): void
+    {
+        $lib = new Local\Processing($this->params([
+            'temp_storage' => new XStorageRemoveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot remove drive file for upload *lorem-ipsum.txt*');
+        $lib->cancel($sharedKey); // flush it all
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testCancelFailInfoStorage(): void
+    {
+        $lib = new Local\Processing($this->params([
+            'driving_file' => new XStorageRemoveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot remove drive file for upload *lorem-ipsum.txt*');
+        $lib->cancel($sharedKey); // flush it all
+    }
+
+    /**
+     * @throws UploadException
+     */
     public function testDoneFail(): void
     {
         $lib = new Local\Processing($this->params());
@@ -283,6 +393,75 @@ class ProcessingTest extends CommonTestClass
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Cannot read key');
         $lib->done('1234567890abcdef');
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testDoneFailFinalStorage(): void
+    {
+        $lib = new Local\Processing($this->params([
+            'driving_file' => new XStorageRemoveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+            'final_storage' => new XStorageSaveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot write file *lorem-ipsum.txt*');
+        $lib->done($sharedKey); // flush it all
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testDoneFailTempStorage(): void
+    {
+        $lib = new Local\Processing($this->params([
+            'driving_file' => new XStorageRemoveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+            'final_storage' => new XStorageSavePass(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot remove drive file for upload *lorem-ipsum.txt*');
+        $lib->done($sharedKey); // flush it all
+    }
+
+    /**
+     * @throws UploadException
+     */
+    public function testDoneFailInfoStorage(): void
+    {
+        $lib = new Local\Processing($this->params([
+            'temp_storage' => new XStorageRemoveFail(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+            'final_storage' => new XStorageSavePass(new Storage\Key\DefaultKey(), new Storage\Target\Memory()),
+        ])); // must stay same, because it's only in the ram
+        $content = file_get_contents($this->getTestFile()); // read test content into ram
+        $maxSize = strlen($content);
+
+        // step 1 - init driver
+        $result1 = $lib->init($this->getTestDir(), 'lorem-ipsum.txt', $maxSize);
+        $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);
+        $sharedKey = $result1->serverKey; // for this test it's zero care
+
+        // step 2 - send data
+        $this->expectException(UploadException::class);
+        $this->expectExceptionMessage('Cannot remove drive file for upload *lorem-ipsum.txt*');
+        $lib->done($sharedKey); // flush it all
     }
 
     protected function params(array $extra = []): Uploader\Config
@@ -301,5 +480,50 @@ class ProcessingTest extends CommonTestClass
             'calc_size' => 1024,
             'decoder' => Local\ContentDecoders\Factory::FORMAT_RAW,
         ], $extra));
+    }
+}
+
+
+class XStorageTruncateFail extends Local\TemporaryStorage\Storage\Storage
+{
+    public function truncate(string $path, int $fromByte): bool
+    {
+        return false;
+    }
+}
+
+
+class XStorageUploadFail extends Local\TemporaryStorage\Storage\Storage
+{
+    public function append(string $path, string $content): bool
+    {
+        return false;
+    }
+}
+
+
+class XStorageRemoveFail extends Storage\Storage
+{
+    public function remove(string $key): bool
+    {
+        return false;
+    }
+}
+
+
+class XStorageSavePass extends Storage\Storage
+{
+    public function write(string $sharedKey, string $data, ?int $timeout = null): bool
+    {
+        return true;
+    }
+}
+
+
+class XStorageSaveFail extends Storage\Storage
+{
+    public function write(string $sharedKey, string $data, ?int $timeout = null): bool
+    {
+        return false;
     }
 }
