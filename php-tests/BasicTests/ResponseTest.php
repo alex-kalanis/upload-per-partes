@@ -85,7 +85,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(7, $lib->lastKnownPart);
         $this->assertEquals(64, $lib->partSize);
         $this->assertEquals('packing', $lib->encoders);
-        $this->assertEquals('hashing', $lib->checksum);
+        $this->assertEquals('hashing', $lib->check);
 
         $this->assertEquals([
             'serverKey' => $this->mockSharedKey(),
@@ -97,7 +97,7 @@ class ResponseTest extends CommonTestClass
             'lastKnownPart' => 7,
             'partSize' => 64,
             'encoders' => 'packing',
-            'checksum' => 'hashing',
+            'check' => 'hashing',
         ], (array) $lib);
     }
 
@@ -124,7 +124,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(357, $lib->lastKnownPart);
         $this->assertEquals(684, $lib->partSize);
         $this->assertEquals('packing', $lib->encoders);
-        $this->assertEquals('hashing', $lib->checksum);
+        $this->assertEquals('hashing', $lib->check);
 
         $this->assertEquals([
             'serverKey' => $this->mockSharedKey(),
@@ -136,7 +136,7 @@ class ResponseTest extends CommonTestClass
             'lastKnownPart' => 357,
             'partSize' => 684,
             'encoders' => 'packing',
-            'checksum' => 'hashing',
+            'check' => 'hashing',
         ], (array) $lib);
     }
 

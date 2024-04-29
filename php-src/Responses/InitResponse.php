@@ -17,12 +17,12 @@ class InitResponse extends BasicResponse
     public int $lastKnownPart = 0;
     public int $partSize = 0;
     public string $encoders = '';
-    public string $checksum = '';
+    public string $check = '';
 
     public function setInitData(
         Data $data,
         string $encoders,
-        string $checksum
+        string $check
     ): self
     {
         $this->name = $data->targetName;
@@ -30,7 +30,7 @@ class InitResponse extends BasicResponse
         $this->lastKnownPart = $data->lastKnownPart;
         $this->partSize = $data->bytesPerPart;
         $this->encoders = $encoders;
-        $this->checksum = $checksum;
+        $this->check = $check;
         return $this;
     }
 
@@ -40,7 +40,7 @@ class InitResponse extends BasicResponse
         int $lastKnownPart,
         int $bytesPerPart,
         string $encoders,
-        string $checksum
+        string $check
     ): self
     {
         $this->name = $targetName;
@@ -48,7 +48,7 @@ class InitResponse extends BasicResponse
         $this->lastKnownPart = $lastKnownPart;
         $this->partSize = $bytesPerPart;
         $this->encoders = $encoders;
-        $this->checksum = $checksum;
+        $this->check = $check;
         return $this;
     }
 }

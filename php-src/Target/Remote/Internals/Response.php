@@ -46,7 +46,7 @@ class Response
                 intval(max(0,$parsed->lastKnownPart ?? 0)),
                 intval(max(0, $parsed->partSize ?? 0)),
                 strval($parsed->encoders ?? 'base64'),
-                strval($parsed->checksum ?? 'md5')
+                strval($parsed->check ?? 'md5')
             )->setBasics(
                 strval($parsed->serverKey ?? ''),
                 $clientData

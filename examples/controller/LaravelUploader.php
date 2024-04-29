@@ -67,7 +67,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous try")
      *             @OA\Property(property="partSize", type="integer", description="How big will be datain single part before encoding")
      *             @OA\Property(property="encoders", type="string", description="Which encoder will be used to pack data"),
-     *             @OA\Property(property="checksum", type="string", description="Which method will be used to calculate checksum")
+     *             @OA\Property(property="check", type="string", description="Which method will be used to calculate checksum")
      *         )
      *     ),
      * )

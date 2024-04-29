@@ -30,7 +30,7 @@ class UploaderTest extends CommonTestClass
         $this->assertEquals(666, $data->lastKnownPart);
         $this->assertEquals(555, $data->partSize);
         $this->assertEquals('clear', $data->encoders);
-        $this->assertEquals('clear', $data->checksum);
+        $this->assertEquals('clear', $data->check);
     }
 
     /**
