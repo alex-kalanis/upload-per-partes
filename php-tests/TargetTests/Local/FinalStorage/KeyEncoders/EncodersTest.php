@@ -30,7 +30,8 @@ class EncodersTest extends CommonTestClass
     {
         return [
             [new KeyEncoders\FullPath(), '/abcdefabcdef'],
-            [new KeyEncoders\Name(), 'fghjkl.partial'],
+            [new KeyEncoders\Name(), 'abcdef'],
+            [new KeyEncoders\TempName(), 'fghjkl.partial'],
         ];
     }
 

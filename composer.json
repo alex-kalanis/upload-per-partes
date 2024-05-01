@@ -11,20 +11,20 @@
     "license": "BSD-3-Clause",
     "type": "library",
     "require": {
+        "alex-kalanis/kw_storage": "~5.0",
+        "alex-kalanis/kw_files": ">=4.1 <5",
+        "alex-kalanis/kw_paths": ">=4.0 <5",
+        "psr/container": "2.0.2",
         "php": ">=7.4.0",
         "ext-json": "*",
         "ext-mbstring": "*"
     },
     "suggest": {
-        "predis/predis": "Redis client",
-        "alex-kalanis/kw_paths": "Paths for accessing targets in KWCMS",
-        "alex-kalanis/kw_files": "Accessing stored entries as files on some volume",
-        "alex-kalanis/kw_storage": "Universal storage library for store data as key-value pairs"
+        "predis/predis": "Redis client"
     },
     "require-dev": {
-        "alex-kalanis/kw_storage": "~5.0",
-        "alex-kalanis/kw_files": ">=4.0 <5",
-        "alex-kalanis/kw_paths": ">=4.0 <5",
+        "predis/predis": "^2.2",
+        "furious/psr7": "^1.3",
         "shipmonk/composer-dependency-analyser": "^1.4",
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^1.0",
@@ -41,7 +41,7 @@
     "authors": [
         {
             "name": "Petr Plsek",
-            "homepage": "http://www.kalanys.com",
+            "homepage": "https://www.kalanys.com",
             "role": "Developer"
         }
     ],

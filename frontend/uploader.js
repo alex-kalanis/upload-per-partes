@@ -125,14 +125,15 @@ var UploadedFile = function () {
      */
     this.setInitialInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_RUN;
-        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.serverData = serverResponse.serverKey;
         uploadedFile.totalParts = parseInt(serverResponse.totalParts);
         uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
+        uploadedFile.lastCheckedPart = 0;
         uploadedFile.partSize = parseInt(serverResponse.partSize);
         uploadedFile.errorMessage = serverResponse.errorMessage;
-        uploadedFile.clientData = serverResponse.clientData;
-        uploadedFile.encode = serverResponse.method;
-        uploadedFile.check = serverResponse.checksum;
+        uploadedFile.clientData = serverResponse.roundaboutClient;
+        uploadedFile.encode = serverResponse.encoder;
+        uploadedFile.check = serverResponse.check;
         return uploadedFile;
     };
 
@@ -142,10 +143,10 @@ var UploadedFile = function () {
      */
     this.setRunnerInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_RUN;
-        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.serverData = serverResponse.serverKey;
         uploadedFile.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         uploadedFile.errorMessage = serverResponse.errorMessage;
-        uploadedFile.clientData = serverResponse.clientData;
+        uploadedFile.clientData = serverResponse.roundaboutClient;
         return uploadedFile;
     };
 
@@ -156,9 +157,9 @@ var UploadedFile = function () {
     this.setDoneInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_FINISH;
         uploadedFile.fileName = serverResponse.fileName;
-        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.serverData = serverResponse.serverKey;
         uploadedFile.errorMessage = serverResponse.errorMessage;
-        uploadedFile.clientData = serverResponse.clientData;
+        uploadedFile.clientData = serverResponse.roundaboutClient;
         return uploadedFile;
     };
 
@@ -168,9 +169,9 @@ var UploadedFile = function () {
      */
     this.setCancelInfoFromServer = function(serverResponse) {
         uploadedFile.readStatus = this.STATUS_FINISH;
-        uploadedFile.serverData = serverResponse.serverData;
+        uploadedFile.serverData = serverResponse.serverKey;
         uploadedFile.errorMessage = serverResponse.errorMessage;
-        uploadedFile.clientData = serverResponse.clientData;
+        uploadedFile.clientData = serverResponse.roundaboutClient;
         return uploadedFile;
     };
 
@@ -195,14 +196,6 @@ var UploadedFile = function () {
         }
         uploadedFile.readStatus = status;
         uploadedFile.errorMessage = message;
-        return uploadedFile;
-    };
-
-    /**
-     * @returns {UploadedFile}
-     */
-    this.nextFilePart = function() {
-        uploadedFile.lastKnownPart++;
         return uploadedFile;
     };
 
@@ -466,7 +459,7 @@ var UploaderChecker = function () {
                 {
                     serverData: uploadedFile.serverData,
                     segment: uploadedFile.lastCheckedPart,
-                    method: uploaderChecker.upChecksum.method(),
+                    method: encoder.type(),
                     clientData: uploadedFile.clientData
                 },
                 function(responseData) {
@@ -475,7 +468,7 @@ var UploaderChecker = function () {
                         if (uploadedFile.RESULT_OK === responseData.status) {
                             // got known checksum on remote - check it against local file
                             uploaderChecker.upReader.processFileRead(uploadedFile, uploadedFile.lastCheckedPart, function (result) {
-                                if (responseData.checksum === uploaderChecker.upChecksum.calculate(result)) {
+                                if (responseData.checksum === encoder.calculate(result)) {
                                     // this part is OK, move to the next one
                                     uploaderChecker.processNext(uploadedFile);
                                 } else {
@@ -630,7 +623,7 @@ var UploaderRunner = function () {
                     {
                         serverData: uploadedFile.serverData,
                         content: encoder.encode(result),
-                        method: encoder.method(),
+                        method: encoder.type(),
                         clientData: uploadedFile.clientData
                     },
                     function(responseData) {
@@ -638,7 +631,6 @@ var UploaderRunner = function () {
                             uploadedFile.setRunnerInfoFromServer(responseData);
                             if (uploadedFile.RESULT_OK === responseData.status) {
                                 // everything ok
-                                uploadedFile.nextFilePart();
                                 uploaderRunner.upRenderer.updateBar(uploadedFile.nextCheckedPart());
                                 uploaderRunner.continueRunning(uploadedFile);
                             } else {
@@ -1406,8 +1398,7 @@ var UploaderRenderer  = function () {
      * @return {number}
      */
     this.calculatePercent = function(uploadedFile) {
-        var percent = Math.round((uploadedFile.lastKnownPart) / uploadedFile.totalParts);
-        return !percent ? 0 : percent * 100;
+        return !uploadedFile.totalParts ? 0 : Math.round((uploadedFile.lastKnownPart / uploadedFile.totalParts) * 100);
     };
 
     /**
@@ -1416,8 +1407,7 @@ var UploaderRenderer  = function () {
      * @return {number}
      */
     this.calculateCheckedPercent = function(uploadedFile) {
-        var percent = Math.round(uploadedFile.lastCheckedPart / uploadedFile.totalParts);
-        return !percent ? 0 : percent * 100;
+        return !uploadedFile.totalParts ? 0 : Math.round((uploadedFile.lastCheckedPart / uploadedFile.totalParts) * 100);
     };
 
     /**

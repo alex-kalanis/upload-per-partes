@@ -14,6 +14,6 @@ class Name extends AEncoder
 {
     public function toPath(Data $data): string
     {
-        return $data->tempName;
+        return $data->targetName;
     }
 }

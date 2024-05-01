@@ -15,7 +15,7 @@ class SaltedName extends AEncoder
 {
     public function toPath(Data $data): string
     {
-        $want = $data->tempName;
+        $want = $data->targetName;
         $halfLen = intval(ceil(strlen($want) / 2));
         return RandomStrings::generate($halfLen) . $want . RandomStrings::generate($halfLen);
     }

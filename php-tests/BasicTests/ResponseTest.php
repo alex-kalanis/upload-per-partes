@@ -175,14 +175,14 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals(Responses\BasicResponse::STATUS_OK, $lib->errorMessage);
         $this->assertEquals('mock data', $lib->roundaboutClient);
 
-        $this->assertEquals(44455, $lib->lastKnown);
+        $this->assertEquals(44455, $lib->lastKnownPart);
 
         $this->assertEquals([
             'serverKey' => $this->mockSharedKey(),
             'status' => Responses\BasicResponse::STATUS_OK,
             'errorMessage' => Responses\BasicResponse::STATUS_OK,
             'roundaboutClient' => 'mock data',
-            'lastKnown' => 44455,
+            'lastKnownPart' => 44455,
         ], (array) $lib);
     }
 

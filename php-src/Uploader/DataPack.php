@@ -35,10 +35,9 @@ class DataPack
         return $data;
     }
 
-    public function fillTempData(Data $data, Config $config, string $tempName): Data
+    public function fillTempData(Data $data, Config $config): Data
     {
         $data->tempDir = $config->tempDir;
-        $data->tempName = $tempName;
         return $data;
     }
 

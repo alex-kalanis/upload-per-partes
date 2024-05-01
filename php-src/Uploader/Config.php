@@ -19,6 +19,7 @@ final class Config
     public int $bytesPerPart = 0;
     public bool $canContinue = true;
     public string $tempDir = '';
+    public string $targetDir = '';
     /** @var string|Interfaces\IUppTranslations|null */
     public $lang = null;
     /** @var string|Interfaces\IOperations|null */
@@ -56,6 +57,9 @@ final class Config
         }
         if (isset($params['temp_location'])) {
             $this->tempDir = strval($params['temp_location']);
+        }
+        if (isset($params['target_location'])) {
+            $this->targetDir = strval($params['target_location']);
         }
         if (isset($params['lang'])) {
             if (is_object($params['lang'])) {

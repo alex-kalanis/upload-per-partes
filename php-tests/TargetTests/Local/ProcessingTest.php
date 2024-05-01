@@ -121,7 +121,7 @@ class ProcessingTest extends CommonTestClass
             $this->assertTrue(false, 'No results');
             return;
         }
-        $lastKnownPart = $result5->lastKnown;
+        $lastKnownPart = $result5->lastKnownPart;
         $this->assertEquals(629, $lastKnownPart);
 
         // step 6 - send second part
@@ -209,7 +209,7 @@ class ProcessingTest extends CommonTestClass
         ]));
         $this->assertNotEmpty($lib);
 
-        $tempStorage->write('dummy_file.upload', 'something');
+        $tempStorage->write('dummy_file', 'something');
 
         $result1 = $lib->init('dummy_file', 'dummy_file', 9999);
         $this->assertEquals(Responses\BasicResponse::STATUS_OK, $result1->status);

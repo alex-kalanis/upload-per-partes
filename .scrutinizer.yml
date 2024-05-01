@@ -8,9 +8,11 @@ filter:
     - 'php-tests/*'
     - 'kw_tests/*'
     - 'kw_upload/*'
-  paths: {  }
+  paths:
+    - 'php-src/*'
 
 build:
+  image: default-bionic
   environment:
     php:
       version: '7.4'

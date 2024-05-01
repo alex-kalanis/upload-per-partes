@@ -24,13 +24,14 @@ class EncodersTest extends CommonTestClass
     public function testAll(KeyEncoders\AEncoder $encoder, string $result): void
     {
         $this->assertEquals($result, $encoder->toPath($this->mockData()));
+        $this->assertEquals($result, $encoder->fromData($encoder->toData($this->mockData())));
     }
 
     public function allProvider(): array
     {
         return [
             [new KeyEncoders\FullPath(), '/abcdefabcdef'],
-            [new KeyEncoders\Name(), 'fghjkl.partial'],
+            [new KeyEncoders\Name(), 'abcdef'],
         ];
     }
 

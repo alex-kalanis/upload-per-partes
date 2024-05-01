@@ -70,6 +70,35 @@ class ConfigTest extends CommonTestClass
         $this->assertEquals('wwhh', $lib->tempDir);
     }
 
+    public function testTargetLocation1(): void
+    {
+        $lib = new Uploader\Config([]);
+        $this->assertEquals('', $lib->targetDir);
+    }
+
+    public function testTargetLocation2(): void
+    {
+        $lib = new Uploader\Config(['target_location' => 'baz']);
+        $this->assertEquals('baz', $lib->targetDir);
+    }
+
+    public function testTargetLocation3(): void
+    {
+        $lib = new Uploader\Config(['target_location' => -66]);
+        $this->assertEquals('-66', $lib->targetDir);
+    }
+
+    public function testTargetLocation4(): void
+    {
+        $lib = new Uploader\Config(['target_location' => new class {
+            public function __toString()
+            {
+                return 'wwhh';
+            }
+        }]);
+        $this->assertEquals('wwhh', $lib->targetDir);
+    }
+
     public function testLang1(): void
     {
         $lib = new Uploader\Config([]);

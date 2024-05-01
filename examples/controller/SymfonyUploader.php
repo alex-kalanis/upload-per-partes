@@ -77,7 +77,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
         return new JsonResponse($this->uploader->init(
             static::TARGET_UPLOAD_PATH,
             strval($request->request->get('fileName')),
-            intval($request->request->get('fileSize')),
+            intval(strval($request->request->get('fileSize'))),
             strval($request->request->get('clientData'))
         ));
     }
@@ -117,7 +117,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
     {
         return new JsonResponse($this->uploader->check(
             strval($request->request->get('serverData')),
-            intval($request->request->get('segment')),
+            intval(strval($request->request->get('segment'))),
             strval($request->request->get('method')),
             strval($request->request->get('clientData'))
         ));
@@ -144,7 +144,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
      *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
-     *             @OA\Property(property="lastKnown", type="integer", description="Last known part on server")
+     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server")
      *         )
      *     ),
      * )
@@ -156,7 +156,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
     {
         return new JsonResponse($this->uploader->truncateFrom(
             strval($request->request->get('serverData')),
-            strval($request->request->get('segment')),
+            intval(strval($request->request->get('segment'))),
             strval($request->request->get('clientData'))
         ));
     }
@@ -182,7 +182,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
      *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
-     *             @OA\Property(property="lastKnown", type="integer", description="Last known part on server - from previous step")
+     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous step")
      *         )
      *     ),
      * )

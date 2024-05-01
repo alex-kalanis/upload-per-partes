@@ -126,12 +126,13 @@ class UploadedFile {
      */
     setInitialInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_RUN;
-        this.serverData = serverResponse.serverData;
+        this.serverData = serverResponse.serverKey;
         this.totalParts = parseInt(serverResponse.totalParts);
         this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
+        this.lastCheckedPart = 0;
         this.partSize = parseInt(serverResponse.partSize);
         this.errorMessage = serverResponse.errorMessage;
-        this.clientData = serverResponse.clientData;
+        this.clientData = serverResponse.roundaboutClient;
         this.encode = serverResponse.encoder;
         this.check = serverResponse.check;
         return this;
@@ -143,10 +144,10 @@ class UploadedFile {
      */
     setRunnerInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_RUN;
-        this.serverData = serverResponse.serverData;
+        this.serverData = serverResponse.serverKey;
         this.lastKnownPart = parseInt(serverResponse.lastKnownPart);
         this.errorMessage = serverResponse.errorMessage;
-        this.clientData = serverResponse.clientData;
+        this.clientData = serverResponse.roundaboutClient;
         return this;
     };
 
@@ -157,9 +158,9 @@ class UploadedFile {
     setDoneInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_FINISH;
         this.fileName = serverResponse.fileName;
-        this.serverData = serverResponse.serverData;
+        this.serverData = serverResponse.serverKey;
         this.errorMessage = serverResponse.errorMessage;
-        this.clientData = serverResponse.clientData;
+        this.clientData = serverResponse.roundaboutClient;
         return this;
     };
 
@@ -169,9 +170,9 @@ class UploadedFile {
      */
     setCancelInfoFromServer(serverResponse) {
         this.readStatus = this.STATUS_FINISH;
-        this.serverData = serverResponse.serverData;
+        this.serverData = serverResponse.serverKey;
         this.errorMessage = serverResponse.errorMessage;
-        this.clientData = serverResponse.clientData;
+        this.clientData = serverResponse.roundaboutClient;
         return this;
     };
 
@@ -193,14 +194,6 @@ class UploadedFile {
     setError(message, status = this.STATUS_STOP) {
         this.readStatus = status;
         this.errorMessage = message;
-        return this;
-    }
-
-    /**
-     * @returns {UploadedFile}
-     */
-    nextFilePart() {
-        this.lastKnownPart++;
         return this;
     }
 
@@ -614,7 +607,7 @@ class UploaderRunner {
      */
     uploadPart(uploadedFile) {
         let self = this;
-        this.upRenderer.updateBar(uploadedFile.nextFilePart());
+        this.upRenderer.updateBar(uploadedFile);
         this.upReader.processFileRead(uploadedFile, uploadedFile.lastKnownPart, function (result) {
             let encoder = self.upEncoder.getEncoder(uploadedFile.encode);
             if (self.upEncoder.can(encoder)) {
@@ -1389,8 +1382,7 @@ class UploaderRenderer {
      * @return {numeric}
      */
     static calculatePercent (uploadedFile) {
-        let percent = Math.round((uploadedFile.lastKnownPart) / uploadedFile.totalParts);
-        return !percent ? 0 : percent * 100;
+        return !uploadedFile.totalParts ? 0 : Math.round((uploadedFile.lastKnownPart / uploadedFile.totalParts) * 100);
     }
 
     /**
@@ -1399,8 +1391,7 @@ class UploaderRenderer {
      * @return {numeric}
      */
     static calculateCheckedPercent (uploadedFile) {
-        let percent = Math.round(uploadedFile.lastCheckedPart / uploadedFile.totalParts);
-        return !percent ? 0 : percent * 100;
+        return !uploadedFile.totalParts ? 0 : Math.round((uploadedFile.lastCheckedPart / uploadedFile.totalParts) * 100);
     };
 
     /**

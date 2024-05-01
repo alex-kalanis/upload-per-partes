@@ -80,7 +80,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
         return new JsonResponse($this->uploader->init(
             static::TARGET_UPLOAD_PATH,
             strval($request->post('fileName')),
-            intval($request->post('fileSize')),
+            intval(strval($request->post('fileSize'))),
             strval($request->post('clientData'))
         ));
     }
@@ -120,7 +120,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
     {
         return new JsonResponse($this->uploader->check(
             strval($request->post('serverData')),
-            intval($request->post('segment')),
+            intval(strval($request->post('segment'))),
             strval($request->post('method')),
             strval($request->post('clientData'))
         ));
@@ -147,7 +147,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
      *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
-     *             @OA\Property(property="lastKnown", type="integer", description="Last known part on server")
+     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server")
      *         )
      *     ),
      * )
@@ -159,7 +159,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
     {
         return new JsonResponse($this->uploader->truncateFrom(
             strval($request->post('serverData')),
-            strval($request->post('segment')),
+            intval(strval($request->post('segment'))),
             strval($request->post('clientData'))
         ));
     }
@@ -185,7 +185,7 @@ class LaravelUploader extends Controller //  extends \yourFavouriteFrameworkCont
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
      *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
-     *             @OA\Property(property="lastKnown", type="integer", description="Last known part on server - from previous step")
+     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous step")
      *         )
      *     ),
      * )

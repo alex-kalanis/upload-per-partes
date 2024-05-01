@@ -35,11 +35,21 @@ class TemporaryStorage
     /**
      * @param Data $data
      * @throws UploadException
+     * @return Data
+     */
+    public function fillData(Data $data): Data
+    {
+        return $this->keyModifier->toData($data);
+    }
+
+    /**
+     * @param Data $data
+     * @throws UploadException
      * @return bool
      */
     public function exists(Data $data): bool
     {
-        return $this->storage->exists($this->keyModifier->toPath($data));
+        return $this->storage->exists($this->keyModifier->fromData($data));
     }
 
     /**
@@ -50,7 +60,7 @@ class TemporaryStorage
      */
     public function checksumData(Data $data, int $fromByte): string
     {
-        $data = $this->storage->readData($this->keyModifier->toPath($data), $fromByte, $data->bytesPerPart);
+        $data = $this->storage->readData($this->keyModifier->fromData($data), $fromByte, $data->bytesPerPart);
         if (empty($data)) {
             throw new UploadException($this->getUppLang()->uppChecksumIsEmpty());
         }
@@ -65,7 +75,7 @@ class TemporaryStorage
      */
     public function truncate(Data $data, int $fromByte): bool
     {
-        return $this->storage->truncate($this->keyModifier->toPath($data), $fromByte);
+        return $this->storage->truncate($this->keyModifier->fromData($data), $fromByte);
     }
 
     /**
@@ -76,7 +86,7 @@ class TemporaryStorage
      */
     public function upload(Data $data, string $content): bool
     {
-        return $this->storage->append($this->keyModifier->toPath($data), $content);
+        return $this->storage->append($this->keyModifier->fromData($data), $content);
     }
 
     /**
@@ -86,7 +96,7 @@ class TemporaryStorage
      */
     public function read(Data $data)
     {
-        return $this->storage->readStream($this->keyModifier->toPath($data));
+        return $this->storage->readStream($this->keyModifier->fromData($data));
     }
 
     /**
@@ -96,6 +106,6 @@ class TemporaryStorage
      */
     public function remove(Data $data)
     {
-        return $this->storage->remove($this->keyModifier->toPath($data));
+        return $this->storage->remove($this->keyModifier->fromData($data));
     }
 }

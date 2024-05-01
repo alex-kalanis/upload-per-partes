@@ -23,4 +23,20 @@ abstract class AEncoder
      * @return string
      */
     abstract public function toPath(Data $data): string;
+
+    /**
+     * @param Data $data
+     * @throws UploadException
+     * @return Data
+     */
+    public function toData(Data $data): Data
+    {
+        $data->tempName = $this->toPath($data);
+        return $data;
+    }
+
+    public function fromData(Data $data): string
+    {
+        return $data->tempName;
+    }
 }

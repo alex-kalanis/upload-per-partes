@@ -33,12 +33,12 @@ class Factory
             return $config->finalStorage;
         }
         if ($config->finalStorage instanceof IStorage) {
-            return new Storage($config->finalStorage, $config->tempDir, $this->getUppLang());
+            return new Storage($config->finalStorage, $config->targetDir, $this->getUppLang());
         }
         if ($config->finalStorage instanceof CompositeAdapter) {
             try {
                 $ap = new ArrayPath();
-                return new Files($config->finalStorage, $ap->setString($config->tempDir)->getArray(), $ap, $this->getUppLang());
+                return new Files($config->finalStorage, $ap->setString($config->targetDir)->getArray(), $ap, $this->getUppLang());
                 // @codeCoverageIgnoreStart
             } catch (PathsException $ex) {
                 throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
@@ -48,7 +48,7 @@ class Factory
 
         switch ($config->finalStorage) {
             case 'volume':
-                return new Volume($config->tempDir, $this->getUppLang());
+                return new Volume($config->targetDir, $this->getUppLang());
             default:
                 if (is_string($config->finalStorage)) {
                     return new Volume($config->finalStorage, $this->getUppLang());

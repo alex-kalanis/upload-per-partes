@@ -83,11 +83,10 @@ class Processing implements Interfaces\IOperations
             $this->calculates->getBytesPerPart(),
             0
         );
-        $data = $this->dataPack->fillTempData(
+        $data = $this->tempStorage->fillData($this->dataPack->fillTempData(
             $initialData,
-            $this->uploadConfig,
-            $this->drivingFile->keyByData($initialData)
-        );
+            $this->uploadConfig
+        ));
 
         $alreadyKnown = false;
         if ($this->drivingFile->existsByData($data)) {

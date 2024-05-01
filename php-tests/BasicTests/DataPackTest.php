@@ -50,9 +50,8 @@ class DataPackTest extends CommonTestClass
     public function testTempDir(): void
     {
         $lib = new Uploader\DataPack(new Uploader\Data());
-        $data = $lib->fillTempData(new Uploader\Data(), new Uploader\Config(['temp_location' => 'whatever']), 'foo_bar');
+        $data = $lib->fillTempData(new Uploader\Data(), new Uploader\Config(['temp_location' => 'whatever']));
         $this->assertEquals('whatever', $data->tempDir);
-        $this->assertEquals('foo_bar', $data->tempName);
     }
 
     public function testNextSegment1(): void

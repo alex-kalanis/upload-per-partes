@@ -91,7 +91,7 @@ class UploaderTest extends CommonTestClass
         $this->assertEquals('foo', $data->serverKey);
         $this->assertEquals('roundabout', $data->roundaboutClient);
 
-        $this->assertEquals(777, $data->lastKnown);
+        $this->assertEquals(777, $data->lastKnownPart);
     }
 
     /**
@@ -121,7 +121,7 @@ class UploaderTest extends CommonTestClass
         $this->assertEquals('foo', $data->serverKey);
         $this->assertEquals('roundabout', $data->roundaboutClient);
 
-        $this->assertEquals(888, $data->lastKnown);
+        $this->assertEquals(888, $data->lastKnownPart);
     }
 
     /**

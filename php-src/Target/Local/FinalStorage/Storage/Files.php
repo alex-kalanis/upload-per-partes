@@ -66,13 +66,18 @@ class Files implements IFinalStorage
     public function findName(string $key): string
     {
         try {
-            $this->paths->setArray($this->fullPath($key));
+            $this->paths->setString($key);
             $fileName = $this->paths->getFileName();
-            return $this->freeName->findFreeName(
-                $this->paths->getArrayDirectory(),
+            $directory = $this->paths->getArrayDirectory();
+            $freeName = $this->freeName->findFreeName(
+                array_merge($this->targetDir, $directory),
                 Stuff::fileBase($fileName),
                 '.' . Stuff::fileExt($fileName)
             );
+            return $this->paths->setArray(array_merge(
+                $directory,
+                [$freeName]
+            ))->getString();
         } catch (FilesException | PathsException $ex) {
             throw new UploadException($this->getUppLang()->uppCannotWriteFile($key), $ex->getCode(), $ex);
         }

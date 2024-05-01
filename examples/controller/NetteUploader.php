@@ -42,7 +42,7 @@ class NetteUploader extends \Nette\Application\UI\Presenter //  extends \yourFav
         $this->sendJson($this->uploader->init(
             static::TARGET_UPLOAD_PATH,
             strval($this->getHttpRequest()->getPost()->__get('fileName')),
-            intval($this->getHttpRequest()->getPost()->__get('fileSize')),
+            intval(strval($this->getHttpRequest()->getPost()->__get('fileSize'))),
             strval($this->getHttpRequest()->getPost()->__get('clientData'))
         ));
     }
@@ -51,7 +51,7 @@ class NetteUploader extends \Nette\Application\UI\Presenter //  extends \yourFav
     {
         $this->sendJson($this->uploader->check(
             strval($this->getHttpRequest()->getPost()->__get('serverData')),
-            intval($this->getHttpRequest()->getPost()->__get('segment')),
+            intval(strval($this->getHttpRequest()->getPost()->__get('segment'))),
             strval($this->getHttpRequest()->getPost()->__get('method')),
             strval($this->getHttpRequest()->getPost()->__get('clientData'))
         ));
@@ -61,7 +61,7 @@ class NetteUploader extends \Nette\Application\UI\Presenter //  extends \yourFav
     {
         $this->sendJson($this->uploader->truncateFrom(
             strval($this->getHttpRequest()->getPost()->__get('serverData')),
-            strval($this->getHttpRequest()->getPost()->__get('segment')),
+            intval(strval($this->getHttpRequest()->getPost()->__get('segment'))),
             strval($this->getHttpRequest()->getPost()->__get('clientData'))
         ));
     }

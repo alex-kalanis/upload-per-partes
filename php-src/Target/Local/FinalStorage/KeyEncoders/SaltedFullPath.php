@@ -3,7 +3,6 @@
 namespace kalanis\UploadPerPartes\Target\Local\FinalStorage\KeyEncoders;
 
 
-use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Uploader\Data;
 use kalanis\UploadPerPartes\Uploader\RandomStrings;
 

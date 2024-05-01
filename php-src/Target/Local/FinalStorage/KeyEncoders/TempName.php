@@ -7,13 +7,13 @@ use kalanis\UploadPerPartes\Uploader\Data;
 
 
 /**
- * Class Name
+ * Class TempName
  * @package kalanis\UploadPerPartes\Target\Local\FinalStorage\KeyEncoders
  */
-class Name extends AEncoder
+class TempName extends AEncoder
 {
     public function toPath(Data $data): string
     {
-        return $data->targetName;
+        return $data->tempName;
     }
 }

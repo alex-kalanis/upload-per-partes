@@ -10,11 +10,11 @@ namespace kalanis\UploadPerPartes\Responses;
  */
 class LastKnownResponse extends BasicResponse
 {
-    public int $lastKnown = 0;
+    public int $lastKnownPart = 0;
 
-    public function setLastKnown(int $lastKnown): self
+    public function setLastKnown(int $lastKnownPart): self
     {
-        $this->lastKnown = $lastKnown;
+        $this->lastKnownPart = $lastKnownPart;
         return $this;
     }
 }

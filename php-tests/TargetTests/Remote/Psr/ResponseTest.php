@@ -125,7 +125,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('OK', $lib->errorMessage);
         $this->assertEquals('pass back', $lib->roundaboutClient);
 
-        $this->assertEquals(84364, $lib->lastKnown);
+        $this->assertEquals(84364, $lib->lastKnownPart);
     }
 
     /**
@@ -152,7 +152,7 @@ class ResponseTest extends CommonTestClass
         $this->assertEquals('OK', $lib->errorMessage);
         $this->assertEquals('pass back', $lib->roundaboutClient);
 
-        $this->assertEquals(84364, $lib->lastKnown);
+        $this->assertEquals(84364, $lib->lastKnownPart);
     }
 
     /**
