@@ -16,9 +16,9 @@ class EncodersTest extends CommonTestClass
     }
 
     /**
-     * @throws UploadException
      * @param KeyEncoders\AEncoder $encoder
      * @param string $result
+     * @throws UploadException
      * @dataProvider allProvider
      */
     public function testAll(KeyEncoders\AEncoder $encoder, string $result): void
@@ -37,8 +37,8 @@ class EncodersTest extends CommonTestClass
     }
 
     /**
-     * @throws UploadException
      * @param KeyEncoders\AEncoder $encoder
+     * @throws UploadException
      * @dataProvider randomProvider
      */
     public function testRandom(KeyEncoders\AEncoder $encoder): void
