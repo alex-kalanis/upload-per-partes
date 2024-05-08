@@ -4,6 +4,7 @@ namespace TargetTests\Local\ContentDecoders;
 
 
 use CommonTestClass;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Interfaces\IContentDecoder;
 use kalanis\UploadPerPartes\Target\Local\ContentDecoders;
 use kalanis\UploadPerPartes\Traits\TLangInit;
@@ -73,6 +74,12 @@ class XFactory extends ContentDecoders\Factory
         10 => \stdClass::class,
         999 => 'this-class-does-not-exists',
     ];
+
+    public function __construct(?Interfaces\IUppTranslations $lang = null)
+    {
+        parent::__construct($lang);
+        $this->map[999] = PHP_VERSION_ID > 77000 ? 'this-class-does-not-exists' : '"this-class-does-not-exists"';
+    }
 }
 
 

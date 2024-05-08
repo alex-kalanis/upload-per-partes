@@ -54,7 +54,7 @@ class LangTest extends CommonTestClass
     {
         $lib = new Uploader\LangFactory('wrong variant 3');
         $conf = new Uploader\Config([]);
-        $conf->lang = 'class-not-exists';
+        $conf->lang = PHP_VERSION_ID > 77000 ? 'class-not-exists' : '"class-not-exists"';
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Class "class-not-exists" does not exist');
         $lib->getLang($conf);

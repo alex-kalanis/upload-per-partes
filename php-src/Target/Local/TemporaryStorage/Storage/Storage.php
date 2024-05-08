@@ -47,7 +47,10 @@ class Storage implements ITemporaryStorage
         try {
             $fullPath = $this->fullPath($path);
             $current = $this->storage->exists($fullPath) ? $this->storage->read($fullPath) : '';
-            return substr($current, intval($fromByte), $length);
+            return is_null($length)
+                ? substr($current, intval($fromByte))
+                : substr($current, intval($fromByte), $length)
+            ;
         } catch (StorageException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }

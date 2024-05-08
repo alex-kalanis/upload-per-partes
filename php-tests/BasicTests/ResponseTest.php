@@ -4,6 +4,7 @@ namespace BasicTests;
 
 
 use CommonTestClass;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Responses;
 use kalanis\UploadPerPartes\UploadException;
 
@@ -247,4 +248,10 @@ class XFFactory extends Responses\Factory
         'std' => \stdClass::class,
         'failed' => 'not-a-class',
     ];
+
+    public function __construct(?Interfaces\IUppTranslations $lang = null)
+    {
+        parent::__construct($lang);
+        $this->responses['failed'] = PHP_VERSION_ID > 77000 ? 'not-a-class' : '"not-a-class"';
+    }
 }

@@ -33,7 +33,11 @@ class Volume implements ITemporaryStorage
 
     public function readData(string $path, ?int $fromByte, ?int $length): string
     {
-        $content = @file_get_contents($this->fullPath($path), false, null, intval($fromByte), $length);
+        if (PHP_VERSION_ID > 77000 || !is_null($length)) {
+            $content = @file_get_contents($this->fullPath($path), false, null, intval($fromByte), $length);
+        } else {
+            $content = @file_get_contents($this->fullPath($path), false, null, intval($fromByte));
+        }
         if (false === $content) {
             throw new UploadException($this->getUppLang()->uppCannotReadFile($path));
         }

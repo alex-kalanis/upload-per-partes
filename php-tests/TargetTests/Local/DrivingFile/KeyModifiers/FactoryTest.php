@@ -4,6 +4,7 @@ namespace TargetTests\Local\DrivingFile\KeyModifiers;
 
 
 use CommonTestClass;
+use kalanis\UploadPerPartes\Interfaces;
 use kalanis\UploadPerPartes\Target\Local\DrivingFile\KeyModifiers;
 use kalanis\UploadPerPartes\UploadException;
 
@@ -91,6 +92,12 @@ class XFactory extends KeyModifiers\Factory
         10 => \stdClass::class,
         999 => 'this-class-does-not-exists',
     ];
+
+    public function __construct(?Interfaces\IUppTranslations $lang = null)
+    {
+        parent::__construct($lang);
+        $this->map[999] = PHP_VERSION_ID > 77000 ? 'this-class-does-not-exists' : '"this-class-does-not-exists"';
+    }
 }
 
 
