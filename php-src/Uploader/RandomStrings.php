@@ -36,6 +36,6 @@ class RandomStrings
     public static function randomLength(): string
     {
         $which = md5(strval(rand()));
-        return strval(substr($which, 0, intval(octdec(substr($which, -1)))));
+        return strval(substr($which, 0, intval(hexdec(bin2hex(substr($which, -1))))));
     }
 }
