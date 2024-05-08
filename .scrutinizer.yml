@@ -15,7 +15,7 @@ build:
   image: default-bionic
   environment:
     php:
-      version: '7.4'
+      version: '7.4.33'
   dependencies:
     before:
       - wget -O composer.phar https://getcomposer.org/composer.phar
