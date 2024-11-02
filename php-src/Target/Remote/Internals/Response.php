@@ -29,12 +29,12 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function init(string $response, string $clientData): Responses\BasicResponse
+    public function init(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
@@ -61,12 +61,12 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function check(string $response, string $clientData): Responses\BasicResponse
+    public function check(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
@@ -89,12 +89,12 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function truncate(string $response, string $clientData): Responses\BasicResponse
+    public function truncate(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
@@ -116,12 +116,12 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function upload(string $response, string $clientData): Responses\BasicResponse
+    public function upload(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
@@ -143,12 +143,12 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function done(string $response, string $clientData): Responses\BasicResponse
+    public function done(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
@@ -170,17 +170,16 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @param string $clientData
      * @throws UploadException
      * @return Responses\BasicResponse
      */
-    public function cancel(string $response, string $clientData): Responses\BasicResponse
+    public function cancel(ResponseData $response, string $clientData): Responses\BasicResponse
     {
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
             $data = $this->responseFactory->getResponse(Responses\Factory::RESPONSE_CANCEL);
-            /** @var Responses\BasicResponse $data */
             return $data->setBasics(
                 strval($parsed->serverKey ?? ''),
                 $clientData
@@ -209,14 +208,14 @@ class Response
     }
 
     /**
-     * @param string $response
+     * @param ResponseData $response
      * @throws UploadException
      * @return stdClass
      */
-    protected function parseResponse(string $response): stdClass
+    protected function parseResponse(ResponseData $response): stdClass
     {
         try {
-            $parsed = json_decode($response, false, 2, JSON_THROW_ON_ERROR);
+            $parsed = json_decode(strval($response->data), false, 2, JSON_THROW_ON_ERROR);
         } catch (JsonException $ex) {
             throw new UploadException($ex->getMessage(), $ex->getCode(), $ex);
         }

@@ -4,11 +4,11 @@ namespace kalanis\UploadPerPartes\Target\Remote\Internals;
 
 
 /**
- * Class Data
+ * Class RequestData
  * @package kalanis\UploadPerPartes\Target\Remote\Internals
  * Configuration of remote querying on internal
  */
-class Data
+class RequestData
 {
     public string $path = '';
     /** @var array<string, array<string, string|int>> */

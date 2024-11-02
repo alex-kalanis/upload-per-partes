@@ -94,7 +94,7 @@ class InternalsTest extends CommonTestClass
 
         return new Internals(
             new XInternalsClient(),
-            new Internals\Request($conf, new Internals\Data()),
+            new Internals\Request($conf, new Internals\RequestData()),
             new Internals\Response(new Factory())
         );
     }
@@ -103,23 +103,23 @@ class InternalsTest extends CommonTestClass
 
 class XInternalsClient extends Internals\Client
 {
-    public function request(Internals\Data $data): string
+    public function request(Internals\RequestData $data): Internals\ResponseData
     {
         switch ($data->path) {
             case 'start':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoders":"code","checksum":"sum"}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoders":"code","checksum":"sum"}');
             case 'tell':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","method":"test","checksum":"blablablabla"}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","method":"test","checksum":"blablablabla"}');
             case 'cut':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}');
             case 'run':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}');
             case 'finish':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}');
             case 'storno':
-                return '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}';
+                return new Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}');
             case 'error':
-                return '{"status":"FAIL","message":"Something happend"}';
+                return new Internals\ResponseData([], '{"status":"FAIL","message":"Something happend"}');
             default:
                 throw new UploadException('Unknown target!');
         }

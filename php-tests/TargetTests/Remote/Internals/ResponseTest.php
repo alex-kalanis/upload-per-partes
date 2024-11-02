@@ -18,7 +18,7 @@ class ResponseTest extends CommonTestClass
     {
         $this->expectException(UploadException::class);
         $this->expectExceptionMessage('Syntax error');
-        $this->getLib()->init("*not-a-json-string", 'whatever');
+        $this->getLib()->init(new Remote\Internals\ResponseData([], "*not-a-json-string"), 'whatever');
     }
 
     /**
@@ -26,7 +26,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testInitOkNoData(): void
     {
-        $lib = $this->getLib()->init('{"status":"OK","message":"OK"}', 'pass back');
+        $lib = $this->getLib()->init(new Remote\Internals\ResponseData([], '{"status":"OK","message":"OK"}'), 'pass back');
         /** @var Responses\InitResponse $lib */
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -46,7 +46,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testInitOkFilledData(): void
     {
-        $lib = $this->getLib()->init('{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoder":"code","check":"sum"}', 'pass back');
+        $lib = $this->getLib()->init(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"which one","totalParts":813143,"lastKnownPart":54531,"partSize":1853,"encoder":"code","check":"sum"}'), 'pass back');
         /** @var Responses\InitResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -66,7 +66,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testInitFailInfo(): void
     {
-        $lib = $this->getLib()->init('{"status":"FAIL","message":"Something happend"}', 'pass back');
+        $lib = $this->getLib()->init(new Remote\Internals\ResponseData([], '{"status":"FAIL","message":"Something happend"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('Something happend', $lib->errorMessage);
@@ -78,7 +78,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testInitFailNoData(): void
     {
-        $lib = $this->getLib()->init('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->init(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);
@@ -90,7 +90,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testCheckOk(): void
     {
-        $lib = $this->getLib()->check('{"serverKey":"my_server","status":"OK","message":"OK","checksum":"blablablabla"}', 'pass back');
+        $lib = $this->getLib()->check(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","checksum":"blablablabla"}'), 'pass back');
         /** @var Responses\CheckResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -105,7 +105,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testCheckFail(): void
     {
-        $lib = $this->getLib()->check('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->check(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);
@@ -117,7 +117,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testTruncateOk(): void
     {
-        $lib = $this->getLib()->truncate('{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}', 'pass back');
+        $lib = $this->getLib()->truncate(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}'), 'pass back');
         /** @var Responses\LastKnownResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -132,7 +132,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testTruncateFail(): void
     {
-        $lib = $this->getLib()->truncate('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->truncate(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);
@@ -144,7 +144,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testUploadOk(): void
     {
-        $lib = $this->getLib()->upload('{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}', 'pass back');
+        $lib = $this->getLib()->upload(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","lastKnown":84364}'), 'pass back');
         /** @var Responses\LastKnownResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -159,7 +159,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testUploadFail(): void
     {
-        $lib = $this->getLib()->upload('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->upload(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);
@@ -171,7 +171,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testDoneOk(): void
     {
-        $lib = $this->getLib()->done('{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}', 'pass back');
+        $lib = $this->getLib()->done(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}'), 'pass back');
         /** @var Responses\DoneResponse $lib */
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
@@ -186,7 +186,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testDoneFail(): void
     {
-        $lib = $this->getLib()->done('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->done(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);
@@ -198,7 +198,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testCancelOk(): void
     {
-        $lib = $this->getLib()->cancel('{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}', 'pass back');
+        $lib = $this->getLib()->cancel(new Remote\Internals\ResponseData([], '{"serverKey":"my_server","status":"OK","message":"OK","name":"ijnuhbzgvftc"}'), 'pass back');
         $this->assertEquals('my_server', $lib->serverKey);
         $this->assertEquals('OK', $lib->status);
         $this->assertEquals('OK', $lib->errorMessage);
@@ -210,7 +210,7 @@ class ResponseTest extends CommonTestClass
      */
     public function testCancelFail(): void
     {
-        $lib = $this->getLib()->cancel('{"status":"FAIL"}', 'pass back');
+        $lib = $this->getLib()->cancel(new Remote\Internals\ResponseData([], '{"status":"FAIL"}'), 'pass back');
         $this->assertEquals('', $lib->serverKey);
         $this->assertEquals('FAIL', $lib->status);
         $this->assertEquals('', $lib->errorMessage);

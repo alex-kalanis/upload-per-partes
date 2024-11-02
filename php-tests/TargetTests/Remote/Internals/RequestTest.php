@@ -118,6 +118,6 @@ class RequestTest extends CommonTestClass
         $conf->uploadPath = 'push';
         $conf->donePath = 'final';
         $conf->cancelPath = 'storno';
-        return new Remote\Internals\Request($conf, new Remote\Internals\Data());
+        return new Remote\Internals\Request($conf, new Remote\Internals\RequestData());
     }
 }

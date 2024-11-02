@@ -14,40 +14,40 @@ use kalanis\UploadPerPartes\Target\Remote;
 class Request
 {
     protected Remote\Config $config;
-    protected Data $data;
+    protected RequestData $data;
 
-    public function __construct(Remote\Config $config, Data $data)
+    public function __construct(Remote\Config $config, RequestData $data)
     {
         $this->config = $config;
         $this->data = $data;
     }
 
-    public function init(string $targetPath, string $fileName, int $fileSize): Data
+    public function init(string $targetPath, string $fileName, int $fileSize): RequestData
     {
         return $this->processQuery($this->config->initPath, compact('targetPath', 'fileName', 'fileSize'));
     }
 
-    public function check(string $serverData, int $segment, string $method): Data
+    public function check(string $serverData, int $segment, string $method): RequestData
     {
         return $this->processQuery($this->config->checkPath, compact('serverData', 'segment', 'method'));
     }
 
-    public function truncate(string $serverData, int $segment): Data
+    public function truncate(string $serverData, int $segment): RequestData
     {
         return $this->processQuery($this->config->truncatePath, compact('serverData', 'segment'));
     }
 
-    public function upload(string $serverData, string $content, string $method): Data
+    public function upload(string $serverData, string $content, string $method): RequestData
     {
         return $this->processQuery($this->config->uploadPath, compact('serverData', 'content', 'method'));
     }
 
-    public function done(string $serverData): Data
+    public function done(string $serverData): RequestData
     {
         return $this->processQuery($this->config->donePath, compact('serverData'));
     }
 
-    public function cancel(string $serverData): Data
+    public function cancel(string $serverData): RequestData
     {
         return $this->processQuery($this->config->cancelPath, compact('serverData'));
     }
@@ -55,9 +55,9 @@ class Request
     /**
      * @param string $path
      * @param array<string, string|int> $params
-     * @return Data
+     * @return RequestData
      */
-    protected function processQuery(string $path, array $params): Data
+    protected function processQuery(string $path, array $params): RequestData
     {
         $data = clone $this->data;
         $remotePath = $this->config->targetHost;

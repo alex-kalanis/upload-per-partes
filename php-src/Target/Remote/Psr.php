@@ -28,12 +28,12 @@ class Psr implements IOperations
         $this->response = $response;
     }
 
-    public function init(string $targetPath, string $fileName, int $length, string $clientData = ''): BasicResponse
+    public function init(string $targetPath, string $targetFileName, int $length, string $clientData = ''): BasicResponse
     {
         try {
             return $this->response->init(
                 $this->client->sendRequest(
-                    $this->request->init($targetPath, $fileName, $length)
+                    $this->request->init($targetPath, $targetFileName, $length)
                 ),
                 $clientData
             );

@@ -25,11 +25,11 @@ class Internals implements IOperations
         $this->response = $response;
     }
 
-    public function init(string $targetPath, string $fileName, int $length, string $clientData = ''): BasicResponse
+    public function init(string $targetPath, string $targetFileName, int $length, string $clientData = ''): BasicResponse
     {
         return $this->response->init(
             $this->client->request(
-                $this->request->init($targetPath, $fileName, $length)
+                $this->request->init($targetPath, $targetFileName, $length)
             ),
             $clientData
         );

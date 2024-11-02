@@ -99,7 +99,7 @@ class Factory
                 new Remote\Internals\Client(),
                 new Remote\Internals\Request(
                     $this->remoteConfig($url),
-                    new Remote\Internals\Data()
+                    new Remote\Internals\RequestData()
                 ),
                 new Remote\Internals\Response(new Responses\Factory($this->getUppLang()), $this->getUppLang())
             );

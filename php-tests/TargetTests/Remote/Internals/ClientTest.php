@@ -15,10 +15,10 @@ class ClientTest extends CommonTestClass
      */
     public function testOK(): void
     {
-        $data = new Internals\Data();
+        $data = new Internals\RequestData();
         $data->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'dummy.txt';
         $lib = new Internals\Client();
-        $this->assertEquals('DUMMY DUMMY DUMMY', $lib->request($data));
+        $this->assertEquals('DUMMY DUMMY DUMMY', $lib->request($data)->data);
     }
 
     /**
@@ -26,7 +26,7 @@ class ClientTest extends CommonTestClass
      */
     public function testFailed(): void
     {
-        $data = new Internals\Data();
+        $data = new Internals\RequestData();
         $data->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'not-exists.txt';
         $lib = new Internals\Client();
         $this->expectException(UploadException::class);
