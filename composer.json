@@ -20,6 +20,8 @@
         "ext-mbstring": "*"
     },
     "suggest": {
+        "zircote/swagger-php": "OpenAPI anotations",
+        "doctrine/annotations": "OpenAPI anotations support",
         "predis/predis": "Redis client"
     },
     "require-dev": {

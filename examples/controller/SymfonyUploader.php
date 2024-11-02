@@ -57,12 +57,12 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here"),
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
      *             @OA\Property(property="name", type="string", description="Uploaded file name - from server"),
-     *             @OA\Property(property="totalParts", type="integer", description="How many parts will be wanted")
-     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous try")
-     *             @OA\Property(property="partSize", type="integer", description="How big will be datain single part before encoding")
+     *             @OA\Property(property="totalParts", type="integer", description="How many parts will be wanted"),
+     *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous try"),
+     *             @OA\Property(property="partSize", type="integer", description="How big will be datain single part before encoding"),
      *             @OA\Property(property="encoder", type="string", description="Which encoder will be used to pack data"),
      *             @OA\Property(property="check", type="string", description="Which method will be used to calculate checksum")
      *         )
@@ -102,10 +102,10 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here"),
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
      *             @OA\Property(property="method", type="string", description="How the segment checksum was calculated"),
-     *             @OA\Property(property="checksum", type="string", description="Checksum of part"),
+     *             @OA\Property(property="checksum", type="string", description="Checksum of part")
      *         )
      *     ),
      * )
@@ -142,7 +142,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here"),
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
      *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server")
      *         )
@@ -180,7 +180,7 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here"),
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
      *             @OA\Property(property="lastKnownPart", type="integer", description="Last known part on server - from previous step")
      *         )
@@ -218,8 +218,8 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
-     *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here").
+     *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server")
      *         )
      *     ),
      * )
@@ -253,9 +253,9 @@ class SymfonyUploader extends AbstractController //  extends \yourFavouriteFrame
      *         @OA\JsonContent(
      *             @OA\Property(property="serverKey", type="string", description="Shared key"),
      *             @OA\Property(property="status", type="string", description="How the upload runs"),
-     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here")
+     *             @OA\Property(property="errorMessage", type="string", description="When became problems, the description will be here"),
      *             @OA\Property(property="roundaboutClient", type="string", description="Roundabout info package from server"),
-     *             @OA\Property(property="name", type="string", description="Final name on server"),
+     *             @OA\Property(property="name", type="string", description="Final name on server")
      *         )
      *     ),
      * )

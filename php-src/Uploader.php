@@ -3,7 +3,6 @@
 namespace kalanis\UploadPerPartes;
 
 
-use kalanis\UploadPerPartes\Interfaces;
 use Psr\Container\ContainerInterface;
 
 
@@ -23,12 +22,12 @@ class Uploader
      *              "calc_size"?: int|object|null,
      *              "temp_location"?: string|null,
      *              "target_location"?: string|null,
-     *              "lang"?: string|int|object|null,
-     *              "target"?: string|int|object|null,
-     *              "data_encoder"?: string|int|object|null,
-     *              "data_modifier"?: string|int|object|null,
-     *              "key_encoder"?: string|int|object|null,
-     *              "key_modifier"?: string|int|object|null,
+     *              "lang"?: string|object|null,
+     *              "target"?: string|object|null,
+     *              "data_encoder"?: string|object|null,
+     *              "data_modifier"?: string|object|null,
+     *              "key_encoder"?: string|object|null,
+     *              "key_modifier"?: string|object|null,
      *              "driving_file"?: string|int|object|null,
      *              "temp_storage"?: string|int|object|null,
      *              "temp_encoder"?: string|int|object|null,
@@ -42,7 +41,7 @@ class Uploader
      */
     public function __construct(
         ?ContainerInterface $container = null,
-        $params = []
+        array $params = []
     )
     {
         $this->errorResponse = new Responses\ErrorResponse();

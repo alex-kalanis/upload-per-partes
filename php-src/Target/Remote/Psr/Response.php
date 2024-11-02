@@ -181,7 +181,6 @@ class Response
         $parsed = $this->parseResponse($response);
         if (Responses\BasicResponse::STATUS_OK == $parsed->status) {
             $data = $this->responseFactory->getResponse(Responses\Factory::RESPONSE_CANCEL);
-            /** @var Responses\BasicResponse $data */
             return $data->setBasics(
                 strval($parsed->serverKey ?? ''),
                 $clientData
